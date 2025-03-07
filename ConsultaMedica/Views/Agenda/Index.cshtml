@@ -1,0 +1,290 @@
+﻿@model ConsultaMedica.Models.Citas
+@{
+    ViewData["Title"] = "Index";
+}
+
+<?php include_once "../global/conexion.php"; ?>
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Agenda</title>
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    <!--css-->
+    <link rel="stylesheet" href="../css/estilos.css">
+    <!-- Remix Icon CSS (para los iconos) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Incluir Notiflix -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-3.2.6.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-3.2.6.min.js"></script>
+    <!-- CSS for full calender -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.css" rel="stylesheet" />
+    <!-- JS for jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- JS for full calender -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
+    <!-- bootstrap css and js -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!--banderas-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</head>
+
+<body>
+    <div class="main-content">
+        <div class="container-fluid text-end">
+            <!-- Fila superior: Seleccione el doctor y botones de vista -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="d-flex gap-2 justify-content-start">
+                        <!-- Dropdown para "Seleccione el doctor" -->
+                        <div class="dropdown">
+                            <button class="btn btn-success dropdown-toggle text-white" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false"
+                                    style="background-color: #00826F; border: none;">
+                                Seleccione el doctor
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Doctor 1</a></li>
+                                <li><a class="dropdown-item" href="#">Doctor 2</a></li>
+                                <li><a class="dropdown-item" href="#">Doctor 3</a></li>
+                            </ul>
+                        </div>
+                        <a class="btn btn-success text-white" style="background-color: #00826F; border: none;">
+                            <!-- Ajusta el ancho según necesites -->
+                            <i class="ri-user-heart-line"></i> Ver ficha
+                        </a>
+                        <div class="btn-group">
+                            <div class="dropdown">
+                                <button class=" btn btn-success dropdown-toggle text-white" type="button"
+                                        id="miniCalendarDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                        style="background-color: #00826F; border: none;">
+                                    <i class="ri-calendar-2-line"></i> Calendario
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="miniCalendarDropdown"
+                                     style="width: 300px;">
+                                    <div id="miniCalendar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón para abrir el modal -->
+                <div class="col-md-6">
+                    <div class="row justify-content-center">
+                        <div class="col-md-12">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button class="btn btn-success " style="background-color: #00826F; border: none;"
+                                        data-bs-toggle="modal" data-bs-target="#nuevaCitaModal">
+                                    <i class="ri-calendar-line"></i> Nueva cita
+                                </button>
+                                <button class="btn btn-success" style="background-color: #00826F; border: none;">
+                                    <i class="ri-user-line"></i> Citas paciente
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal de Nueva Cita -->
+        <div class="modal fade" id="nuevaCitaModal" tabindex="-1" aria-labelledby="nuevaCitaModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="nuevaCitaModalLabel">
+                            <i class="ri-calendar-line"></i> Nueva Cita
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-action="Create" >
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="fechaHora" class="form-label">
+                                        <i class="ri-calendar-event-line"></i> Fecha y Hora
+                                    </label>
+                                    <input type="datetime-local" class="form-control" id="fechaHora" asp-for="FechaHora"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="especialidad" class="form-label">
+                                        <i class="ri-stethoscope-line"></i> Especialidades <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="especialidad" asp-for="EspecialidadId" required>
+                                        <option selected>Seleccione una especialidad</option>
+                                        @if (ViewBag.Especialidades != null)
+                                        {
+                                            @foreach (var especialidad in ViewBag.Especialidades)
+                                            {
+                                                <option value="@especialidad.Value">@especialidad.Text</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option disabled>No hay especialidades disponibles</option>
+                                        }
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <!-- Tipo de visita y Paciente en la misma fila -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="tiempoVisita" class="form-label">
+                                        <i class="ri-time-line"></i> Tiempo visita (min) <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="tiempoVisita" asp-for="TiempoVisita" value="30" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="paciente" class="form-label">
+                                        <i class="ri-user-line"></i> Paciente <span class="text-danger">*</span>
+                                    </label>
+
+                                    <!-- Campo oculto para almacenar el ID del paciente -->
+                                    <input type="hidden" id="pacienteId" asp-for="PacienteId">
+
+                                    <div class="input-group">
+                                        <!-- Input donde se mostrará el paciente seleccionado -->
+                                        <input type="text" class="form-control" id="pacienteNombre" placeholder="Buscar paciente" readonly>
+
+                                        <!-- Botón con ícono de lupa -->
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPacientes">
+                                            <i class="ri-search-line text-dark"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Modal para buscar pacientes -->
+                                <div class="modal fade" id="modalPacientes" tabindex="-1" aria-labelledby="modalPacientesLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="modalPacientesLabel">Buscar Paciente</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="text" id="buscarPaciente" class="form-control mb-3" placeholder="Escriba para buscar...">
+                                                <ul class="list-group" id="listaPacientes">
+                                                    @foreach (var paciente in ViewBag.Pacientes)
+                                                    {
+                                                        <li class="list-group-item paciente-item" data-id="@paciente.Value">@paciente.Text</li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal para el resumen del usuario -->
+                                <div class="modal fade" id="modalResumenUsuario" tabindex="-1"
+                                     aria-labelledby="modalResumenUsuarioLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <!-- Se hace más grande y se centra -->
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="modalResumenUsuarioLabel">
+                                                    Resumen del
+                                                    Usuario
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <!-- Contenido del resumen del usuario -->
+                                                <p><strong>Nombre:</strong> <span id="resumenNombre"></span></p>
+                                                <p><strong>Edad:</strong> <span id="resumenEdad"></span></p>
+                                                <p><strong>Sexo:</strong> <span id="resumenSexo"></span></p>
+                                                <p><strong>Móvil:</strong> <span id="resumenMovil"></span></p>
+                                                <p><strong>Email:</strong> <span id="resumenEmail"></span></p>
+                                                <p>
+                                                    <strong>Procedencia:</strong> <span id="resumenProcedencia"></span>
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer d-flex justify-content-between">
+                                                <button type="button" class="btn btn-info">
+                                                    <i class="ri-folder-user-line"></i> Ficha del paciente
+                                                </button>
+                                                <button type="button" class="btn btn-warning">
+                                                    <i class="ri-file-list-line"></i> Documentos del paciente
+                                                </button>
+                                                <button type="button" class="btn btn-secondary" id="cerrarModalResumen">
+                                                    Cerrar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Primera visita y Nueva alta en la misma fila -->
+                            <div class="row mb-3 text-center">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input custom-checkbox" type="checkbox" id="nuevaAlta">
+                                        <label class="form-check-label custom-label" for="nuevaAlta">
+                                            <strong>
+                                                <i class="ri-checkbox-circle-line"></i> Registrar Nueva alta
+                                            </strong>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div class="mb-3">
+                                <label for="observaciones" class="form-label">
+                                    <i class="ri-file-text-line"></i> Observaciones de la cita
+                                </label>
+                                <textarea class="form-control" id="observaciones" asp-for="Observaciones" rows="3"></textarea>
+                            </div>
+
+                            <!-- Destaca, Cita múltiple profesional y Múltiple en la misma fila -->
+                            <div class="row mb-3 text-center">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="destaca">
+                                        <label class="form-check-label" for="destaca">
+                                            <i class="ri-star-line"></i> Mostrar Observaciones
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <!-- Botón Guardar con icono -->
+                                <button type="submit" class="btn btn-success" style="background-color: #00826F; border: none;">
+                                    <i class="ri-save-line"></i> Guardar
+                                </button>
+                                <!-- Botón Guardar e imprimir con icono -->
+                                <button type="button" class="btn btn-success" style="background-color: #00826F; border: none;">
+                                    <i class="ri-printer-line"></i> Imprimir 
+                                </button>
+                                <!-- Botón Cerrar con icono -->
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="ri-close-line"></i> Cerrar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</body>
+
+</html>
+

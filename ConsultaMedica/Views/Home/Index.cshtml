@@ -1,0 +1,158 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="header">
+    <div class="header-content d-flex">
+        <!-- Columna izquierda: Imagen -->
+        <div class="me-4" style="width: 250px; height: 250px;">
+            <img src="imagenes/profile.webp" alt="Imagen de perfil" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+        </div>
+
+        <!-- Columna derecha: Nombre e información -->
+        <div>
+            <h4 class="text-white">Buen día,</h4>
+            <h2 class="display-4 fw-bold text-white">
+                <span class="brand-name">Junior Rodriguez castañeda</span>
+            </h2>
+            <div class="d-flex align-items-center mt-4">
+                <div class="icon-box me-3">
+                    <i class="ri-surgical-mask-line fs-4 text-white"></i>
+                </div>
+                <div>
+                    <h2 class="m-0 fw-bold">9</h2>
+                    <p class="m-0 text-white">Pacientes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wave">
+        <svg viewBox="0 0 500 150" preserveAspectRatio="none">
+            <path d="M-0.27,67.61 C149.99,150.00 589.45,66.63 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"></path>
+        </svg>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Primera tarjeta -->
+        <div class="col-md-4 mb-3 px-2">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4 text-success">
+                        <i class="ri-heart-pulse-line fs-1"></i>
+                    </div>
+                    <div>
+                        <a class="card-title text-decoration-none" asp-area="" asp-controller="Agenda" asp-action="Index">Servicios Asistenciales - Listado</a>
+                        <p class="card-text">Información sobre los servicios asistenciales ofrecidos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Segunda tarjeta -->
+        <div class="col-md-4 mb-3 px-2">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4">
+                        <i class="ri-calendar-check-line fs-1 text-success"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title">Desglose Atenciones Diarias</h5>
+                        <p class="card-text">Resumen de las atenciones realizadas en el día.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tercera tarjeta -->
+        <div class="col-md-4 mb-3 px-2">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4">
+                        <i class="ri-money-dollar-circle-line fs-1 text-success"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title">Facturación</h5>
+                        <p class="card-text">Detalles sobre la facturación y pagos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cuarta tarjeta -->
+        <div class="col-md-4 mb-3 px-2">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4">
+                        <i class="ri-user-heart-line fs-1 text-success"></i>
+                    </div>
+                    <div>
+                        <a class="card-title" href="../Pacientes/paciente.php">Gestión Pacientes</a>
+                        <p class="card-text">Resumen de las atenciones realizadas en el día.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quinta tarjeta -->
+        <div class="col-md-4 mb-3 px-2">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4">
+                        <i class="ri-calendar-check-line fs-1 text-success"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title">Gestión Profesionales</h5>
+                        <p class="card-text">Resumen de las atenciones realizadas en el día.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sexta tarjeta -->
+        <div class="col-md-4 mb-3 px-2">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4">
+                        <i class="ri-calendar-check-line fs-1 text-success"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title">Medicamentos y procedimientos</h5>
+                        <p class="card-text">Resumen de las atenciones realizadas en el día.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Séptima tarjeta -->
+        <div class="col-md-4 mb-3 px-2">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4">
+                        <i class="ri-calendar-check-line fs-1 text-success"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title">Estadísticas</h5>
+                        <p class="card-text">Resumen de las atenciones realizadas en el día.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Octava tarjeta -->
+        <div class="col-md-4 mb-3 px-2">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4">
+                        <i class="ri-calendar-check-line fs-1 text-success"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title">Plantillas</h5>
+                        <p class="card-text">Resumen de las atenciones realizadas en el día.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
