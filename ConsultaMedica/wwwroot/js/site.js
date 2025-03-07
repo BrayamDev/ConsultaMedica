@@ -100,9 +100,44 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error('Error al cargar las citas:', error);
                     failureCallback('Error al cargar las citas');
                 });
+        },
+        eventClick: function (info) {
+            // Detectar doble clic
+            if (info.jsEvent.detail === 2) { // Si se hizo doble clic
+                abrirModalEditarCita(info.event); // Abrir el modal con la información de la cita
+            }
         }
     });
 
     calendar.render();
 });
+
+
+function abrirModalEditarCita(evento) {
+    // Obtener los datos de la cita
+    const cita = {
+        id: evento.id,
+        title: evento.title,
+        start: evento.start,
+        end: evento.end,
+        extendedProps: evento.extendedProps // Propiedades adicionales (observaciones, pacienteId, etc.)
+    };
+
+    // Llenar el formulario del modal con los datos de la cita
+    document.getElementById('citaId').value = cita.id;
+    document.getElementById('estadoCita').value = cita.extendedProps.estado || 'Activa'; // Estado de la cita
+    document.getElementById('fechaHora').value = cita.start.toISOString().slice(0, 16); // Formato datetime-local
+    document.getElementById('especialidad').value = cita.extendedProps.especialidad || 'Medicina General';
+    document.getElementById('tratamiento').value = cita.extendedProps.tratamiento || '';
+    document.getElementById('tiempoVisita').value = (cita.end - cita.start) / (1000 * 60); // Duración en minutos
+    document.getElementById('paciente').value = cita.extendedProps.paciente || '';
+    document.getElementById('tarifa').value = cita.extendedProps.tarifa || '';
+    document.getElementById('observaciones').value = cita.extendedProps.observaciones || '';
+    document.getElementById('destaca').checked = cita.extendedProps.destaca || false;
+    document.getElementById('citaMultiple').checked = cita.extendedProps.citaMultiple || false;
+
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('editarCitaModal'));
+    modal.show();
+}
 /* **************************************** FULL CALENDAR en nueva ANGENDA ****************************************** */

@@ -322,6 +322,114 @@
             <div id="calendar"></div>
         </div>
     </div>
+
+    <!-- Modal para editar citas -->
+    <div class="modal fade" id="editarCitaModal" tabindex="-1" aria-labelledby="editarCitaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarCitaModalLabel">Modificar Cita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editarCitaForm">
+                        <input type="hidden" id="citaId" name="citaId" />
+
+                        <div class="row">
+                            <!-- Columna izquierda -->
+                            <div class="col-md-6">
+                                <!-- Estado de la cita y Origen -->
+                                <div class="mb-3">
+                                    <label class="form-label">Estado de la cita</label>
+                                    <input type="text" class="form-control" id="estadoCita" name="estadoCita" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Origen</label>
+                                    <input type="text" class="form-control" id="origenCita" name="origenCita" value="Agenda" readonly>
+                                </div>
+
+                                <!-- Fecha y Hora -->
+                                <div class="mb-3">
+                                    <label for="fechaHora" class="form-label">Fecha y Hora</label>
+                                    <input type="datetime-local" class="form-control" id="fechaHora" name="fechaHora" required>
+                                </div>
+
+                                <!-- Especialidades -->
+                                <div class="mb-3">
+                                    <label for="especialidad" class="form-label">Especialidades *</label>
+                                    <select class="form-select" id="especialidad" name="especialidad" required>
+                                        <option value="Medicina General">Medicina General</option>
+                                        <!-- Agrega más opciones según sea necesario -->
+                                    </select>
+                                </div>
+
+                                <!-- Tratamiento -->
+                                <div class="mb-3">
+                                    <label for="tratamiento" class="form-label">Tratamiento</label>
+                                    <input type="text" class="form-control" id="tratamiento" name="tratamiento">
+                                </div>
+
+                                <!-- Tiempo de visita -->
+                                <div class="mb-3">
+                                    <label for="tiempoVisita" class="form-label">Tiempo visita (min) *</label>
+                                    <input type="number" class="form-control" id="tiempoVisita" name="tiempoVisita" required>
+                                </div>
+
+                                <!-- Paciente -->
+                                <div class="mb-3">
+                                    <label for="paciente" class="form-label">Paciente *</label>
+                                    <input type="text" class="form-control" id="paciente" name="paciente" required>
+                                </div>
+
+                                <!-- Tar./Mút. -->
+                                <div class="mb-3">
+                                    <label for="tarifa" class="form-label">Tar./Mút.</label>
+                                    <input type="text" class="form-control" id="tarifa" name="tarifa">
+                                </div>
+                            </div>
+
+                            <!-- Columna derecha -->
+                            <div class="col-md-6">
+                                <!-- Observaciones -->
+                                <div class="mb-3">
+                                    <label for="observaciones" class="form-label">Observaciones</label>
+                                    <textarea class="form-control" id="observaciones" name="observaciones" rows="10"></textarea>
+                                </div>
+
+                                <!-- Destaca -->
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="destaca" name="destaca">
+                                    <label class="form-check-label" for="destaca">Destaca</label>
+                                </div>
+
+                                <!-- Cita múltiple profesional -->
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="citaMultiple" name="citaMultiple">
+                                    <label class="form-check-label" for="citaMultiple">Cita múltiple profesional</label>
+                                </div>
+
+                                <!-- Enlaces para descargar PDF -->
+                                <div class="mb-3">
+                                    <label class="form-label">Descargar:</label>
+                                    <div>
+                                        <a href="#" class="btn btn-outline-primary btn-sm">Justificante de la visita</a>
+                                        <a href="#" class="btn btn-outline-primary btn-sm">Recordatorio de cita</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="guardarCambios">Guardar</button>
+                    <button type="button" class="btn btn-success" id="nuevaCita">Nueva cita</button>
+                    <button type="button" class="btn btn-danger" id="eliminarCita">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
