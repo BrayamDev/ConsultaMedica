@@ -52,19 +52,25 @@ namespace ConsultaMedica.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Citas cita)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                // Recargar datos necesarios en ViewBag
-                ViewBag.Especialidades = new SelectList(_context.especialidades, "Id", "Nombre");
-                ViewBag.Pacientes = new SelectList(_context.pacientes, "Id", "Nombre");
+                // Guardar la cita en la base de datos
+                _context.citas.Add(cita);
+                _context.SaveChanges();
 
-                // Mostrar errores en la vista
-                return View(cita);
+                // Enviar un mensaje de éxito usando TempData
+                TempData["Mensaje"] = "La cita se ha insertado correctamente.";
+                TempData["TipoMensaje"] = "success"; // Para identificar el tipo de mensaje
+            }
+            catch (Exception ex)
+            {
+                // Enviar un mensaje de error si algo sale mal
+                TempData["Mensaje"] = "Error al insertar la cita: " + ex.Message;
+                TempData["TipoMensaje"] = "error"; // Para identificar el tipo de mensaje
             }
 
-            _context.citas.Add(cita);
-            _context.SaveChanges();
-            return RedirectToAction(nameof(Index));
+            // Redirigir a la vista Index de Agenda
+            return RedirectToAction("Index", "Agenda");
         }
 
         // GET: CitaController/Edit/5

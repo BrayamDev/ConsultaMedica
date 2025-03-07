@@ -10,6 +10,7 @@ namespace ConsultaMedica.Models
         public DateTime FechaHora { get; set; }
         [Required(ErrorMessage = "La especialidad es obligatoria.")]
         public int EspecialidadId { get; set; }
+
         [Required(ErrorMessage = "El tiempo de visita es obligatorio.")]
         public int TiempoVisita { get; set; }
         public int PacienteId { get; set; }
