@@ -35,10 +35,23 @@ namespace ConsultaMedica.Controllers
             return View();
         }
 
-        // GET: CitaController/Details/5
-        public ActionResult Details(int id)
+        // Método para obtener las citas en formato JSON
+        public IActionResult GetCitas()
         {
-            return View();
+            var citas = _context.citas
+                .Include(c => c.Paciente) // Incluye la relación con Paciente
+                .Select(c => new
+                {
+                    id = c.Id, // Identificador de la cita
+                    title = $"Cita con {c.Paciente.Nombre}", // Usa el nombre del paciente
+                    start = c.FechaHora.ToString("yyyy-MM-ddTHH:mm:ss"), // Fecha y hora de inicio
+                    end = c.FechaHora.AddMinutes(c.TiempoVisita).ToString("yyyy-MM-ddTHH:mm:ss"), // Fecha y hora de fin
+                    observaciones = c.Observaciones,
+                    especialidadId = c.EspecialidadId
+                })
+                .ToList();
+
+            return Json(citas);
         }
 
         // GET: CitaController/Create

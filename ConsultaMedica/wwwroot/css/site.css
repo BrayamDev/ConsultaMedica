@@ -568,80 +568,6 @@ body {
     color: #ffffff; /* Color del texto */
 }
 
-/*tabla pacientes*/
-
-/* Estilos personalizados para la tabla */
-.tabulator {
-    font-family: 'Arial', sans-serif;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-    /* Encabezados de la tabla */
-    .tabulator .tabulator-header {
-        background-color: #00826F; /* Color principal */
-        color: #ffffff; /* Texto blanco */
-        font-weight: bold;
-    }
-
-        .tabulator .tabulator-header .tabulator-col {
-            border-right: 1px solid #ffffff; /* Líneas divisorias blancas */
-        }
-
-    /* Filas de la tabla */
-    .tabulator .tabulator-tableHolder .tabulator-table {
-        background-color: #f8f9fa; /* Fondo gris claro */
-    }
-
-    .tabulator .tabulator-row {
-        border-bottom: 1px solid #ddd; /* Líneas divisorias grises */
-    }
-
-        .tabulator .tabulator-row:nth-child(even) {
-            background-color: #e0f2f1; /* Fondo verde claro para filas pares */
-        }
-
-        .tabulator .tabulator-row:hover {
-            background-color: #b2dfdb; /* Fondo verde más claro al pasar el mouse */
-        }
-
-    /* Paginación */
-    .tabulator .tabulator-footer {
-        background-color: #00826F; /* Color principal */
-        color: #ffffff; /* Texto blanco */
-    }
-
-    .tabulator .tabulator-page {
-        color: #ffffff; /* Texto blanco */
-    }
-
-        .tabulator .tabulator-page.active {
-            background-color: #ffffff; /* Fondo blanco para la página activa */
-            color: #00826F; /* Texto en color principal */
-            border-radius: 4px;
-        }
-
-/* Campo de búsqueda */
-#buscador-global {
-    border: 1px solid #00826F;
-    border-radius: 4px;
-    padding: 8px;
-    width: 100%;
-    margin-bottom: 16px;
-}
-
-    #buscador-global:focus {
-        outline: none;
-        border-color: #00695c; /* Color más oscuro al enfocar */
-        box-shadow: 0 0 0 2px rgba(0, 130, 111, 0.2); /* Sombra suave */
-    }
-
-#calendar {
-    width: 50%; /* Ajusta el ancho */
-    height: 400px; /* Ajusta la altura */
-    margin: 0 auto; /* Centra el calendario */
-}
 
 /* Aumentar el tamaño de los checkboxes */
 .custom-checkbox {
@@ -654,3 +580,46 @@ body {
     font-size: 1em; /* Aumenta el tamaño de la fuente */
 }
 
+
+
+#calendar {
+    width: 100%; /* Ocupa el 100% del ancho disponible */
+    height: 700px; /* Aumenta la altura */
+    margin: 50px auto; /* Centra el calendario */
+}
+
+/* Capitalizar textos en FullCalendar */
+.fc .fc-toolbar-title,
+.fc .fc-col-header-cell-cushion,
+.fc .fc-daygrid-day-number,
+.fc .fc-timegrid-slot-label-cushion,
+.fc .fc-event-title {
+    text-transform: capitalize;
+}
+
+/* Cambia el color principal a verde claro */
+:root {
+    --fc-button-bg-color: #4CAF50; /* Verde para botones */
+    --fc-button-border-color: #4CAF50; /* Borde de botones */
+    --fc-button-hover-bg-color: #45a049; /* Verde más oscuro al pasar el mouse */
+    --fc-button-hover-border-color: #45a049; /* Borde más oscuro al pasar el mouse */
+    --fc-button-active-bg-color: #3d8b40; /* Verde más oscuro al hacer clic */
+    --fc-button-active-border-color: #3d8b40; /* Borde más oscuro al hacer clic */
+
+    --fc-event-bg-color: #4CAF50; /* Color de fondo de los eventos */
+    --fc-event-border-color: #4CAF50; /* Borde de los eventos */
+    --fc-event-text-color: #ffffff; /* Color del texto de los eventos */
+
+    --fc-today-bg-color: #e6f4ea; /* Color de fondo del día actual (verde claro tenue) */
+    --fc-highlight-color: rgba(76, 175, 80, 0.2); /* Color de resaltado (verde claro tenue) */
+}
+
+/* Cambia el color del texto en los botones */
+.fc-button {
+    color: #ffffff !important; /* Texto blanco en los botones */
+}
+
+/* Cambia el color del texto en la barra de herramientas */
+.fc-toolbar-title {
+    color: #4CAF50; /* Verde para el título */
+}

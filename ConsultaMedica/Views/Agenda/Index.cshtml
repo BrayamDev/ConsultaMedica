@@ -3,7 +3,6 @@
     ViewData["Title"] = "Index";
 }
 
-<?php include_once "../global/conexion.php"; ?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -24,6 +23,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pnotify/dist/PNotifyBrightTheme.css">
     <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotify.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotifyButtons.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- FullCalendar CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -61,6 +70,7 @@
             }
         </script>
     }
+
     <div class="main-content">
         <div class="container-fluid text-end">
             <!-- Fila superior: Seleccione el doctor y botones de vista -->
@@ -307,8 +317,11 @@
         </div>
     </div>
 
-
-
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div id="calendar"></div>
+        </div>
+    </div>
 </body>
 
 </html>

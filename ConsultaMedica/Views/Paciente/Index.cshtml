@@ -1,0 +1,189 @@
+﻿@model List<Pacientes>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Agenda</title>
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    <!-- Remix Icon CSS (para los iconos) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- JS for jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- bootstrap css and js -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- PNotify  -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pnotify/dist/PNotifyBrightTheme.css">
+    <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotifyButtons.js"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+</head>
+
+<body>
+    <div class="row mx-auto p-2 justify-content-center mb-4" style="width: 120rem;">
+        <!-- Rectángulo 1: Agregar Paciente -->
+        <div class="col-md-3 p-0">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4 text-success">
+                        <i class="ri-user-add-line fs-1"></i>
+                    </div>
+                    <div>
+                        <a class="card-title text-decoration-none" >Registrar nueva alta</a>
+                        <p class="card-text">Registrar un nuevo paciente en el sistema.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rectángulo: Desactivar Paciente -->
+        <div class="col-md-3 p-0">
+            <div class="card custom-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-large me-4">
+                        <i class="ri-user-unfollow-line fs-1 text-warning"></i>
+                    </div>
+                    <div>
+                        <!-- Botón para abrir el modal de desactivar -->
+                        <a class="card-title text-decoration-none" href="../Pacientes/consolidado_pacientes.php">
+                            Consolidado del paciente
+                        </a>
+                        <p class="card-text">Desactivar temporalmente el acceso de un paciente en el sistema.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="table-responsive">
+            <table class="table table-striped" id="idTabla">
+                <thead class="table table-success">
+                    <tr>
+                        <th colspan="11" class="text-center text-uppercase fs-4">Pacientes En Alta</th>
+                    </tr>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Tipo de Documento</th>
+                        <th>Número de Documento</th>
+                        <th>Nacionalidad</th>
+                        <th>Fecha Nacimiento</th>
+                        <th>Sexo</th>
+                        <th>Móvil</th>
+                        <th>Email</th>
+                        <th>Procedencia</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var paciente in Model)
+                    {
+                        <tr>
+                            <td class="text-nowrap">@paciente.Nombre</td>
+                            <td class="text-nowrap">@paciente.PrimerApellido @paciente.SegundoApellido</td>
+                            <td class="text-nowrap">@paciente.TipoDocumento</td>
+                            <td class="text-nowrap">@paciente.NumeroDocumento</td>
+                            <td class="text-nowrap">@paciente.PaisOrigen</td>
+                            <td class="text-nowrap">@paciente.FechaNacimiento</td>
+                            <td class="text-nowrap">@paciente.Sexo</td>
+                            <td class="text-nowrap">@paciente.Movil</td>
+                            <td class="text-nowrap">@paciente.Email</td>
+                            <td class="text-nowrap">@paciente.Procedencia</td>
+                            <td class="text-nowrap">
+                                <a asp-action="Editar" asp-route-id="@paciente.Id" class="btn btn-warning btn-sm">Editar</a>
+                                <a asp-action="Eliminar" asp-route-id="@paciente.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+@section scripts {
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+
+    <!-- DataTables JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- DataTables Buttons JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+
+    <!-- JSZip (requerido para Excel) -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- pdfmake (requerido para PDF) -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <!-- Buttons HTML5 (exportación) -->
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Destruir la instancia anterior si existe
+            if ($.fn.DataTable.isDataTable('#idTabla')) {
+                $('#idTabla').DataTable().destroy();
+            }
+
+            // Inicializar DataTable
+            $('#idTabla').DataTable({
+                // Paginación de 5 en 5
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+
+                // Habilitar búsqueda y filtrado
+                searching: true,
+
+                // Botones de exportación
+                dom: 'Bfrtip', // Define la posición de los botones
+                buttons: [
+                    {
+                        extend: 'excelHtml5', // Botón para exportar a Excel
+                        text: 'Exportar a Excel',
+                        className: 'btn btn-success'
+                    },
+                    {
+                        extend: 'pdfHtml5', // Botón para exportar a PDF
+                        text: 'Exportar a PDF',
+                        className: 'btn btn-danger'
+                    }
+                ],
+
+                // Personalización de mensajes
+                language: {
+                    lengthMenu: "Mostrar _MENU_ registros por página",
+                    zeroRecords: "No se encontraron resultados",
+                    info: "Mostrando página _PAGE_ de _PAGES_",
+                    infoEmpty: "No hay registros disponibles",
+                    infoFiltered: "(filtrado de _MAX_ registros totales)",
+                    search: "Buscar:",
+                    paginate: {
+                        first: "Primera",
+                        last: "Última",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    }
+                }
+            });
+        });
+    </script>
+}
+
