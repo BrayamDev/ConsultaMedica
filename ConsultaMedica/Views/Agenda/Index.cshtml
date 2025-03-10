@@ -322,7 +322,33 @@
             <div id="calendar"></div>
         </div>
     </div>
-
+    <!-- Modal para opciones de cita -->
+    <div class="modal fade" id="opcionesCitaModal" tabindex="-1" aria-labelledby="opcionesCitaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="opcionesCitaModalLabel">Opciones de Cita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-grid gap-3">
+                        <button type="button" class="btn btn-primary btn-lg" id="btnFacturacion">
+                            <i class="ri-bill-line me-2"></i>Facturación
+                        </button>
+                        <button type="button" class="btn btn-success btn-lg" id="btnModificarCita">
+                            <i class="ri-edit-2-line me-2"></i>Modificar Cita
+                        </button>
+                        <button type="button" class="btn btn-info btn-lg" id="btnHistoriaClinica">
+                            <i class="ri-file-user-line me-2"></i>Historia Clínica
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Modal para editar citas -->
     <div class="modal fade" id="editarCitaModal" tabindex="-1" aria-labelledby="editarCitaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">

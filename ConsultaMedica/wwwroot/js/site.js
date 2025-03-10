@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         eventClick: function (info) {
             // Detectar doble clic
             if (info.jsEvent.detail === 2) { // Si se hizo doble clic
-                abrirModalEditarCita(info.event); // Abrir el modal con la información de la cita
+                abrirModalOpcionesCita(info.event); // Abrir el nuevo modal con opciones
             }
         }
     });
@@ -112,7 +112,17 @@ document.addEventListener('DOMContentLoaded', function () {
     calendar.render();
 });
 
+// Nueva función para abrir el modal con las tres opciones
+function abrirModalOpcionesCita(evento) {
+    // Guardar el evento en una variable global para usarlo más tarde
+    window.eventoSeleccionado = evento;
 
+    // Mostrar el modal de opciones
+    const modal = new bootstrap.Modal(document.getElementById('opcionesCitaModal'));
+    modal.show();
+}
+
+// Mantenemos la función original para editar cita, pero la llamaremos desde el botón "Modificar Cita"
 function abrirModalEditarCita(evento) {
     // Obtener los datos de la cita
     const cita = {
@@ -140,4 +150,44 @@ function abrirModalEditarCita(evento) {
     const modal = new bootstrap.Modal(document.getElementById('editarCitaModal'));
     modal.show();
 }
+
+// Función para abrir el modal de facturación
+function abrirModalFacturacion(evento) {
+    // Aquí implementarías la lógica para mostrar el modal de facturación
+    alert('Función de facturación para la cita: ' + evento.title);
+    // En lugar del alert, mostrarías tu modal de facturación
+}
+
+// Función para abrir el modal de historia clínica
+function abrirModalHistoriaClinica(evento) {
+    // Aquí implementarías la lógica para mostrar el modal de historia clínica
+    alert('Abriendo historia clínica del paciente: ' + evento.extendedProps.paciente);
+    // En lugar del alert, mostrarías tu modal de historia clínica
+}
+
+// Configurar los manejadores de eventos para los botones del modal de opciones
+document.addEventListener('DOMContentLoaded', function () {
+    // Botón de Facturación
+    document.getElementById('btnFacturacion').addEventListener('click', function () {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('opcionesCitaModal'));
+        modal.hide();
+        abrirModalFacturacion(window.eventoSeleccionado);
+    });
+
+    // Botón de Modificar Cita
+    document.getElementById('btnModificarCita').addEventListener('click', function () {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('opcionesCitaModal'));
+        modal.hide();
+        abrirModalEditarCita(window.eventoSeleccionado);
+    });
+
+    // Botón de Historia Clínica
+    document.getElementById('btnHistoriaClinica').addEventListener('click', function () {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('opcionesCitaModal'));
+        modal.hide();
+        abrirModalHistoriaClinica(window.eventoSeleccionado);
+    });
+});
+
+
 /* **************************************** FULL CALENDAR en nueva ANGENDA ****************************************** */
