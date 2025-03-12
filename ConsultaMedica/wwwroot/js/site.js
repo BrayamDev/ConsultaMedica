@@ -191,3 +191,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /* **************************************** FULL CALENDAR en nueva ANGENDA ****************************************** */
+
+
+/* **************************************** INTEL TEL INPUT EN PACIENTE ****************************************** */
+// Inicializar intl-tel-input
+const input = document.querySelector("#telefono");
+window.intlTelInput(input, {
+    initialCountry: "auto", // Detectar país automáticamente
+    geoIpLookup: function (callback) {
+        fetch("https://ipapi.co/json")
+            .then(response => response.json())
+            .then(data => callback(data.country_code))
+            .catch(() => callback("us")); // País por defecto si falla la detección
+    },
+    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js", // Utilidades
+});
+
+/* **************************************** INTEL TEL INPUT EN PACIENTE ****************************************** */
+
+/* **************************************** MANEJADOR DE PAISES EN PACIENTE ****************************************** */
+
+
+
+/* **************************************** MANEJADOR DE PAISES EN PACIENTE ****************************************** */

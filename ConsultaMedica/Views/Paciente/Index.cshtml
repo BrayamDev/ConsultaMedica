@@ -26,6 +26,11 @@
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+
+    <!-- CSS de intl-tel-input -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    <!-- Utilidades para validación y formato -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 </head>
 
 <body>
@@ -38,13 +43,132 @@
                         <i class="ri-user-add-line fs-1"></i>
                     </div>
                     <div>
-                        <a class="card-title text-decoration-none" >Registrar nueva alta</a>
+                        <!-- Botón para abrir el modal -->
+                        <a type="button" class="text-black" data-bs-toggle="modal" data-bs-target="#addPacienteModal">
+                            Agregar Paciente
+                        </a>
                         <p class="card-text">Registrar un nuevo paciente en el sistema.</p>
                     </div>
                 </div>
             </div>
         </div>
 
+
+        <!-- Modal -->
+        <div class="modal fade" id="addPacienteModal" tabindex="-1" aria-labelledby="addPacienteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <!-- Aumentar el ancho del modal -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPacienteModalLabel">Agregar Paciente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addPacienteForm" asp-action="Create">
+                            <div class="row">
+                                <!-- Columna 1 -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="nombre" class="form-label"><i class="ri-user-line"></i> Nombre *</label>
+                                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="primerApellido" class="form-label"><i class="ri-user-3-line"></i> Primer Apellido *</label>
+                                        <input type="text" class="form-control" id="primerApellido" name="primerApellido" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="segundoApellido" class="form-label"><i class="ri-user-3-line"></i> Segundo Apellido</label>
+                                        <input type="text" class="form-control" id="segundoApellido" name="segundoApellido">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="fechaNacimiento" class="form-label"><i class="ri-calendar-line"></i> Fecha de Nacimiento</label>
+                                        <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="sexo" class="form-label"><i class="ri-genderless-line"></i> Sexo</label>
+                                        <select class="form-select" id="sexo" name="sexo">
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Femenino">Femenino</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Columna 2 -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="pais" class="form-label"><i class="ri-earth-line"></i> País de Origen/Nacionalidad</label>
+                                        <input type="text" class="form-control" id="pais" name="pais">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="provincia" class="form-label"><i class="ri-map-pin-line"></i> Provincia</label>
+                                        <input type="text" class="form-control" id="provincia" name="provincia">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="poblacion" class="form-label"><i class="ri-community-line"></i> Población</label>
+                                        <input type="text" class="form-control" id="poblacion" name="poblacion">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tipoDocumento" class="form-label"><i class="ri-file-text-line"></i> Tipo de Documento</label>
+                                        <input type="text" class="form-control" id="tipoDocumento" name="tipoDocumento">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="numeroDocumento" class="form-label"><i class="ri-file-text-line"></i> Número de Documento</label>
+                                        <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento">
+                                    </div>
+                                </div>
+
+                                <!-- Columna 3 -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="direccion" class="form-label"><i class="ri-home-line"></i> Dirección</label>
+                                        <input type="text" class="form-control" id="direccion" name="direccion">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="codigoPostal" class="form-label"><i class="ri-mail-line"></i> Código Postal</label>
+                                        <input type="text" class="form-control" id="codigoPostal" name="codigoPostal">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="telefono" class="form-label"><i class="ri-phone-line"></i> Teléfono</label>
+                                        <input type="tel" class="form-control" id="telefono" name="telefono">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="movil" class="form-label"><i class="ri-smartphone-line"></i> Móvil</label>
+                                        <input type="text" class="form-control" id="movil" name="movil">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label"><i class="ri-mail-line"></i> Email</label>
+                                        <input type="email" class="form-control" id="email" name="email">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Campos que ocupan el ancho completo -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="procedencia" class="form-label"><i class="ri-map-pin-line"></i> Procedencia</label>
+                                        <input type="text" class="form-control" id="procedencia" name="procedencia">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="aseguradora" class="form-label"><i class="ri-shield-check-line"></i> Aseguradora</label>
+                                        <input type="text" class="form-control" id="aseguradora" name="aseguradora">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="observaciones" class="form-label"><i class="ri-file-text-line"></i> Observaciones</label>
+                                        <textarea class="form-control" id="observaciones" name="observaciones"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="ri-close-line"></i> Cerrar</button>
+                                <button type="button" class="btn btn-primary" onclick="submitPaciente()"><i class="ri-save-line"></i> Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Rectángulo: Desactivar Paciente -->
         <div class="col-md-3 p-0">
             <div class="card custom-card h-100">

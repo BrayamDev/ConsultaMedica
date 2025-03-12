@@ -623,3 +623,20 @@ body {
 .fc-toolbar-title {
     color: #4CAF50; /* Verde para el título */
 }
+
+/* Aumentar el ancho del modal */
+.modal-lg {
+    max-width: 1200px; /* Ajusta este valor según tus necesidades */
+}
+
+.iti {
+    width: 100%; /* Asegura que ocupe todo el ancho */
+}
+
+.iti__flag-container {
+    margin-right: 10px; /* Espacio entre la bandera y el campo */
+}
+
+.iti__selected-flag {
+    padding: 8px; /* Ajusta el padding del selector de país */
+}
