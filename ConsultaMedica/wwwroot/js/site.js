@@ -209,8 +209,31 @@ window.intlTelInput(input, {
 
 /* **************************************** INTEL TEL INPUT EN PACIENTE ****************************************** */
 
-/* **************************************** MANEJADOR DE PAISES EN PACIENTE ****************************************** */
+/* **************************************** FICHA DEL DOCTOR ****************************************** */
 
 
+document.getElementById('fotografia').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('image-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
 
-/* **************************************** MANEJADOR DE PAISES EN PACIENTE ****************************************** */
+// Script para mostrar la imagen seleccionada en el campo de tipo file
+document.getElementById('fotografia').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('image-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+
+/* ****************************************  FICHA DEL DOCTOR  ****************************************** */

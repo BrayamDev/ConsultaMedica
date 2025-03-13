@@ -19,10 +19,12 @@ namespace ConsultaMedica.Controllers
 
         // GET: CitaController
         public ActionResult Index()
-        { 
+        {
+            // Obtener la lista de especialidades
             var especialidades = _context.especialidades.ToList();
             ViewBag.Especialidades = new SelectList(especialidades, "Id", "Nombre");
 
+            // Obtener la lista de pacientes
             var pacientes = _context.pacientes
                .Select(p => new SelectListItem
                {
@@ -30,8 +32,18 @@ namespace ConsultaMedica.Controllers
                    Text = $"{p.PrimerApellido} {p.SegundoApellido} {p.Nombre}"
                })
                .ToList();
-
             ViewBag.Pacientes = pacientes;
+
+            // Obtener la lista de doctores
+            var doctores = _context.doctores
+               .Select(d => new SelectListItem
+               {
+                   Value = d.Id.ToString(),
+                   Text = $"{d.PrimerApellido} {d.SegundoApellido} {d.Nombre}"
+               })
+               .ToList();
+            ViewBag.Doctores = doctores;
+
             return View();
         }
 

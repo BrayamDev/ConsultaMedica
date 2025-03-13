@@ -14,7 +14,7 @@ namespace ConsultaMedica.Data
         public DbSet<Especialidades> especialidades { get; set; }
         public DbSet<HistoriasClinicas> historiasClinicas { get; set; }
         public DbSet<Pacientes> pacientes { get; set; }
-
+        public DbSet<Doctores> doctores { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -77,23 +77,39 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <div class="d-flex gap-2 justify-content-start">
-                        <!-- Dropdown para "Seleccione el doctor" -->
-                        <div class="dropdown">
-                            <button class="btn btn-success dropdown-toggle text-white" type="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false"
-                                    style="background-color: #00826F; border: none;">
-                                Seleccione el doctor
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Doctor 1</a></li>
-                                <li><a class="dropdown-item" href="#">Doctor 2</a></li>
-                                <li><a class="dropdown-item" href="#">Doctor 3</a></li>
-                            </ul>
-                        </div>
-                        <a class="btn btn-success text-white" style="background-color: #00826F; border: none;">
-                            <!-- Ajusta el ancho según necesites -->
-                            <i class="ri-user-heart-line"></i> Ver ficha
+                        @using (Html.BeginForm("Index", "Doctor", FormMethod.Get))
+                        {
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="ri-user-line"></i> <!-- Ícono de usuario -->
+                                </span>
+                                <select class="form-select" id="doctor" name="id" required>
+                                    <option selected disabled>Seleccione un doctor</option>
+                                    @if (ViewBag.Doctores != null)
+                                    {
+                                        @foreach (var doctor in ViewBag.Doctores)
+                                        {
+                                            <option value="@doctor.Value">@doctor.Text</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option disabled>No hay doctores disponibles</option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-primary text-dark">
+                                    <i class="ri-stethoscope-line"></i> <!-- Ícono de doctor -->
+                                </button>
+                            </div>
+                        }
+
+                        <!-- Ícono que aparecerá al seleccionar un doctor -->
+                        <a id="verFichaIcon" href="#" class="d-none text-decoration-none ms-2 mt-3">
+                            <i class="bi bi-eye-fill"></i> Ver ficha
                         </a>
+
+                        <input type="hidden" id="selectedDoctorId" name="selectedDoctorId" />
+
                         <div class="btn-group">
                             <div class="dropdown">
                                 <button class=" btn btn-success dropdown-toggle text-white" type="button"
