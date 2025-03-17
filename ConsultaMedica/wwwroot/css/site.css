@@ -1,134 +1,26 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
-
-/* Estilos generales de login */
-.auth-box {
-    background: #ffffff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-    .auth-box header {
-        padding: 0;
-        border-radius: 10px 10px 0 0;
-        text-align: right;
-        margin: -2rem -2rem 2rem -2rem;
-        overflow: hidden;
-    }
-
-        .auth-box header img.logo {
-            width: 50%;
-            height: auto;
-            display: block;
-            border-radius: 10px 10px 0 0;
-            margin-left: auto;
-            margin-right: 0;
-        }
-
-.btn-primary {
-    background-color: #008000;
-    border: none;
-    transition: background-color 0.3s ease;
-    color: #ffffff;
-}
-
-    .btn-primary:hover {
-        background-color: #006400;
-    }
-
-.input-group button {
-    background-color: transparent;
-    border: 1px solid #ced4da;
-    transition: background-color 0.3s ease;
-}
-
-    .input-group button:hover {
-        background-color: #f8f9fa;
-    }
-
-
-/*OLVIDE CONTRASEÑA*/
-
-.auth-box {
-    background: #ffffff;
-    /* Fondo blanco */
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    /* Sombra más pronunciada */
-    max-width: 400px;
-    /* Ancho máximo de la tarjeta */
-    margin: 0 auto;
-    /* Centrar la tarjeta */
-}
-
-    .auth-box header {
-        padding: 0;
-        border-radius: 10px 10px 0 0;
-        /* Bordes redondeados solo arriba */
-        text-align: right;
-        /* Alinear el logo a la derecha */
-        margin: -2rem -2rem 2rem -2rem;
-        /* Extender el header fuera del padding */
-        overflow: hidden;
-        /* Evitar que la imagen se desborde */
-    }
-
-        .auth-box header img.logo {
-            width: 50%;
-            /* La imagen ocupa la mitad del ancho del header */
-            height: auto;
-            display: block;
-            /* Eliminar espacio inferior */
-            border-radius: 10px 10px 0 0;
-            /* Bordes redondeados solo arriba */
-            margin-left: auto;
-            /* Alinear la imagen a la derecha */
-            margin-right: 0;
-            /* Eliminar margen derecho */
-        }
-
-.btn-success {
-    background-color: #28a745;
-    /* Color verde */
-    border: none;
-    transition: background-color 0.3s ease;
-    color: #ffffff;
-    /* Texto blanco */
-}
-
-    .btn-success:hover {
-        background-color: #218838;
-        /* Color verde más oscuro al pasar el mouse */
-    }
-
-.text-decoration-underline {
-    text-decoration: underline;
-}
 
 /**HOME**/
 
@@ -139,19 +31,18 @@ body {
     justify-content: space-between;
 }
 
-    .navbar-custom .navbar-brand,
-    .navbar-custom .nav-link {
-        color: white !important;
-    }
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+    color: white !important;
+}
 
-        .navbar-custom .nav-link:hover {
-            color: #FFD700 !important;
-        }
+.navbar-custom .nav-link:hover {
+    color: #FFD700 !important;
+}
 
-    .navbar-custom .navbar-toggler {
-        border-color: white;
-    }
-
+.navbar-custom .navbar-toggler {
+    border-color: white;
+}
 
 .btn-logout {
     background-color: #dc3545;
@@ -163,10 +54,9 @@ body {
     margin-left: 10px;
 }
 
-    .btn-logout:hover {
-        background-color: #c82333;
-        /* Rojo más oscuro al hacer hover */
-    }
+.btn-logout:hover {
+    background-color: #c82333;
+}
 
 .logo-custom {
     border-radius: 50%;
@@ -194,31 +84,40 @@ body {
     /* Asegura que el sidebar esté por encima de otros elementos */
 }
 
-    .sidebar.collapsed {
-        width: 60px;
-    }
+.sidebar.collapsed {
+    width: 60px;
+}
 
-        .sidebar.collapsed .menu-text {
-            display: none;
-        }
+.sidebar.collapsed .menu-text {
+    display: none;
+}
 
-        .sidebar.collapsed .user-info .name,
-        .sidebar.collapsed .user-info .role {
-            display: none;
-        }
+.sidebar.collapsed .user-info .name,
+.sidebar.collapsed .user-info .role {
+    display: none;
+}
 
-        .sidebar.collapsed:hover {
-            width: 250px;
-        }
+.sidebar.collapsed:hover {
+    width: 250px;
+}
 
-            .sidebar.collapsed:hover .menu-text {
-                display: inline;
-            }
+.sidebar.collapsed:hover .menu-text {
+    display: inline;
+}
+.fc-event-main {
+    /* Deshabilitar estilos */
+    background-color: transparent !important;
+    border: none !important;
+    color: inherit !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    /* Agrega cualquier otra propiedad que desees deshabilitar */
+}
 
-            .sidebar.collapsed:hover .user-info .name,
-            .sidebar.collapsed:hover .user-info .role {
-                display: block;
-            }
+.sidebar.collapsed:hover .user-info .name,
+.sidebar.collapsed:hover .user-info .role {
+    display: block;
+}
 
     .sidebar a {
         padding: 10px 15px;
@@ -511,44 +410,14 @@ body {
     border-color: #007bff;
 }
 
-    .btn-urgencia:hover,
-    .btn-bloqueos:hover {
-        background-color: #0056b3;
-        /* Color azul más oscuro al pasar el ratón */
-        border-color: #0056b3;
-    }
-
-.fc-time-grid .fc-slats .fc-minor {
-    font-weight: normal;
-    color: #666;
+.btn-urgencia:hover,
+.btn-bloqueos:hover {
+    background-color: #0056b3;
+    /* Color azul más oscuro al pasar el ratón */
+    border-color: #0056b3;
 }
 
-.fc-time-grid .fc-slats .fc-major {
-    font-weight: bold;
-    color: black;
-}
 
-.container-xl {
-    position: relative;
-    min-height: 100vh;
-    /* Ajusta según sea necesario */
-}
-
-.calendar-responsive {
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .calendar-responsive {
-        width: 85%;
-    }
-}
-
-@media (min-width: 992px) {
-    .calendar-responsive {
-        width: 70%;
-    }
-}
 
 .main-content {
     padding: 20px; /* Espaciado interno */
@@ -575,11 +444,6 @@ body {
     margin-right: 10px; /* Ajusta el espacio entre el checkbox y la etiqueta */
 }
 
-/* Aumentar el tamaño de las etiquetas */
-.custom-label {
-    font-size: 1em; /* Aumenta el tamaño de la fuente */
-}
-
 
 
 #calendar {
@@ -588,58 +452,121 @@ body {
     margin: 50px auto; /* Centra el calendario */
 }
 
-/* Capitalizar textos en FullCalendar */
+
+/*************************************** VISTA DETALLE CITA *************************************************/
+
+/* Contenedor del evento */
+.event-container {
+    background-color: #4CAF50; /* Color de fondo verde */
+    color: white; /* Color del texto */
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    width: 100%; /* Ocupa todo el ancho disponible */
+    display: block; /* Asegura que ocupe todo el ancho */
+    font-weight: bold; /* Texto en negrita */
+}
+
+.event-container:hover {
+    background-color: #45a049; /* Cambio de color al pasar el mouse */
+}
+
+/* Hora del evento */
+.event-time {
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    color: #e0e0e0; /* Color de texto más claro */
+}
+
+/* Título del evento */
+.event-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+/* Observaciones del evento */
+.event-observations {
+    font-size: 0.85em;
+    color: #f0f0f0; /* Color de texto más claro */
+    line-height: 1.4;
+    background-color: #333; /* Fondo de otro color */
+    padding: 5px; /* Espaciado interno para mejor legibilidad */
+    border-radius: 4px; /* Bordes redondeados */
+    font-style: italic; /* Texto en cursiva */
+    margin-top: 5px; /* Espacio superior para separar del título */
+}
+
+/*************************************** VISTA DETALLE CITA *************************************************/
+
+
+/*************************************** COLORES DEL MODAL *************************************************/
 .fc .fc-toolbar-title,
 .fc .fc-col-header-cell-cushion,
-.fc .fc-daygrid-day-number,
 .fc .fc-timegrid-slot-label-cushion,
-.fc .fc-event-title {
+.fc .fc-event-title,
+.fc .fc-event-time {
     text-transform: capitalize;
 }
 
-/* Cambia el color principal a verde claro */
+/* Color principal: verde */
 :root {
-    --fc-button-bg-color: #4CAF50; /* Verde para botones */
-    --fc-button-border-color: #4CAF50; /* Borde de botones */
-    --fc-button-hover-bg-color: #45a049; /* Verde más oscuro al pasar el mouse */
-    --fc-button-hover-border-color: #45a049; /* Borde más oscuro al pasar el mouse */
-    --fc-button-active-bg-color: #3d8b40; /* Verde más oscuro al hacer clic */
-    --fc-button-active-border-color: #3d8b40; /* Borde más oscuro al hacer clic */
-
-    --fc-event-bg-color: #4CAF50; /* Color de fondo de los eventos */
-    --fc-event-border-color: #4CAF50; /* Borde de los eventos */
-    --fc-event-text-color: #ffffff; /* Color del texto de los eventos */
-
-    --fc-today-bg-color: #e6f4ea; /* Color de fondo del día actual (verde claro tenue) */
-    --fc-highlight-color: rgba(76, 175, 80, 0.2); /* Color de resaltado (verde claro tenue) */
+    --fc-green: #4CAF50; /* Verde principal */
+    --fc-green-dark: #45a049; /* Verde oscuro para hover */
+    --fc-green-light: #e8f5e9; /* Verde claro para fondos */
 }
 
-/* Cambia el color del texto en los botones */
-.fc-button {
-    color: #ffffff !important; /* Texto blanco en los botones */
+/* Aplicar el color verde a los botones y elementos interactivos */
+.fc .fc-button-primary {
+    background-color: var(--fc-green);
+    border-color: var(--fc-green);
 }
 
-/* Cambia el color del texto en la barra de herramientas */
-.fc-toolbar-title {
-    color: #4CAF50; /* Verde para el título */
+    .fc .fc-button-primary:hover {
+        background-color: var(--fc-green-dark);
+        border-color: var(--fc-green-dark);
+    }
+
+/* Aplicar el color verde a los encabezados de las columnas */
+.fc .fc-col-header-cell {
+    background-color: var(--fc-green);
+    color: white;
 }
 
-/* Aumentar el ancho del modal */
-.modal-lg {
-    max-width: 1200px; /* Ajusta este valor según tus necesidades */
+/* Aplicar el color verde a los eventos */
+.fc .fc-event {
+    background-color: var(--fc-green);
+    border-color: var(--fc-green);
 }
 
-.iti {
-    width: 100%; /* Asegura que ocupe todo el ancho */
+    .fc .fc-event:hover {
+        background-color: var(--fc-green-dark);
+        border-color: var(--fc-green-dark);
+    }
+
+/* Aplicar el color verde a la fecha actual */
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: var(--fc-green-light);
 }
 
-.iti__flag-container {
-    margin-right: 10px; /* Espacio entre la bandera y el campo */
+/* Aplicar el color verde a los bordes de las celdas */
+.fc .fc-daygrid-day-frame,
+.fc .fc-timegrid-col-frame {
+    border-color: var(--fc-green);
 }
 
-.iti__selected-flag {
-    padding: 8px; /* Ajusta el padding del selector de país */
+/* Aplicar el color verde a los textos de los días */
+.fc .fc-daygrid-day-number {
+    color: var(--fc-green);
 }
 
-/***************************************VISTA DETALLE FICHA DOCTOR*************************************************/
+/* Aplicar el color verde a los textos de los eventos */
+.fc .fc-event-title,
+.fc .fc-event-time {
+    color: white;
+}
 
+/*************************************** COLORES DEL MODAL *************************************************/

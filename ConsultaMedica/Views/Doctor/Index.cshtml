@@ -41,45 +41,9 @@
                     <input type="text" class="form-control" value="@Html.DisplayFor(model => model.NumColegiado)" readonly>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label"><i class="fas fa-check-circle"></i> @Html.DisplayNameFor(model => model.Estado)</label>
-                    <input type="text" class="form-control" value="@Html.DisplayFor(model => model.Estado)" readonly>
-                </div>
-                <div class="mb-3">
                     <label class="form-label"><i class="fas fa-stethoscope"></i> @Html.DisplayNameFor(model => model.EspecialidadPrincipal)</label>
                     <input type="text" class="form-control" value="@Html.DisplayFor(model => model.EspecialidadPrincipal)" readonly>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label"><i class="fas fa-globe"></i> @Html.DisplayNameFor(model => model.Pais)</label>
-                    <input type="text" class="form-control" value="@Html.DisplayFor(model => model.Pais)" readonly>
-                </div>
-            </div>
-
-            <!-- Tercera columna -->
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label"><i class="fas fa-camera"></i> @Html.DisplayNameFor(model => model.Fotografia)</label>
-                    <input type="file" class="form-control" id="fotografia" name="fotografia" accept="image/*">
-                </div>
-                <div class="text-center">
-                    <img id="image-preview" src="@Url.Content(Model.Fotografia)" alt="Fotografía del doctor" class="img-fluid rounded" style="max-width: 200px; height: auto;" />
-                </div>
-            </div>
-        </div>
-
-        <!-- Segunda fila de columnas -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label"><i class="fas fa-map-marker-alt"></i> @Html.DisplayNameFor(model => model.Provincia)</label>
-                    <input type="text" class="form-control" value="@Html.DisplayFor(model => model.Provincia)" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label"><i class="fas fa-city"></i> @Html.DisplayNameFor(model => model.Poblacion)</label>
-                    <input type="text" class="form-control" value="@Html.DisplayFor(model => model.Poblacion)" readonly>
-                </div>
-            </div>
-
-            <div class="col-md-4">
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-id-card"></i> @Html.DisplayNameFor(model => model.TipoDeDocumento)</label>
                     <input type="text" class="form-control" value="@Html.DisplayFor(model => model.TipoDeDocumento)" readonly>
@@ -90,46 +54,38 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label"><i class="fas fa-map-marked-alt"></i> @Html.DisplayNameFor(model => model.Direccion)</label>
-                    <input type="text" class="form-control" value="@Html.DisplayFor(model => model.Direccion)" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label"><i class="fas fa-map-marked-alt"></i> @Html.DisplayNameFor(model => model.DireccionAlterna)</label>
-                    <input type="text" class="form-control" value="@Html.DisplayFor(model => model.DireccionAlterna)" readonly>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tercera fila de columnas -->
-        <div class="row mb-4">
+            <!-- Tercera columna -->
             <div class="col-md-4">
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-phone"></i> @Html.DisplayNameFor(model => model.Telefono)</label>
                     <input type="text" class="form-control" value="@Html.DisplayFor(model => model.Telefono)" readonly>
                 </div>
-            </div>
-
-            <div class="col-md-4">
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-mobile-alt"></i> @Html.DisplayNameFor(model => model.Movil)</label>
                     <input type="text" class="form-control" value="@Html.DisplayFor(model => model.Movil)" readonly>
                 </div>
-            </div>
-
-            <div class="col-md-4">
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-envelope"></i> @Html.DisplayNameFor(model => model.Email)</label>
                     <input type="text" class="form-control" value="@Html.DisplayFor(model => model.Email)" readonly>
                 </div>
-            </div>
-            <!-- Acciones -->
-            <div class="text-start">
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary"><i class="fas fa-edit"></i> Editar</a>
-                <a href="../Agenda/Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a la lista</a>
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-camera"></i> @Html.DisplayNameFor(model => model.Fotografia)</label>
+                    <input type="file" class="form-control" id="fotografia" name="fotografia" accept="image/*">
+                </div>
             </div>
         </div>
-    </div>
 
+        <!-- Previsualización de la imagen -->
+        <div class="row mb-4">
+            <div class="col-md-12 text-center">
+                <img id="image-preview" src="@Url.Content(Model.Fotografia)" alt="Fotografía del doctor" class="img-fluid rounded" style="max-width: 200px; height: auto;" />
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="text-start">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary"><i class="fas fa-edit"></i> Editar</a>
+            <a href="../Agenda/Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a la lista</a>
+        </div>
+    </div>
 </div>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ConsultaMedica.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigrate : Migration
+    public partial class ModificacionDoctor : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,6 +48,30 @@ namespace ConsultaMedica.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "doctores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PrimerApellido = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SegundoApellido = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Acronimo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NumColegiado = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EspecialidadPrincipal = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Fotografia = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TipoDeDocumento = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NumeroDeDocumento = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Telefono = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Movil = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_doctores", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -327,6 +351,9 @@ namespace ConsultaMedica.Migrations
 
             migrationBuilder.DropTable(
                 name: "citas");
+
+            migrationBuilder.DropTable(
+                name: "doctores");
 
             migrationBuilder.DropTable(
                 name: "historiasClinicas");

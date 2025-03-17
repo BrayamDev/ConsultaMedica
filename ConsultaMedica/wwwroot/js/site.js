@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        locale: 'es',  // Esto traduce automáticamente los nombres de meses y días
+        locale: 'es',
         initialView: 'dayGridMonth',
         headerToolbar: {
             left: 'prev,next today',
@@ -57,15 +57,15 @@ document.addEventListener('DOMContentLoaded', function () {
             week: 'Semana',
             day: 'Día'
         },
-        allDayText: '', // Elimina el texto "Todo el día"
-        dayHeaderFormat: { weekday: 'long' },  // Asegura que los días se muestren completos con la primera en mayúscula
+        allDayText: '',
+        dayHeaderFormat: { weekday: 'long' },
         views: {
             dayGridMonth: {
-                titleFormat: { year: 'numeric', month: 'long' } // Mes con primera en mayúscula
+                titleFormat: { year: 'numeric', month: 'long' }
             },
             timeGridWeek: {
-                titleFormat: { year: 'numeric', month: 'long', day: 'numeric' }, // Semana con mes y día en español
-                slotLabelFormat: { // Formato de 12 horas para la vista de semana
+                titleFormat: { year: 'numeric', month: 'long', day: 'numeric' },
+                slotLabelFormat: {
                     hour: 'numeric',
                     minute: '2-digit',
                     hour12: true,
@@ -73,8 +73,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             timeGridDay: {
-                titleFormat: { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }, // Día con nombre completo
-                slotLabelFormat: { // Formato de 12 horas para la vista de día
+                titleFormat: { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' },
+                slotLabelFormat: {
                     hour: 'numeric',
                     minute: '2-digit',
                     hour12: true,
@@ -82,18 +82,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         },
-        eventTimeFormat: { // Formato de 12 horas para los eventos
+        eventTimeFormat: {
             hour: 'numeric',
             minute: '2-digit',
             hour12: true,
             meridiem: 'short'
         },
         events: function (fetchInfo, successCallback, failureCallback) {
-            // Hacer una solicitud AJAX para obtener las citas
-            fetch('/Agenda/GetCitas') // Ruta al método del controlador
+            fetch('/Agenda/GetCitas')
                 .then(response => response.json())
                 .then(data => {
-                    // Pasar los datos a FullCalendar
                     successCallback(data);
                 })
                 .catch(error => {
@@ -102,92 +100,104 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         },
         eventClick: function (info) {
-            // Detectar doble clic
-            if (info.jsEvent.detail === 2) { // Si se hizo doble clic
-                abrirModalOpcionesCita(info.event); // Abrir el nuevo modal con opciones
+            if (info.jsEvent.detail === 2) { // Detectar doble clic
+                // Mostrar el modal
+                var modal = new bootstrap.Modal(document.getElementById('opcionesCitaModal'));
+                modal.show();
+
+                // Obtener la información del evento
+                var eventTitle = info.event.title;
+                var eventId = info.event.id; // Suponiendo que el evento tiene un ID
+
+                // Asignar funciones a los botones del modal
+                document.getElementById('btnFacturacion').onclick = function () {
+                    alert('Facturación para: ' + eventTitle);
+                    modal.hide();
+                };
+
+                document.getElementById('btnModificarCita').onclick = function () {
+                    alert('Modificar cita: ' + eventTitle);
+                    modal.hide();
+                };
+
+                document.getElementById('btnHistoriaClinica').onclick = function () {
+                    alert('Historia clínica para: ' + eventTitle);
+                    modal.hide();
+                };
             }
+        },
+        eventContent: function (arg) {
+            var observaciones = arg.event.extendedProps.observaciones;
+            var content = document.createElement('div');
+            content.classList.add('event-container');
+
+            // Hora del evento en vistas de Semana/Día
+            if (arg.view.type !== 'dayGridMonth') {
+                var time = document.createElement('div');
+                time.classList.add('event-time');
+                time.innerHTML = `<strong>${arg.timeText}</strong>`;
+                content.appendChild(time);
+            }
+
+            // Título del evento
+            var title = document.createElement('div');
+            title.classList.add('event-title');
+            title.innerHTML = arg.event.title;
+            content.appendChild(title);
+
+            // Observaciones (si existen)
+            if (observaciones) {
+                var obs = document.createElement('div');
+                obs.classList.add('event-observations');
+                obs.innerHTML = observaciones;
+                content.appendChild(obs);
+            }
+
+            return { domNodes: [content] };
+        },
+        eventDidMount: function (info) {
+            // Eliminar las clases no deseadas
+            const classesToRemove = [
+                'fc-timegrid-event',
+                'fc-v-event',
+                'fc-timegrid-event-short',
+                'fc-event-start',
+                'fc-event-end',
+                'fc-event-past'
+            ];
+
+            classesToRemove.forEach(className => {
+                info.el.classList.remove(className);
+            });
         }
     });
 
     calendar.render();
 });
-
-// Nueva función para abrir el modal con las tres opciones
-function abrirModalOpcionesCita(evento) {
-    // Guardar el evento en una variable global para usarlo más tarde
-    window.eventoSeleccionado = evento;
-
-    // Mostrar el modal de opciones
-    const modal = new bootstrap.Modal(document.getElementById('opcionesCitaModal'));
-    modal.show();
-}
-
-// Mantenemos la función original para editar cita, pero la llamaremos desde el botón "Modificar Cita"
 function abrirModalEditarCita(evento) {
-    // Obtener los datos de la cita
     const cita = {
         id: evento.id,
         title: evento.title,
         start: evento.start,
         end: evento.end,
-        extendedProps: evento.extendedProps // Propiedades adicionales (observaciones, pacienteId, etc.)
+        extendedProps: evento.extendedProps
     };
 
-    // Llenar el formulario del modal con los datos de la cita
     document.getElementById('citaId').value = cita.id;
-    document.getElementById('estadoCita').value = cita.extendedProps.estado || 'Activa'; // Estado de la cita
-    document.getElementById('fechaHora').value = cita.start.toISOString().slice(0, 16); // Formato datetime-local
+    document.getElementById('estadoCita').value = cita.extendedProps.estado || 'Activa';
+    document.getElementById('fechaHora').value = cita.start.toISOString().slice(0, 16);
     document.getElementById('especialidad').value = cita.extendedProps.especialidad || 'Medicina General';
     document.getElementById('tratamiento').value = cita.extendedProps.tratamiento || '';
-    document.getElementById('tiempoVisita').value = (cita.end - cita.start) / (1000 * 60); // Duración en minutos
+    document.getElementById('tiempoVisita').value = (cita.end - cita.start) / (1000 * 60);
     document.getElementById('paciente').value = cita.extendedProps.paciente || '';
     document.getElementById('tarifa').value = cita.extendedProps.tarifa || '';
     document.getElementById('observaciones').value = cita.extendedProps.observaciones || '';
     document.getElementById('destaca').checked = cita.extendedProps.destaca || false;
     document.getElementById('citaMultiple').checked = cita.extendedProps.citaMultiple || false;
 
-    // Mostrar el modal
     const modal = new bootstrap.Modal(document.getElementById('editarCitaModal'));
     modal.show();
 }
-
-// Función para abrir el modal de facturación
-function abrirModalFacturacion(evento) {
-    // Aquí implementarías la lógica para mostrar el modal de facturación
-    alert('Función de facturación para la cita: ' + evento.title);
-    // En lugar del alert, mostrarías tu modal de facturación
-}
-
-// Función para abrir el modal de historia clínica
-function abrirModalHistoriaClinica(evento) {
-    // Aquí implementarías la lógica para mostrar el modal de historia clínica
-    alert('Abriendo historia clínica del paciente: ' + evento.extendedProps.paciente);
-    // En lugar del alert, mostrarías tu modal de historia clínica
-}
-
-// Configurar los manejadores de eventos para los botones del modal de opciones
-document.addEventListener('DOMContentLoaded', function () {
-    // Botón de Facturación
-    document.getElementById('btnFacturacion').addEventListener('click', function () {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('opcionesCitaModal'));
-        modal.hide();
-        abrirModalFacturacion(window.eventoSeleccionado);
-    });
-
-    // Botón de Modificar Cita
-    document.getElementById('btnModificarCita').addEventListener('click', function () {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('opcionesCitaModal'));
-        modal.hide();
-        abrirModalEditarCita(window.eventoSeleccionado);
-    });
-
-    // Botón de Historia Clínica
-    document.getElementById('btnHistoriaClinica').addEventListener('click', function () {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('opcionesCitaModal'));
-        modal.hide();
-        abrirModalHistoriaClinica(window.eventoSeleccionado);
-    });
-});
 
 
 /* **************************************** FULL CALENDAR en nueva ANGENDA ****************************************** */
