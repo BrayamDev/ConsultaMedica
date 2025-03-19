@@ -344,15 +344,15 @@
                         <div class="row mb-3">
                             <div class="col">
                                 <!-- Botón de Facturación -->
-                                <button type="button" class="btn btn-primary btn-lg w-100" id="btnFacturacion">
+                                <a href="Facturacion/index" class="btn btn-primary btn-lg w-100 text-decoration-none text-white" id="btnFacturacion">
                                     <i class="ri-bill-line me-2"></i>Facturación
-                                </button>
+                                </a>
                             </div>
                             <div class="col">
                                 <!-- Botón de Modificar Cita -->
-                                <button type="button" class="btn btn-success btn-lg w-100" id="btnModificarCita">
+                                <a class="btn btn-primary btn-lg w-100 text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editarCitaModal">
                                     <i class="ri-edit-2-line me-2"></i>Modificar Cita
-                                </button>
+                                </a>
                             </div>
                         </div>
 
@@ -361,9 +361,9 @@
                             <div class="col-md-6 offset-md-3">
                                 <!-- Centrado en una columna de 6 con un offset de 3 -->
                                 <!-- Botón de Historia Clínica -->
-                                <button type="button" class="btn btn-info btn-lg w-100" id="btnHistoriaClinica">
+                                <a  href="HistoriaClinica/Index" class="btn btn-primary btn-lg w-100 text-decoration-none text-white" id="btnHistoriaClinica">
                                     <i class="ri-file-user-line me-2"></i>Historia Clínica
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -375,6 +375,7 @@
             </div>
         </div>
     </div>
+
     <!-- Modal para editar citas -->
     <div class="modal fade" id="editarCitaModal" tabindex="-1" aria-labelledby="editarCitaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">

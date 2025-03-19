@@ -1,0 +1,202 @@
+﻿@{
+    ViewData["Title"] = "Facturacion";
+}
+
+<div class="bg-success rounded container-fluid text-white text-center">
+    <h3>Gestionar Facturacion</h3>
+</div>
+
+<div class="container-fluid row mt-4 p-2">
+    <!-- Primer div: Gestión de historia -->
+    <div class="col-md-8">
+        <div class="p-2 text-center">
+            <h4>Tratamientos <i class="ri-add-circle-line"></i> </h4>
+            <div class="align-content-center">
+                <p>Paciente: <strong>KELLY, BARBARA (44777667)</strong></p>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead class="text-white" style="background-color: #00826F; border: none;">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Tratamiento</th>
+                        <th scope="col">Observaciones</th>
+                        <th scope="col">Unidades</th>
+                        <th scope="col">Imp. Dto</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Acciones</th> <!-- Columna para las acciones -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Consulta General</td>
+                        <td>Revisión de rutina</td>
+                        <td>1</td>
+                        <td>0.00 €</td>
+                        <td>50.00 €</td>
+                        <td>
+                            <a class="btn btn-success btn-sm"><i class="ri-edit-box-line"></i></a>
+                            <a class="btn btn-danger btn-sm"><i class="ri-delete-bin-6-line"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>Análisis de Sangre</td>
+                        <td>Perfil lipídico</td>
+                        <td>2</td>
+                        <td>5.00 €</td>
+                        <td>95.00 €</td>
+                        <td>
+                            <a class="btn btn-success btn-sm"><i class="ri-edit-box-line"></i></a>
+                            <a class="btn btn-danger btn-sm"><i class="ri-delete-bin-6-line"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>Radiografía Torácica</td>
+                        <td>Control postoperatorio</td>
+                        <td>1</td>
+                        <td>10.00 €</td>
+                        <td>90.00 €</td>
+                        <td>
+                            <a class="btn btn-success btn-sm"><i class="ri-edit-box-line"></i></a>
+                            <a class="btn btn-danger btn-sm"><i class="ri-delete-bin-6-line"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">4</th>
+                        <td>Fisioterapia</td>
+                        <td>Sesión de rehabilitación</td>
+                        <td>3</td>
+                        <td>15.00 €</td>
+                        <td>135.00 €</td>
+                        <td>
+                            <a class="btn btn-success btn-sm"><i class="ri-edit-box-line"></i></a>
+                            <a class="btn btn-danger btn-sm"><i class="ri-delete-bin-6-line"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">5</th>
+                        <td>Ecografía Abdominal</td>
+                        <td>Dolor abdominal persistente</td>
+                        <td>1</td>
+                        <td>0.00 €</td>
+                        <td>120.00 €</td>
+                        <td>
+                            <a class="btn btn-success btn-sm"><i class="ri-edit-box-line"></i></a>
+                            <a class="btn btn-danger btn-sm"><i class="ri-delete-bin-6-line"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="container mt-4">
+                <div class="row">
+                    <!-- Primera tarjeta: Factura -->
+                    <div class="col-md-6 d-flex ">
+                        <div class="card shadow-sm flex-fill">
+                            <div class="card-header text-white" >
+                                <h5 class="card-title text-white mb-0" style="background-color: #00826F; border: none;">Factura</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Fecha Doc. -->
+                                <div class="mb-3">
+                                    <label for="fechaDoc" class="form-label"><strong>Fecha Doc.</strong></label>
+                                    <input type="text" class="form-control" id="fechaDoc" value="12/02/2025" readonly>
+                                </div>
+                                <!-- Empresa (input) -->
+                                <div class="mb-3">
+                                    <label for="empresa" class="form-label"><strong>Empresa</strong></label>
+                                    <input type="text" class="form-control" id="empresa" placeholder="Ingrese la empresa">
+                                </div>
+                                <!-- Checkbox Factura -->
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="facturaCheck">
+                                    <label class="form-check-label" for="facturaCheck">
+                                        Factura
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Segunda tarjeta: Cobrar -->
+                    <div class="col-md-6 d-flex">
+                        <div class="card shadow-sm flex-fill">
+                            <div class="card-header text-white" style="background-color: #00826F; border: none;">
+                                <h5 class="card-title mb-0 bg-success text-white">Cobrar</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Fila para Cobrar la visita e Importe -->
+                                <div class="row mb-3">
+                                    <!-- Cobrar la visita (desplegable) -->
+                                    <div class="col-md-6">
+                                        <label for="metodoPago" class="form-label"><strong>Cobrar la visita</strong></label>
+                                        <select class="form-select" id="metodoPago">
+                                            <option value="efectivo">Efectivo</option>
+                                            <option value="tarjeta">Tarjeta</option>
+                                        </select>
+                                    </div>
+                                    <!-- Importe -->
+                                    <div class="col-md-6">
+                                        <label for="importe" class="form-label"><strong>Importe</strong></label>
+                                        <input type="number" class="form-control" id="importe" placeholder="Ingrese el importe">
+                                    </div>
+                                </div>
+                                <!-- Observaciones del cobro -->
+                                <div class="mb-3">
+                                    <label for="observaciones" class="form-label"><strong>Observaciones del cobro</strong></label>
+                                    <textarea class="form-control" id="observaciones" rows="3" placeholder="Ingrese observaciones"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Segundo div: Información de Visita -->
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header text-white " style="background-color: #00826F; border: none;">
+                <h5 class="card-title text-white mb-0">Informacion del paciente</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>ID:</strong> 2147483647</p>
+                        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Foto de perfil" class="img-fluid rounded" style="max-width: 250px; height: 250px;">
+                    </div>
+                    <div class="col-md-6">
+                        <br />  <br /> <br />
+                        <p><strong>Nombre:</strong> LISE, STEFANO</p>
+                        <p><strong>Email:</strong> STEFANOLISE11@GMAIL.COM</p>
+                        <p><strong>Ficha:</strong> <a href="#">Ver ficha</a></p>
+                        <p><strong>Docs.:</strong> <a href="#">Ver documentos</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white ">
+                <h5 class="card-title bg-success text-white mb-0">Visita</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Fecha y hora:</strong> 12/02/2025 - 13:00</p>
+                <p><strong>Profesional:</strong> JOGA</p>
+                <p><strong>Especialidad:</strong> MEDICINA GENERAL</p>
+                <p><strong>Observaciones:</strong> RECETA MEDICA RESIDENTE</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm p-3">
+            <div class="d-flex justify-content-around">
+                <a class="btn btn-success">Procesar Visita</a>
+                <a  class="btn btn-success">Volver</a>
+            </div>
+        </div>
+    </div>
+</div>

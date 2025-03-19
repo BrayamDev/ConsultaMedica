@@ -104,26 +104,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Mostrar el modal
                 var modal = new bootstrap.Modal(document.getElementById('opcionesCitaModal'));
                 modal.show();
-
-                // Obtener la información del evento
-                var eventTitle = info.event.title;
-                var eventId = info.event.id; // Suponiendo que el evento tiene un ID
-
-                // Asignar funciones a los botones del modal
-                document.getElementById('btnFacturacion').onclick = function () {
-                    alert('Facturación para: ' + eventTitle);
-                    modal.hide();
-                };
-
-                document.getElementById('btnModificarCita').onclick = function () {
-                    alert('Modificar cita: ' + eventTitle);
-                    modal.hide();
-                };
-
-                document.getElementById('btnHistoriaClinica').onclick = function () {
-                    alert('Historia clínica para: ' + eventTitle);
-                    modal.hide();
-                };
             }
         },
         eventContent: function (arg) {
