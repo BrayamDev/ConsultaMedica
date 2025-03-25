@@ -145,7 +145,6 @@
             </div>
         </div>
 
-
         <!-- Modal de Nueva Cita -->
         <div class="modal fade" id="nuevaCitaModal" tabindex="-1" aria-labelledby="nuevaCitaModalLabel"
              aria-hidden="true">
@@ -158,7 +157,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form asp-action="Create" >
+                        <form asp-action="Create">
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="fechaHora" class="form-label">
@@ -185,7 +184,6 @@
                                             <option disabled>No hay especialidades disponibles</option>
                                         }
                                     </select>
-
                                 </div>
                             </div>
 
@@ -215,71 +213,248 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
 
-                                <!-- Modal para buscar pacientes -->
-                                <div class="modal fade" id="modalPacientes" tabindex="-1" aria-labelledby="modalPacientesLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="modalPacientesLabel">Buscar Paciente</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <input type="text" id="buscarPaciente" class="form-control mb-3" placeholder="Escriba para buscar...">
-                                                <ul class="list-group" id="listaPacientes">
-                                                    @foreach (var paciente in ViewBag.Pacientes)
-                                                    {
-                                                        <li class="list-group-item paciente-item" data-id="@paciente.Value">@paciente.Text</li>
-                                                    }
-                                                </ul>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                            </div>
-                                        </div>
+                            <!-- Primera visita y Nueva alta en la misma fila -->
+                            <div class="row mb-3 text-center">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input custom-checkbox" type="checkbox" id="nuevaAlta">
+                                        <label class="form-check-label custom-label" for="nuevaAlta">
+                                            <strong><i class="ri-checkbox-circle-line"></i> Registrar Nueva alta</strong>
+                                        </label>
                                     </div>
                                 </div>
-                                <!-- Modal para el resumen del usuario -->
-                                <div class="modal fade" id="modalResumenUsuario" tabindex="-1"
-                                     aria-labelledby="modalResumenUsuarioLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                                        <!-- Se hace más grande y se centra -->
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="modalResumenUsuarioLabel">
-                                                    Resumen del
-                                                    Usuario
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <!-- Contenido del resumen del usuario -->
-                                                <p><strong>Nombre:</strong> <span id="resumenNombre"></span></p>
-                                                <p><strong>Edad:</strong> <span id="resumenEdad"></span></p>
-                                                <p><strong>Sexo:</strong> <span id="resumenSexo"></span></p>
-                                                <p><strong>Móvil:</strong> <span id="resumenMovil"></span></p>
-                                                <p><strong>Email:</strong> <span id="resumenEmail"></span></p>
-                                                <p>
-                                                    <strong>Procedencia:</strong> <span id="resumenProcedencia"></span>
-                                                </p>
-                                            </div>
-                                            <div class="modal-footer d-flex justify-content-between">
-                                                <button type="button" class="btn btn-info">
-                                                    <i class="ri-folder-user-line"></i> Ficha del paciente
-                                                </button>
-                                                <button type="button" class="btn btn-warning">
-                                                    <i class="ri-file-list-line"></i> Documentos del paciente
-                                                </button>
-                                                <button type="button" class="btn btn-secondary" id="cerrarModalResumen">
-                                                    Cerrar
-                                                </button>
-                                            </div>
+                            </div>
+
+                            <!-- Submenú desplegable para Nueva Alta -->
+                            <div id="submenuNuevaAlta" class="mb-3" style="display: none;">
+                                <div class="row mb-3">
+                                    <!-- Columna 1 -->
+                                    <div class="col-md-4">
+                                        <label for="nombreAlta" class="form-label">
+                                            <i class="ri-user-line"></i> Nombre <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="nombreAlta">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="primerApellidoAlta" class="form-label">
+                                            <i class="ri-user-line"></i> Primer apellido <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="primerApellidoAlta">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="segundoApellidoAlta" class="form-label">
+                                            <i class="ri-user-line"></i> Segundo apellido
+                                        </label>
+                                        <input type="text" class="form-control" id="segundoApellidoAlta">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="fechaNacimientoAlta" class="form-label">
+                                            <i class="ri-calendar-line"></i> Fecha de nacimiento
+                                        </label>
+                                        <input type="date" class="form-control" id="fechaNacimientoAlta">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="sexoAlta" class="form-label">
+                                            <i class="ri-user-line"></i> Sexo
+                                        </label>
+                                        <select class="form-select" id="sexoAlta">
+                                            <option selected>Masculino</option>
+                                            <option>Femenino</option>
+                                        </select>
+                                    </div>
+                                    <!-- Campo de selección -->
+                                    <div class="col-md-4">
+                                        <label for="pais" class="form-label">
+                                            <i class="ri-map-pin-line"></i> País de origen/Nacionalidad
+                                        </label>
+                                        <select id="pais" class="form-control">
+                                            <option value="" disabled selected>Selecciona un país</option>
+                                        </select>
+                                        <!-- Campo para "Otro" -->
+                                        <input type="text" id="otroPais" class="form-control mt-2"
+                                               placeholder="Escribe tu país" style="display: none;">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="provinciaAlta" class="form-label">
+                                            <i class="ri-map-pin-line"></i> Provincia
+                                        </label>
+                                        <input type="text" class="form-control" id="provinciaAlta"
+                                               placeholder="Ingrese una provincia">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="poblacionAlta" class="form-label">
+                                            <i class="ri-map-pin-line"></i> Población
+                                        </label>
+                                        <select class="form-select" id="poblacionAlta">
+                                            <option selected>Seleccione una población</option>
+                                            <option>Población 1</option>
+                                            <option>Población 2</option>
+                                            <option>Población 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="tipoDocumentoAlta" class="form-label">
+                                            <i class="ri-id-card-line"></i> Tipo de documento
+                                        </label>
+                                        <select class="form-select" id="tipoDocumentoAlta">
+                                            <option selected>Seleccione un tipo</option>
+                                            <option>DNI</option>
+                                            <option>Pasaporte</option>
+                                            <option>NIE</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="numeroDocumentoAlta" class="form-label">
+                                            <i class="ri-id-card-line"></i> Número de documento
+                                        </label>
+                                        <input type="text" class="form-control" id="numeroDocumentoAlta">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="direccionAlta" class="form-label">
+                                            <i class="ri-map-pin-line"></i> Dirección
+                                        </label>
+                                        <input type="text" class="form-control" id="direccionAlta">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="codigoPostalAlta" class="form-label">
+                                            <i class="ri-map-pin-line"></i> Código postal
+                                        </label>
+                                        <input type="text" class="form-control" id="codigoPostalAlta">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="telefonoAlta" class="form-label">
+                                            <i class="ri-phone-line"></i> Teléfono
+                                        </label>
+                                        <input type="text" class="form-control" id="telefonoAlta">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="movilAlta" class="form-label">
+                                            <i class="ri-smartphone-line"></i> Móvil
+                                        </label>
+                                        <input type="text" class="form-control" id="movilAlta">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="emailAlta" class="form-label">
+                                            <i class="ri-mail-line"></i> E-mail
+                                        </label>
+                                        <input type="email" class="form-control" id="emailAlta">
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" id="mailing">
+                                            <label class="form-check-label" for="mailing">Mailing</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="procedenciaAlta" class="form-label">
+                                            <label for="tarifasMutuasAlta" class="form-label">
+                                                <i class="ri-map-pin-line"></i>Procedencia
+                                            </label>
+                                            <input type="text" class="form-control" id="procedencia"
+                                                   placeholder="Procedencia">
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="tarifasMutuasAlta" class="form-label">
+                                            <i class="ri-money-dollar-circle-line"></i> Aseguradora
+                                        </label>
+                                        <input type="text" class="form-control" id="tarifasMutuasAlta"
+                                               placeholder="Aseguradora">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="observacionesAlta" class="form-label">
+                                            <i class="ri-file-text-line"></i> Observaciones de la cita
+                                        </label>
+                                        <textarea class="form-control" id="observacionesAlta" name="observacionesAlta"
+                                                  rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="alertarObservaciones">
+                                            <label class="form-check-label" for="alertarObservaciones">
+                                                <i class="ri-alert-line"></i> Mostrar observaciones del paciente
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Modal para buscar pacientes -->
+                            <div class="modal fade" id="modalPacientes" tabindex="-1" aria-labelledby="modalPacientesLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalPacientesLabel">Buscar Paciente</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="text" id="buscarPaciente" class="form-control mb-3" placeholder="Escriba para buscar...">
+                                            <ul class="list-group" id="listaPacientes">
+                                                @foreach (var paciente in ViewBag.Pacientes)
+                                                {
+                                                    <li class="list-group-item paciente-item" data-id="@paciente.Value">@paciente.Text</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal para el resumen del usuario -->
+                            <div class="modal fade" id="modalResumenUsuario" tabindex="-1"
+                                 aria-labelledby="modalResumenUsuarioLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg modal-dialog-centered">
+                                    <!-- Se hace más grande y se centra -->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalResumenUsuarioLabel">
+                                                Resumen del
+                                                Usuario
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Contenido del resumen del usuario -->
+                                            <p><strong>Nombre:</strong> <span id="resumenNombre"></span></p>
+                                            <p><strong>Edad:</strong> <span id="resumenEdad"></span></p>
+                                            <p><strong>Sexo:</strong> <span id="resumenSexo"></span></p>
+                                            <p><strong>Móvil:</strong> <span id="resumenMovil"></span></p>
+                                            <p><strong>Email:</strong> <span id="resumenEmail"></span></p>
+                                            <p>
+                                                <strong>Procedencia:</strong> <span id="resumenProcedencia"></span>
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer d-flex justify-content-between">
+                                            <button type="button" class="btn btn-info">
+                                                <i class="ri-folder-user-line"></i> Ficha del paciente
+                                            </button>
+                                            <button type="button" class="btn btn-warning">
+                                                <i class="ri-file-list-line"></i> Documentos del paciente
+                                            </button>
+                                            <button type="button" class="btn btn-secondary" id="cerrarModalResumen">
+                                                Cerrar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Otros campos del formulario -->
                             <input type="hidden" id="citaId" asp-for="Id" />
@@ -309,7 +484,7 @@
                                 </button>
                                 <!-- Botón Guardar e imprimir con icono -->
                                 <button type="button" class="btn btn-success" style="background-color: #00826F; border: none;">
-                                    <i class="ri-printer-line"></i> Imprimir 
+                                    <i class="ri-printer-line"></i> Imprimir
                                 </button>
                                 <!-- Botón Cerrar con icono -->
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -321,58 +496,26 @@
                 </div>
             </div>
         </div>
+
+        <!-- Script para manejar el checkbox de nueva alta -->
+        <script>
+            document.getElementById('nuevaAlta').addEventListener('change', function() {
+                const submenu = document.getElementById('submenuNuevaAlta');
+                if (this.checked) {
+                    submenu.style.display = 'block';
+                    // Limpiar campos de búsqueda de paciente cuando se activa nueva alta
+                    document.getElementById('pacienteNombre').value = '';
+                    document.getElementById('pacienteId').value = '';
+                } else {
+                    submenu.style.display = 'none';
+                }
+            });
+        </script>
     </div>
 
     <div class="container-fluid">
         <div class="row mb-4">
             <div id="calendar"></div>
-        </div>
-    </div>
-
-    <!-- Modal para opciones de cita -->
-    <div class="modal fade" id="opcionesCitaModal" tabindex="-1" aria-labelledby="opcionesCitaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="opcionesCitaModalLabel">Opciones de Cita</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Contenedor principal -->
-                    <div class="container">
-                        <!-- Primera fila: Facturación y Modificar Cita -->
-                        <div class="row mb-3">
-                            <div class="col">
-                                <!-- Botón de Facturación -->
-                                <a href="Facturacion/index" class="btn btn-primary btn-lg w-100 text-decoration-none text-white" id="btnFacturacion">
-                                    <i class="ri-bill-line me-2"></i>Facturación
-                                </a>
-                            </div>
-                            <div class="col">
-                                <!-- Botón de Modificar Cita -->
-                                <a class="btn btn-primary btn-lg w-100 text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editarCitaModal">
-                                    <i class="ri-edit-2-line me-2"></i>Modificar Cita
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Segunda fila: Historia Clínica (centrado) -->
-                        <div class="row">
-                            <div class="col-md-6 offset-md-3">
-                                <!-- Centrado en una columna de 6 con un offset de 3 -->
-                                <!-- Botón de Historia Clínica -->
-                                <a  href="HistoriaClinica/Index" class="btn btn-primary btn-lg w-100 text-decoration-none text-white" id="btnHistoriaClinica">
-                                    <i class="ri-file-user-line me-2"></i>Historia Clínica
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <!-- Botón de Cerrar -->
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
         </div>
     </div>
 

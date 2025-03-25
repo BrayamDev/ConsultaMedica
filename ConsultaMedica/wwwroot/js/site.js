@@ -92,6 +92,11 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch('/Agenda/GetCitas')
                 .then(response => response.json())
                 .then(data => {
+                    data.forEach(event => {
+                        if (event.extendedProps) {
+                            event.title = `${event.extendedProps.nombre || ''} ${event.extendedProps.apellido || ''}`.trim();
+                        }
+                    });
                     successCallback(data);
                 })
                 .catch(error => {
@@ -99,61 +104,146 @@ document.addEventListener('DOMContentLoaded', function () {
                     failureCallback('Error al cargar las citas');
                 });
         },
-        eventClick: function (info) {
-            if (info.jsEvent.detail === 2) { // Detectar doble clic
-                // Mostrar el modal
-                var modal = new bootstrap.Modal(document.getElementById('opcionesCitaModal'));
-                modal.show();
-            }
-        },
         eventContent: function (arg) {
             var observaciones = arg.event.extendedProps.observaciones;
             var content = document.createElement('div');
             content.classList.add('event-container');
+            content.style.display = 'flex';
+            content.style.alignItems = 'center';
+            content.style.gap = '5px';
+            content.style.width = '100%';
 
-            // Hora del evento en vistas de Semana/Día
+            // Contenedor de iconos
+            var iconContainer = document.createElement('div');
+            iconContainer.classList.add('event-icons');
+            iconContainer.style.display = 'flex';
+            iconContainer.style.flexDirection = 'column';
+            iconContainer.style.gap = '3px';
+            iconContainer.style.marginRight = '5px';
+
+            // Iconos de acciones
+            var facturacionIcon = document.createElement('i');
+            facturacionIcon.classList.add('ri-bill-line');
+            facturacionIcon.title = 'Facturación';
+            facturacionIcon.addEventListener('click', function (e) {
+                e.stopPropagation();
+                window.location.href = 'Facturacion/Index?id=' + arg.event.id;
+            });
+
+            var editarIcon = document.createElement('i');
+            editarIcon.classList.add('ri-edit-2-line');
+            editarIcon.title = 'Editar cita';
+            editarIcon.addEventListener('click', function (e) {
+                e.stopPropagation();
+                abrirModalEditarCita(arg.event);
+            });
+
+            var historiaIcon = document.createElement('i');
+            historiaIcon.classList.add('ri-file-user-line');
+            historiaIcon.title = 'Historia clínica';
+            historiaIcon.addEventListener('click', function (e) {
+                e.stopPropagation();
+                window.location.href = 'HistoriaClinica/Index?id=' + arg.event.id;
+            });
+
+            iconContainer.appendChild(facturacionIcon);
+            iconContainer.appendChild(editarIcon);
+            iconContainer.appendChild(historiaIcon);
+
+            // Contenido del evento
+            var eventContent = document.createElement('div');
+            eventContent.classList.add('event-content');
+            eventContent.style.overflow = 'hidden';
+
+            // Título (Nombre + Apellido)
+            var title = document.createElement('div');
+            title.classList.add('event-title');
+            title.style.fontWeight = 'bold';
+            title.style.whiteSpace = 'nowrap';
+            title.style.overflow = 'hidden';
+            title.style.textOverflow = 'ellipsis';
+            title.textContent = arg.event.title;
+            eventContent.appendChild(title);
+
+            // Hora en vistas de semana/día
             if (arg.view.type !== 'dayGridMonth') {
                 var time = document.createElement('div');
                 time.classList.add('event-time');
-                time.innerHTML = `<strong>${arg.timeText}</strong>`;
-                content.appendChild(time);
+                time.style.fontSize = '0.85em';
+                time.style.color = '#555';
+                time.textContent = arg.timeText;
+                eventContent.insertBefore(time, title);
             }
 
-            // Título del evento
-            var title = document.createElement('div');
-            title.classList.add('event-title');
-            title.innerHTML = arg.event.title;
-            content.appendChild(title);
-
-            // Observaciones (si existen)
+            // Observaciones
             if (observaciones) {
                 var obs = document.createElement('div');
                 obs.classList.add('event-observations');
-                obs.innerHTML = observaciones;
-                content.appendChild(obs);
+                obs.style.fontSize = '0.8em';
+                obs.style.color = '#fff';
+                obs.style.marginTop = '3px';
+                obs.textContent = observaciones;
+                eventContent.appendChild(obs);
             }
+
+            content.appendChild(iconContainer);
+            content.appendChild(eventContent);
 
             return { domNodes: [content] };
         },
         eventDidMount: function (info) {
-            // Eliminar las clases no deseadas
+            // Estilos para el evento - fondo blanco y borde
+            const eventEl = info.el;
+            eventEl.style.borderRadius = '4px';
+            eventEl.style.padding = '5px';
+            eventEl.style.margin = '2px 0';
+            eventEl.style.backgroundColor = '#ffffff'; // Fondo blanco
+            eventEl.style.border = '1px solid #e0e0e0'; // Borde gris claro
+            eventEl.style.color = '#333333';
+            eventEl.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+
+            // Eliminar clases de FullCalendar
             const classesToRemove = [
                 'fc-timegrid-event',
                 'fc-v-event',
                 'fc-timegrid-event-short',
                 'fc-event-start',
                 'fc-event-end',
-                'fc-event-past'
+                'fc-event-past',
+                'fc-daygrid-event'
             ];
 
             classesToRemove.forEach(className => {
-                info.el.classList.remove(className);
+                eventEl.classList.remove(className);
+            });
+
+            // Estilos para los iconos
+            const icons = eventEl.querySelectorAll('.event-icons i');
+            icons.forEach(icon => {
+                icon.style.fontSize = '14px';
+                icon.style.padding = '2px';
+                icon.style.borderRadius = '3px';
+                icon.style.transition = 'all 0.2s';
+                icon.style.color = '#fff';
+                icon.style.cursor = 'pointer';
+
+                icon.addEventListener('mouseenter', () => {
+                    icon.style.color = '#00826F';
+                    icon.style.backgroundColor = 'rgba(0, 130, 111, 0.1)';
+                });
+
+                icon.addEventListener('mouseleave', () => {
+                    icon.style.color = '#fff';
+                    icon.style.backgroundColor = 'transparent';
+                });
             });
         }
     });
 
     calendar.render();
 });
+
+// Función para abrir modal de edición (se mantiene para el icono de editar)
 function abrirModalEditarCita(evento) {
     const cita = {
         id: evento.id,
@@ -178,8 +268,6 @@ function abrirModalEditarCita(evento) {
     const modal = new bootstrap.Modal(document.getElementById('editarCitaModal'));
     modal.show();
 }
-
-
 /* **************************************** FULL CALENDAR en nueva ANGENDA ****************************************** */
 
 

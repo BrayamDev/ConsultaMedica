@@ -569,6 +569,28 @@ body {
     color: white;
 }
 
+/* Estilos para el calendario */
+.fc-event {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+
+    .fc-event:hover {
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+
+/* Asegurar consistencia en todas las vistas */
+.fc-timegrid-event, .fc-daygrid-event {
+    border-radius: 4px !important;
+    padding: 5px !important;
+    margin: 2px 0 !important;
+}
+
+/* Estilos para el checkbox de observaciones */
+#mostrarObservaciones:checked ~ .container-fluid .event-observations {
+    display: block !important;
+}
+
 /*************************************** COLORES DEL MODAL *************************************************/
 /*************************************** HISTORIA CLINICA CSS *************************************************/
 
