@@ -1,8 +1,13 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using ConsultaMedica.Models.HistoriaClinica
+@model HistoriaClinicaViewModel
 @{
+    var paciente = ViewBag.Paciente as Pacientes;
+    var citaId = ViewBag.CitaId;
+    var medicoId = ViewBag.MedicoId;
+    var medicos = ViewBag.Medicos as List<SelectListItem> ?? new List<SelectListItem>(); // Previene null
+
 }
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -33,9 +38,24 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
-   <body>
-    <div class="p-2 container rounded text-center">
-        <h1>Gestionar Historia Clínica</h1>
+
+<body>
+    <div class="container-fluid p-2 rounded">
+        <div class="row align-items-center">
+            <!-- Título pegado a la izquierda -->
+            <div class="col text-start">
+                <h1 class="m-0">Gestionar Historia Clínica</h1>
+            </div>
+
+            <!-- Botones pegados a la derecha -->
+            <div class="col-auto">
+                <div class="d-flex justify-content-end gap-2">
+                    <button class="btn btn-success" style="background-color: #00826F; border: none;">Volver</button>
+                    <button class="btn btn-success" style="background-color: #00826F; border: none;">Finalizar visita y salir</button>
+                    <button class="btn btn-success" style="background-color: #00826F; border: none;">Finalizar visita y facturar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="container-fluid">
@@ -55,8 +75,21 @@
                             </div>
                             <div class="col-md-6">
                                 <br /> <br /> <br />
-                                <p><strong>Nombre:</strong> LISE, STEFANO</p>
-                                <p><strong>Email:</strong> STEFANOLISE11@GMAIL.COM</p>
+                                <p><strong>Nombre:</strong> @($"{paciente.PrimerApellido?.ToUpper()}, {paciente.Nombre?.ToUpper()}")</p>
+                                <p><strong>Email:</strong> @paciente.Email</p>
+                                <p><strong>Telefono:</strong> @paciente.Telefono</p>
+                                <p>
+                                    <strong>Edad:</strong>
+                                    @if (paciente.FechaNacimiento.HasValue)
+                                    {
+                                        <text>@(DateTime.Today.Year - paciente.FechaNacimiento.Value.Year) años</text>
+                                    }
+                                    else
+                                    {
+                                        <text>No especificada</text>
+                                    }
+                                </p>
+                                <p><strong>Documento:</strong> @paciente.NumeroDocumento</p>
                             </div>
                         </div>
                         <!-- Botones adicionales -->
@@ -64,10 +97,7 @@
                             <div class="row">
                                 <!-- Primera fila de botones -->
                                 <div class="col-6 mb-2">
-                                    <button class="btn btn-success btn-sm w-100" style="background-color: #00826F; border: none;">Historial Paciente</button>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <button class="btn btn-success btn-sm w-100" style="background-color: #00826F; border: none;">Informes</button>
+                                    <button class="btn btn-success btn-sm w-100" style="background-color: #00826F; border: none;">Episodios</button>
                                 </div>
                             </div>
                             <div class="row">
@@ -100,56 +130,176 @@
                 </div>
             </div>
 
-            <!-- Columna para las visitas -->
+            <!-- Columna principal con el formulario de historia clínica -->
             <div class="col-md-8">
-                <div class="details">
-                    <details class="card border-success mb-3">
-                        <summary class="card-header text-white summary" style="background-color: #00826F; border: none;">Visita 12/02/2025 - Medicina general - JOGA</summary>
-                        <div class="card-body text-success content">
-                            <p><strong>Edad en el momento de la visita:</strong> 11 meses</p>
-                            <p><strong>Tratamientos:</strong></p>
-                            <ul>
-                                <li>Consulta control residentes [20 m] - 1</li>
-                                <li>Consulta residentes diurna [30 m] - 1</li>
-                                <li>Receta médica [10 m] - 1</li>
-                                <li>Sutura grande residentes [20 m] - 1</li>
-                            </ul>
-                            <p><strong>Observaciones de la cita (Agenda):</strong> CONSULTA DE URGENCIA RESIDENTE</p>
-                            <p><strong>Pruebas complementarias:</strong> 924 × 482</p>
+                <!-- Formulario de Historia Clínica -->
+                <div class="form-section">
+                    <div class="form-header">
+                        <h5 class="mb-0">Registro de Historia Clínica</h5>
+                    </div>
+
+                    <form id="historiaClinicaForm" asp-action="Create" asp-route-citaId="@ViewBag.CitaId">
+                        <!-- Motivo de consulta -->
+                        <div class="form-group">
+                            <label asp-for="MotivoConsulta"><strong>Motivo de consulta</strong></label>
+                            <textarea class="form-control" asp-for="MotivoConsulta" rows="3" required></textarea>
+                            <span asp-validation-for="MotivoConsulta" class="text-danger"></span>
                         </div>
-                    </details>
+
+                        <!-- Enfermedad actual -->
+                        <div class="form-group">
+                            <label asp-for="EnfermedadActual"><strong>Enfermedad actual</strong></label>
+                            <textarea class="form-control" asp-for="EnfermedadActual" rows="3" required></textarea>
+                            <span asp-validation-for="EnfermedadActual" class="text-danger"></span>
+                        </div>
+
+                        <!-- Examen físico -->
+                        <div class="form-group">
+                            <label><strong>Examen físico</strong></label>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label asp-for="Temperatura">Temperatura</label>
+                                    <input type="text" class="form-control" asp-for="Temperatura" placeholder="°C">
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="FrecuenciaCardiaca">Frecuencia cardiaca</label>
+                                    <input type="text" class="form-control" asp-for="FrecuenciaCardiaca" placeholder="lpm">
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="TensionArterial">Tensión arterial</label>
+                                    <input type="text" class="form-control" asp-for="TensionArterial" placeholder="mmHg">
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-md-4">
+                                    <label asp-for="FrecuenciaRespiratoria">Frecuencia respiratoria</label>
+                                    <input type="text" class="form-control" asp-for="FrecuenciaRespiratoria" placeholder="rpm">
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="SatO2">Sat O2</label>
+                                    <input type="text" class="form-control" asp-for="SatO2" placeholder="%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Diagnóstico -->
+                        <div class="form-group">
+                            <label asp-for="Diagnostico"><strong>Diagnóstico</strong></label>
+                            <textarea class="form-control" asp-for="Diagnostico" rows="3" required></textarea>
+                            <span asp-validation-for="Diagnostico" class="text-danger"></span>
+                        </div>
+
+                        <!-- Evolución / Análisis -->
+                        <div class="form-group">
+                            <label asp-for="EvolucionAnalisis"><strong>Evolución / Análisis</strong></label>
+                            <textarea class="form-control" asp-for="EvolucionAnalisis" rows="3" required></textarea>
+                            <span asp-validation-for="EvolucionAnalisis" class="text-danger"></span>
+                        </div>
+
+                        <!-- Conducta médica y recomendaciones -->
+                        <div class="form-group">
+                            <label asp-for="ConductaMedica"><strong>Conducta médica y recomendaciones</strong></label>
+                            <textarea class="form-control" asp-for="ConductaMedica" rows="3" required></textarea>
+                            <span asp-validation-for="ConductaMedica" class="text-danger"></span>
+                        </div>
+
+                        <!-- Procedimientos profesionales -->
+                        <div class="form-group">
+                            <label><strong>Procedimientos profesionales</strong></label>
+
+                            <!-- Nuevo campo: Nombre del procedimiento -->
+                            <div class="form-group">
+                                <label asp-for="NombreProcedimiento">Nombre del procedimiento</label>
+                                <input type="text" class="form-control" asp-for="NombreProcedimiento" placeholder="Ej: Consulta general, Cirugía menor, etc.">
+                            </div>
+
+                            <!-- Observación del procedimiento -->
+                            <div class="form-group">
+                                <label asp-for="ObservacionProcedimiento">Observación del procedimiento</label>
+                                <textarea class="form-control" asp-for="ObservacionProcedimiento" rows="2"></textarea>
+                            </div>
+
+                            <!-- Fecha y selección del médico -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label asp-for="FechaProcedimiento">Fecha del procedimiento</label>
+                                    <input type="date" class="form-control" asp-for="FechaProcedimiento" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Médico responsable</label>
+                                    <select class="form-select" asp-for="IdMedico" required>
+                                        <option selected disabled value="">Seleccione un doctor</option>
+                                        @if (ViewBag.Doctores != null)
+                                        {
+                                            @foreach (var doctor in ViewBag.Doctores)
+                                            {
+                                                <option value="@doctor.Value">@doctor.Text</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option disabled>No hay doctores disponibles</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-secondary me-2">Cancelar</button>
+                            <button type="submit" class="btn btn-success" style="background-color: #00826F; border: none;">Guardar Historia Clínica</button>
+                        </div>
+                    </form>
                 </div>
 
-                <div class="details">
-                    <details class="card border-success mb-3">
-                        <summary class="card-header text-white summary" style="background-color: #00826F; border: none;">Visita 11/02/2025 - Medicina general - BIROCA</summary>
-                        <div class="card-body text-success content">
-                            <p><strong>Edad en el momento de la visita:</strong> 11 meses</p>
-                            <p><strong>Tratamientos:</strong></p>
-                            <ul>
-                                <li>Consulta control residentes [20 m] - 1</li>
-                                <li>Consulta residentes diurna [30 m] - 1</li>
-                                <li>Receta médica [10 m] - 1</li>
-                                <li>Sutura grande residentes [20 m] - 1</li>
-                            </ul>
-                            <p><strong>Observaciones de la cita (Agenda):</strong> CONSULTA DE URGENCIA RESIDENTE</p>
-                            <p><strong>Pruebas complementarias:</strong> 924 × 482</p>
-                        </div>
-                    </details>
-                </div>
-            </div>
-        </div>
+                <!-- Sección de visitas anteriores (manteniendo tu contenido original) -->
+                @if (ViewBag.HistoriasClinicas != null && ViewBag.HistoriasClinicas.Count > 0)
+                {
+                    @foreach (var historia in ViewBag.HistoriasClinicas)
+                    {
+                        <div class="details">
+                            <details class="card border-success mb-3">
+                                <summary class="card-header text-white summary" style="background-color: #00826F; border: none;">
+                                    Visita @(historia.FechaAlta != null ? Convert.ToDateTime(historia.FechaAlta).ToString("dd/MM/yyyy") : "Fecha no disponible")
+                                </summary>
+                                <div class="card-body text-success content">
+                                    <p><strong>Motivo de Consulta:</strong> @historia.MotivoConsulta</p>
+                                    <p><strong>Diagnóstico:</strong> @historia.Diagnostico</p>
+                                    <p><strong>Conducta Médica:</strong> @historia.ConductaMedicaRecomendaciones</p>
 
-        <!-- Fila para los botones de acción -->
-        <div class="row mt-3">
-            <div class="col-12">
-                <div class="d-flex justify-content-end">
-                    <button class="btn btn-success me-2" style="background-color: #00826F; border: none;">Volver</button>
-                    <button class="btn btn-success me-2" style="background-color: #00826F; border: none;">Finalizar visita y salir</button>
-                    <button class="btn btn-success" style="background-color: #00826F; border: none;">Finalizar visita y facturar</button>
-                </div>
+                                    <p><strong>Procedimientos:</strong></p>
+                                    <ul>
+                                        @if (historia.Procedimientos != null && historia.Procedimientos.Count > 0)
+                                        {
+                                            @foreach (var procedimiento in historia.Procedimientos)
+                                            {
+                                                <li>@procedimiento.NombreProcedimiento - @procedimiento.NombreProfesional</li>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <li>No hay procedimientos registrados</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </details>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No hay historias clínicas registradas para este paciente.</p>
+                }
             </div>
         </div>
     </div>
-   </body>
+
+    <br />
+    <br />
+    <br />
+    <br />
+</body>
 </html>

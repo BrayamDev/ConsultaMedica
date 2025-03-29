@@ -263,7 +263,6 @@ function abrirModalEditarCita(evento) {
     document.getElementById('tarifa').value = cita.extendedProps.tarifa || '';
     document.getElementById('observaciones').value = cita.extendedProps.observaciones || '';
     document.getElementById('destaca').checked = cita.extendedProps.destaca || false;
-    document.getElementById('citaMultiple').checked = cita.extendedProps.citaMultiple || false;
 
     const modal = new bootstrap.Modal(document.getElementById('editarCitaModal'));
     modal.show();

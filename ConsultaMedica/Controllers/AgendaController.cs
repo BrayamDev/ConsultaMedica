@@ -18,13 +18,13 @@ namespace ConsultaMedica.Controllers
         }
 
         // GET: CitaController
-        public ActionResult Index()
+        // GET: AgendaController/Index
+        public ActionResult Index(int? id)
         {
-            // Obtener la lista de especialidades
+            // Código existente para dropdowns
             var especialidades = _context.especialidades.ToList();
             ViewBag.Especialidades = new SelectList(especialidades, "Id", "Nombre");
 
-            // Obtener la lista de pacientes
             var pacientes = _context.pacientes
                .Select(p => new SelectListItem
                {
@@ -34,7 +34,6 @@ namespace ConsultaMedica.Controllers
                .ToList();
             ViewBag.Pacientes = pacientes;
 
-            // Obtener la lista de doctores
             var doctores = _context.doctores
                .Select(d => new SelectListItem
                {
@@ -44,8 +43,23 @@ namespace ConsultaMedica.Controllers
                .ToList();
             ViewBag.Doctores = doctores;
 
+            // Nuevo código para manejar el ID de paciente
+            if (id.HasValue)
+            {
+                var cita = _context.citas
+                    .Include(c => c.Paciente)
+                    .FirstOrDefault(c => c.Id == id.Value);
+
+                if (cita != null)
+                {
+                    ViewBag.PacienteActual = cita.Paciente;
+                    ViewBag.CitaId = id.Value;
+                }
+            }
+
             return View();
         }
+
 
         // Método para obtener las citas en formato JSON
         public IActionResult GetCitas()
@@ -97,8 +111,6 @@ namespace ConsultaMedica.Controllers
             // Redirigir a la vista Index de Agenda
             return RedirectToAction("Index", "Agenda");
         }
-
-
 
 
     }

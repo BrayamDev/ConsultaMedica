@@ -593,5 +593,30 @@ body {
 
 /*************************************** COLORES DEL MODAL *************************************************/
 /*************************************** HISTORIA CLINICA CSS *************************************************/
+.form-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
 
+.form-header {
+    background-color: #00826F;
+    color: white;
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+    margin-bottom: 15px;
+}
+
+.dynamic-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: white;
+}
+
+.btn-add-item {
+    margin-bottom: 15px;
+}
 /*************************************** HISTORIA CLINICA CSS *************************************************/

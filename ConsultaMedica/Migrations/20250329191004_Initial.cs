@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ConsultaMedica.Migrations
 {
     /// <inheritdoc />
-    public partial class ModificacionDoctor : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,7 +60,7 @@ namespace ConsultaMedica.Migrations
                     PrimerApellido = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SegundoApellido = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Acronimo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NumColegiado = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NumColegiado = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     EspecialidadPrincipal = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Fotografia = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TipoDeDocumento = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -105,7 +105,7 @@ namespace ConsultaMedica.Migrations
                     Provincia = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Poblacion = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TipoDocumento = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NumeroDocumento = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NumeroDocumento = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Direccion = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CodigoPostal = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Telefono = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -246,7 +246,7 @@ namespace ConsultaMedica.Migrations
                         column: x => x.EspecialidadId,
                         principalTable: "especialidades",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_citas_pacientes_PacienteId",
                         column: x => x.PacienteId,
@@ -262,15 +262,101 @@ namespace ConsultaMedica.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IdPaciente = table.Column<int>(type: "int", nullable: false),
-                    FechaAlta = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CitaId = table.Column<int>(type: "int", nullable: true),
+                    IdMedico = table.Column<int>(type: "int", nullable: false),
+                    FechaAlta = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MotivoConsulta = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EnfermedadActual = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Diagnostico = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EvolucionAnalisis = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ConductaMedicaRecomendaciones = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_historiasClinicas", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_historiasClinicas_citas_CitaId",
+                        column: x => x.CitaId,
+                        principalTable: "citas",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_historiasClinicas_doctores_IdMedico",
+                        column: x => x.IdMedico,
+                        principalTable: "doctores",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_historiasClinicas_pacientes_IdPaciente",
                         column: x => x.IdPaciente,
                         principalTable: "pacientes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExamenesFisicos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdHistoriaClinica = table.Column<int>(type: "int", nullable: false),
+                    Temperatura = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FrecuenciaCardiaca = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TensionArterial = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FrecuenciaRespiratoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SatO2 = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamenesFisicos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExamenesFisicos_historiasClinicas_IdHistoriaClinica",
+                        column: x => x.IdHistoriaClinica,
+                        principalTable: "historiasClinicas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExamenesFisicosAdicionales",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdHistoriaClinica = table.Column<int>(type: "int", nullable: false),
+                    NombreItem = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamenesFisicosAdicionales", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExamenesFisicosAdicionales_historiasClinicas_IdHistoriaClinica",
+                        column: x => x.IdHistoriaClinica,
+                        principalTable: "historiasClinicas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProcedimientosProfesionales",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdHistoriaClinica = table.Column<int>(type: "int", nullable: false),
+                    NombreProcedimiento = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaProcedimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NombreProfesional = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProcedimientosProfesionales", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProcedimientosProfesionales_historiasClinicas_IdHistoriaClinica",
+                        column: x => x.IdHistoriaClinica,
+                        principalTable: "historiasClinicas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -325,10 +411,49 @@ namespace ConsultaMedica.Migrations
                 column: "PacienteId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_doctores_NumColegiado",
+                table: "doctores",
+                column: "NumColegiado",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExamenesFisicos_IdHistoriaClinica",
+                table: "ExamenesFisicos",
+                column: "IdHistoriaClinica");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExamenesFisicosAdicionales_IdHistoriaClinica",
+                table: "ExamenesFisicosAdicionales",
+                column: "IdHistoriaClinica");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_historiasClinicas_CitaId",
+                table: "historiasClinicas",
+                column: "CitaId",
+                unique: true,
+                filter: "[CitaId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_historiasClinicas_IdMedico",
+                table: "historiasClinicas",
+                column: "IdMedico");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_historiasClinicas_IdPaciente",
                 table: "historiasClinicas",
-                column: "IdPaciente",
-                unique: true);
+                column: "IdPaciente");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_pacientes_NumeroDocumento",
+                table: "pacientes",
+                column: "NumeroDocumento",
+                unique: true,
+                filter: "[NumeroDocumento] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProcedimientosProfesionales_IdHistoriaClinica",
+                table: "ProcedimientosProfesionales",
+                column: "IdHistoriaClinica");
         }
 
         /// <inheritdoc />
@@ -350,19 +475,28 @@ namespace ConsultaMedica.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "citas");
+                name: "ExamenesFisicos");
 
             migrationBuilder.DropTable(
-                name: "doctores");
+                name: "ExamenesFisicosAdicionales");
 
             migrationBuilder.DropTable(
-                name: "historiasClinicas");
+                name: "ProcedimientosProfesionales");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "historiasClinicas");
+
+            migrationBuilder.DropTable(
+                name: "citas");
+
+            migrationBuilder.DropTable(
+                name: "doctores");
 
             migrationBuilder.DropTable(
                 name: "especialidades");

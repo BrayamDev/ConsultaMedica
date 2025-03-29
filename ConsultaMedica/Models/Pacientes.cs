@@ -1,7 +1,7 @@
 ﻿namespace ConsultaMedica.Models
 {
     public class Pacientes
-    { 
+    {
         public int Id { get; set; }
         public string? Nombre { get; set; }
         public string? PrimerApellido { get; set; }
@@ -22,8 +22,10 @@
         public string? Aseguradora { get; set; }
         public string? Observaciones { get; set; }
 
-        public HistoriasClinicas HistoriaClinica { get; set; }
-        public List<Citas> Citas { get; set; } = new List<Citas>();
+        // Propiedades de navegación
+        public ICollection<HistoriasClinicas> HistoriasClinicas { get; set; } = new List<HistoriasClinicas>();
+        public ICollection<Citas> Citas { get; set; } = new List<Citas>();
+
 
     }
 }
