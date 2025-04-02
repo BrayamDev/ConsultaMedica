@@ -260,7 +260,6 @@ function abrirModalEditarCita(evento) {
     document.getElementById('tratamiento').value = cita.extendedProps.tratamiento || '';
     document.getElementById('tiempoVisita').value = (cita.end - cita.start) / (1000 * 60);
     document.getElementById('paciente').value = cita.extendedProps.paciente || '';
-    document.getElementById('tarifa').value = cita.extendedProps.tarifa || '';
     document.getElementById('observaciones').value = cita.extendedProps.observaciones || '';
     document.getElementById('destaca').checked = cita.extendedProps.destaca || false;
 

@@ -1,16 +1,15 @@
-﻿@using ConsultaMedica.Models.HistoriaClinica
+﻿@using ConsultaMedica.Models.ViewModels
 @model HistoriaClinicaViewModel
 @{
     var paciente = ViewBag.Paciente as Pacientes;
     var citaId = ViewBag.CitaId;
     var medicoId = ViewBag.MedicoId;
-    var medicos = ViewBag.Medicos as List<SelectListItem> ?? new List<SelectListItem>(); // Previene null
+    var medicos = ViewBag.Medicos as List<SelectListItem> ?? new List<SelectListItem>(); 
 
 }
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -70,7 +69,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>ID:</strong> 2147483647</p>
+                                <p><strong>ID:</strong> @($"{paciente.Nombre?[0]}{DateTime.Now:yyyyMMdd}{paciente.NumeroDocumento}")</p>
                                 <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Foto de perfil" class="img-fluid rounded" style="max-width: 250px; height: 250px;">
                             </div>
                             <div class="col-md-6">
@@ -217,8 +216,8 @@
 
                             <!-- Observación del procedimiento -->
                             <div class="form-group">
-                                <label asp-for="ObservacionProcedimiento">Observación del procedimiento</label>
-                                <textarea class="form-control" asp-for="ObservacionProcedimiento" rows="2"></textarea>
+                                <label asp-for="ObservacionesProcedimiento">Observación del procedimiento</label>
+                                <textarea class="form-control" asp-for="ObservacionesProcedimiento" rows="2"></textarea>
                             </div>
 
                             <!-- Fecha y selección del médico -->
@@ -261,9 +260,98 @@
                     @foreach (var historia in ViewBag.HistoriasClinicas)
                     {
                         <div class="details">
+
                             <details class="card border-success mb-3">
+                                <div class="p-2">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" style="background-color: #00826F; border: none;">
+                                        <i class="ri-add-line"></i> Visita Sucesiva
+                                    </button>
+                                </div>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header" style="background-color: #00826F; border: none;">
+                                                <h5 class="modal-title" id="exampleModalLabel">Visita Sucesiva</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form id="evolucionForm" asp-action="InsertarVisitaSucesiva" method="post">
+
+                                                    <input type="hidden" id="IdHistoriaClinica" name="IdHistoriaClinica" value="@(ViewBag.IdHistoriaClinica ?? 0)" />
+                                                    <input type="hidden" id="IdCita" name="IdCita" value="@ViewBag.CitaId" />
+
+                                                    <!-- 1. Evolución / Análisis -->
+                                                    <div class="mb-4">
+                                                        <label asp-for="EvolucionAnalisis" class="form-label fw-bold">1. Evolución / Análisis</label>
+                                                        <textarea class="form-control" asp-for="EvolucionAnalisis" rows="4" required></textarea>
+                                                        <span asp-validation-for="EvolucionAnalisis" class="text-danger"></span>
+                                                    </div>
+
+                                                    <!-- 2. Conducta médica y recomendaciones -->
+                                                    <div class="mb-4">
+                                                        <label asp-for="ConductaMedica" class="form-label fw-bold">2. Conducta médica y recomendaciones</label>
+                                                        <textarea class="form-control" asp-for="ConductaMedica" rows="4" required></textarea>
+                                                        <span asp-validation-for="ConductaMedica" class="text-danger"></span>
+                                                    </div>
+
+                                                    <!-- 3. Procedimientos profesionales -->
+                                                    <div class="mb-4">
+                                                        <h5 class="fw-bold mb-3">3. Procedimientos profesionales</h5>
+                                                        <div class="card w-100">
+                                                            <div class="card-header bg-light fw-bold">Procedimiento 1</div>
+                                                            <div class="card-body">
+                                                                <div class="mb-3">
+                                                                    <label asp-for="FechaProcedimiento" class="form-label">a. Fecha del procedimiento</label>
+                                                                    <input type="date" class="form-control" asp-for="FechaProcedimiento">
+                                                                    <span asp-validation-for="FechaProcedimiento" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label asp-for="ObservacionesProcedimiento" class="form-label">b. Observación</label>
+                                                                    <textarea class="form-control" asp-for="ObservacionesProcedimiento" rows="3"></textarea>
+                                                                    <span asp-validation-for="ObservacionesProcedimiento" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label asp-for="IdMedico" class="form-label">c. Nombre del profesional</label>
+                                                                    <select class="form-select" asp-for="IdMedico" required>
+                                                                        <option selected disabled value="">Seleccione un doctor</option>
+                                                                        @if (ViewBag.Doctores != null)
+                                                                        {
+                                                                            @foreach (var doctor in ViewBag.Doctores)
+                                                                            {
+                                                                                <option value="@doctor.Value">@doctor.Text</option>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <option disabled>No hay doctores disponibles</option>
+                                                                        }
+                                                                    </select>
+                                                                    <span asp-validation-for="IdMedico" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                        <button type="submit" class="btn btn-primary" style="background-color: #00826F; border: none;">Guardar Cambios</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <summary class="card-header text-white summary" style="background-color: #00826F; border: none;">
-                                    Visita @(historia.FechaAlta != null ? Convert.ToDateTime(historia.FechaAlta).ToString("dd/MM/yyyy") : "Fecha no disponible")
+                                    @{
+                                        var fechaTexto = historia.FechaAlta != null ?
+                                        Convert.ToDateTime(historia.FechaAlta).ToString("dd/MM/yyyy") :
+                                        "Fecha no disponible";
+
+                                        var primerProc = historia.Procedimientos.Count > 0 ? historia.Procedimientos[0] : null;
+                                        var procedimientoTexto = primerProc != null ? primerProc.NombreProcedimiento : "Sin procedimiento";
+                                    }
+                                    Visita @fechaTexto - @procedimientoTexto
                                 </summary>
                                 <div class="card-body text-success content">
                                     <p><strong>Motivo de Consulta:</strong> @historia.MotivoConsulta</p>

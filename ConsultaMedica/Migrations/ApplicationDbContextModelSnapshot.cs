@@ -33,6 +33,9 @@ namespace ConsultaMedica.Migrations
                     b.Property<int>("EspecialidadId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Estado")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("FechaHora")
                         .HasColumnType("datetime2");
 
@@ -269,62 +272,78 @@ namespace ConsultaMedica.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Aseguradora")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CodigoPostal")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Direccion")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("FechaNacimiento")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Movil")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Nombre")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("NumeroDocumento")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Observaciones")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaisOrigen")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Poblacion")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PrimerApellido")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Procedencia")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Provincia")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("SegundoApellido")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Sexo")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Telefono")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("TipoDocumento")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TipoDocumentoId")
+                        .HasColumnType("int")
+                        .HasColumnName("IdTipoDocumento");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NumeroDocumento")
+                    b.HasIndex("TipoDocumentoId", "NumeroDocumento")
                         .IsUnique()
                         .HasFilter("[NumeroDocumento] IS NOT NULL");
 
@@ -362,6 +381,104 @@ namespace ConsultaMedica.Migrations
                     b.HasIndex("IdHistoriaClinica");
 
                     b.ToTable("ProcedimientosProfesionales");
+                });
+
+            modelBuilder.Entity("ConsultaMedica.Models.ProcedimientoVisitaSucesiva", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FechaProcedimiento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IdProfesional")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdVisitaSucesiva")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Observaciones")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdProfesional");
+
+                    b.HasIndex("IdVisitaSucesiva");
+
+                    b.ToTable("procedimientoVisitaSucesivas");
+                });
+
+            modelBuilder.Entity("ConsultaMedica.Models.TipoDocumento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TiposDocumento", (string)null);
+                });
+
+            modelBuilder.Entity("ConsultaMedica.Models.VisitaSucesiva", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConductaMedica")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EvolucionAnalisis")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaVisita")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IdCita")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdHistoriaClinica")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdMedicoResponsable")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdCita");
+
+                    b.HasIndex("IdHistoriaClinica");
+
+                    b.HasIndex("IdMedicoResponsable");
+
+                    b.ToTable("visitaSucesivas");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -577,7 +694,7 @@ namespace ConsultaMedica.Migrations
                     b.HasOne("ConsultaMedica.Models.Pacientes", "Paciente")
                         .WithMany("Citas")
                         .HasForeignKey("PacienteId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Especialidad");
@@ -622,7 +739,7 @@ namespace ConsultaMedica.Migrations
                     b.HasOne("ConsultaMedica.Models.Pacientes", "Paciente")
                         .WithMany("HistoriasClinicas")
                         .HasForeignKey("IdPaciente")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cita");
@@ -630,6 +747,17 @@ namespace ConsultaMedica.Migrations
                     b.Navigation("Medico");
 
                     b.Navigation("Paciente");
+                });
+
+            modelBuilder.Entity("ConsultaMedica.Models.Pacientes", b =>
+                {
+                    b.HasOne("ConsultaMedica.Models.TipoDocumento", "TipoDocumento")
+                        .WithMany("Pacientes")
+                        .HasForeignKey("TipoDocumentoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("TipoDocumento");
                 });
 
             modelBuilder.Entity("ConsultaMedica.Models.ProcedimientoProfesional", b =>
@@ -641,6 +769,52 @@ namespace ConsultaMedica.Migrations
                         .IsRequired();
 
                     b.Navigation("HistoriaClinica");
+                });
+
+            modelBuilder.Entity("ConsultaMedica.Models.ProcedimientoVisitaSucesiva", b =>
+                {
+                    b.HasOne("ConsultaMedica.Models.Doctores", "Profesional")
+                        .WithMany()
+                        .HasForeignKey("IdProfesional")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ConsultaMedica.Models.VisitaSucesiva", "VisitaSucesiva")
+                        .WithMany("Procedimientos")
+                        .HasForeignKey("IdVisitaSucesiva")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Profesional");
+
+                    b.Navigation("VisitaSucesiva");
+                });
+
+            modelBuilder.Entity("ConsultaMedica.Models.VisitaSucesiva", b =>
+                {
+                    b.HasOne("ConsultaMedica.Models.Citas", "Cita")
+                        .WithMany()
+                        .HasForeignKey("IdCita")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ConsultaMedica.Models.HistoriasClinicas", "HistoriaClinica")
+                        .WithMany()
+                        .HasForeignKey("IdHistoriaClinica")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ConsultaMedica.Models.Doctores", "MedicoResponsable")
+                        .WithMany()
+                        .HasForeignKey("IdMedicoResponsable")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Cita");
+
+                    b.Navigation("HistoriaClinica");
+
+                    b.Navigation("MedicoResponsable");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -710,6 +884,16 @@ namespace ConsultaMedica.Migrations
                     b.Navigation("Citas");
 
                     b.Navigation("HistoriasClinicas");
+                });
+
+            modelBuilder.Entity("ConsultaMedica.Models.TipoDocumento", b =>
+                {
+                    b.Navigation("Pacientes");
+                });
+
+            modelBuilder.Entity("ConsultaMedica.Models.VisitaSucesiva", b =>
+                {
+                    b.Navigation("Procedimientos");
                 });
 #pragma warning restore 612, 618
         }

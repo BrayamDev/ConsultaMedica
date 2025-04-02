@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ConsultaMedica.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialMigrate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -91,33 +91,18 @@ namespace ConsultaMedica.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "pacientes",
+                name: "TiposDocumento",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PrimerApellido = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SegundoApellido = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Sexo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaisOrigen = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Provincia = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Poblacion = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TipoDocumento = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NumeroDocumento = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Direccion = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CodigoPostal = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Telefono = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Movil = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Procedencia = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Aseguradora = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Activo = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_pacientes", x => x.Id);
+                    table.PrimaryKey("PK_TiposDocumento", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -227,6 +212,42 @@ namespace ConsultaMedica.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "pacientes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    PrimerApellido = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    SegundoApellido = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Sexo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    PaisOrigen = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Provincia = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Poblacion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    IdTipoDocumento = table.Column<int>(type: "int", nullable: false),
+                    NumeroDocumento = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Direccion = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    CodigoPostal = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Telefono = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Movil = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Procedencia = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Aseguradora = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_pacientes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_pacientes_TiposDocumento_IdTipoDocumento",
+                        column: x => x.IdTipoDocumento,
+                        principalTable: "TiposDocumento",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "citas",
                 columns: table => new
                 {
@@ -236,7 +257,8 @@ namespace ConsultaMedica.Migrations
                     EspecialidadId = table.Column<int>(type: "int", nullable: false),
                     TiempoVisita = table.Column<int>(type: "int", nullable: false),
                     PacienteId = table.Column<int>(type: "int", nullable: false),
-                    Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Estado = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -252,7 +274,7 @@ namespace ConsultaMedica.Migrations
                         column: x => x.PacienteId,
                         principalTable: "pacientes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -262,7 +284,7 @@ namespace ConsultaMedica.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IdPaciente = table.Column<int>(type: "int", nullable: false),
-                    CitaId = table.Column<int>(type: "int", nullable: true),
+                    CitaId = table.Column<int>(type: "int", nullable: false),
                     IdMedico = table.Column<int>(type: "int", nullable: false),
                     FechaAlta = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MotivoConsulta = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -290,7 +312,7 @@ namespace ConsultaMedica.Migrations
                         column: x => x.IdPaciente,
                         principalTable: "pacientes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -359,6 +381,71 @@ namespace ConsultaMedica.Migrations
                         principalTable: "historiasClinicas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "visitaSucesivas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdHistoriaClinica = table.Column<int>(type: "int", nullable: false),
+                    IdCita = table.Column<int>(type: "int", nullable: false),
+                    FechaVisita = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EvolucionAnalisis = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ConductaMedica = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IdMedicoResponsable = table.Column<int>(type: "int", nullable: false),
+                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_visitaSucesivas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_visitaSucesivas_citas_IdCita",
+                        column: x => x.IdCita,
+                        principalTable: "citas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_visitaSucesivas_doctores_IdMedicoResponsable",
+                        column: x => x.IdMedicoResponsable,
+                        principalTable: "doctores",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_visitaSucesivas_historiasClinicas_IdHistoriaClinica",
+                        column: x => x.IdHistoriaClinica,
+                        principalTable: "historiasClinicas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "procedimientoVisitaSucesivas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdVisitaSucesiva = table.Column<int>(type: "int", nullable: false),
+                    FechaProcedimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IdProfesional = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_procedimientoVisitaSucesivas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_procedimientoVisitaSucesivas_doctores_IdProfesional",
+                        column: x => x.IdProfesional,
+                        principalTable: "doctores",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_procedimientoVisitaSucesivas_visitaSucesivas_IdVisitaSucesiva",
+                        column: x => x.IdVisitaSucesiva,
+                        principalTable: "visitaSucesivas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -430,8 +517,7 @@ namespace ConsultaMedica.Migrations
                 name: "IX_historiasClinicas_CitaId",
                 table: "historiasClinicas",
                 column: "CitaId",
-                unique: true,
-                filter: "[CitaId] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_historiasClinicas_IdMedico",
@@ -444,9 +530,9 @@ namespace ConsultaMedica.Migrations
                 column: "IdPaciente");
 
             migrationBuilder.CreateIndex(
-                name: "IX_pacientes_NumeroDocumento",
+                name: "IX_pacientes_IdTipoDocumento_NumeroDocumento",
                 table: "pacientes",
-                column: "NumeroDocumento",
+                columns: new[] { "IdTipoDocumento", "NumeroDocumento" },
                 unique: true,
                 filter: "[NumeroDocumento] IS NOT NULL");
 
@@ -454,6 +540,31 @@ namespace ConsultaMedica.Migrations
                 name: "IX_ProcedimientosProfesionales_IdHistoriaClinica",
                 table: "ProcedimientosProfesionales",
                 column: "IdHistoriaClinica");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_procedimientoVisitaSucesivas_IdProfesional",
+                table: "procedimientoVisitaSucesivas",
+                column: "IdProfesional");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_procedimientoVisitaSucesivas_IdVisitaSucesiva",
+                table: "procedimientoVisitaSucesivas",
+                column: "IdVisitaSucesiva");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_visitaSucesivas_IdCita",
+                table: "visitaSucesivas",
+                column: "IdCita");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_visitaSucesivas_IdHistoriaClinica",
+                table: "visitaSucesivas",
+                column: "IdHistoriaClinica");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_visitaSucesivas_IdMedicoResponsable",
+                table: "visitaSucesivas",
+                column: "IdMedicoResponsable");
         }
 
         /// <inheritdoc />
@@ -484,10 +595,16 @@ namespace ConsultaMedica.Migrations
                 name: "ProcedimientosProfesionales");
 
             migrationBuilder.DropTable(
+                name: "procedimientoVisitaSucesivas");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "visitaSucesivas");
 
             migrationBuilder.DropTable(
                 name: "historiasClinicas");
@@ -503,6 +620,9 @@ namespace ConsultaMedica.Migrations
 
             migrationBuilder.DropTable(
                 name: "pacientes");
+
+            migrationBuilder.DropTable(
+                name: "TiposDocumento");
         }
     }
 }

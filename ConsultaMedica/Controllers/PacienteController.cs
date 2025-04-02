@@ -1,4 +1,5 @@
 ﻿using ConsultaMedica.Data;
+using ConsultaMedica.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,66 +30,40 @@ namespace ConsultaMedica.Controllers
             return View();
         }
 
-        // GET: PacienteController/Create
-        public ActionResult Create()
+        // GET: Paciente/CrearPacienteCita
+        public IActionResult CrearPacienteCita()
         {
+            // Puedes agregar lógica de inicialización aquí si es necesario
             return View();
         }
 
-        // POST: PacienteController/Create
+        // POST: Paciente/CrearPacienteCita
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> CrearPacienteCita(Pacientes paciente)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                if (ModelState.IsValid)
+                {
 
-        // GET: PacienteController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+                    // Agregar el paciente a la base de datos
+                    _context.pacientes.Add(paciente);
+                    await _context.SaveChangesAsync();
 
-        // POST: PacienteController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                    // Redirigir a alguna vista de éxito o a la lista de pacientes
+                    TempData["SuccessMessage"] = "Paciente creado exitosamente";
+                    return RedirectToAction("Index", "Home"); // Cambia esto por tu acción deseada
+                }
 
-        // GET: PacienteController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: PacienteController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
+                // Si el modelo no es válido, regresar a la vista con los errores
+                return View(paciente);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                // Loggear el error (puedes implementar un sistema de logging)
+                ModelState.AddModelError("", "Ocurrió un error al crear el paciente. Por favor intente nuevamente.");
+                return View(paciente);
             }
         }
     }

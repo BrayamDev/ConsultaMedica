@@ -1,15 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ConsultaMedica.Models.HistoriaClinica
+namespace ConsultaMedica.Models.ViewModels
 {
     public class HistoriaClinicaViewModel
     {
         // Datos de historia clínica
+        public int IdCita { get; set; }
+        public int IdHistoriaClinica { get; set; }
         [Required] public string MotivoConsulta { get; set; }
         [Required] public string EnfermedadActual { get; set; }
         [Required] public string Diagnostico { get; set; }
         [Required] public string EvolucionAnalisis { get; set; }
         [Required] public string ConductaMedica { get; set; }
+        [Required] public DateTime FechaAlta { get; set; }
 
         // Datos de examen físico
         public string Temperatura { get; set; }
@@ -19,7 +22,7 @@ namespace ConsultaMedica.Models.HistoriaClinica
         public string SatO2 { get; set; }
 
         // Datos de procedimiento profesional
-        public string ObservacionProcedimiento { get; set; }
+        public string ObservacionesProcedimiento { get; set; }
         public string NombreProfesional { get; set; }
         public string NombreProcedimiento { get; set; }
         public DateTime? FechaProcedimiento { get; set; }

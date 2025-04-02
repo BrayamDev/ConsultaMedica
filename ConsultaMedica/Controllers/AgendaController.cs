@@ -18,7 +18,6 @@ namespace ConsultaMedica.Controllers
         }
 
         // GET: CitaController
-        // GET: AgendaController/Index
         public ActionResult Index(int? id)
         {
             // Código existente para dropdowns
@@ -42,6 +41,16 @@ namespace ConsultaMedica.Controllers
                })
                .ToList();
             ViewBag.Doctores = doctores;
+
+
+            var tiposDocumento = _context.TiposDocumento
+               .Select(d => new SelectListItem
+               {
+                   Value = d.Id.ToString(),
+                   Text = $"{d.Nombre}"
+               })
+               .ToList();
+            ViewBag.TiposDocumento = tiposDocumento;
 
             // Nuevo código para manejar el ID de paciente
             if (id.HasValue)
@@ -111,7 +120,24 @@ namespace ConsultaMedica.Controllers
             // Redirigir a la vista Index de Agenda
             return RedirectToAction("Index", "Agenda");
         }
+        [HttpGet]
+        public ActionResult ConsultarTipoDocumento()
+        {
+            // Cargar solo tipos de documento en ViewBag
+            var tiposDocumento = _context.TiposDocumento
+                .Where(t => t.Activo)
+                .OrderBy(t => t.Nombre)
+                .Select(t => new SelectListItem
+                {
+                    Value = t.Id.ToString(),
+                    Text = t.Nombre
+                })
+                .ToList();
 
+            ViewBag.TiposDocumento = tiposDocumento;
+
+            return View();
+        }
 
     }
 }
