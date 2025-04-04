@@ -39,6 +39,39 @@
 </head>
 
 <body>
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <script>
+            PNotify.defaults.stack = {
+                dir1: 'up',
+                dir2: 'left',
+                firstpos1: 25,
+                firstpos2: 25,
+                spacing1: 25,
+                spacing2: 25,
+                push: 'bottom',
+                context: document.body
+            };
+
+            var tipoMensaje = "@TempData["TipoMensaje"]";
+            var mensaje = "@Html.Raw(TempData["Mensaje"])";
+
+            if (tipoMensaje === "success") {
+                PNotify.success({
+                    title: 'Éxito',
+                    text: mensaje,
+                    delay: 3000
+                });
+            } else if (tipoMensaje === "error") {
+                PNotify.error({
+                    title: 'Error',
+                    text: mensaje,
+                    delay: 3000
+                });
+            }
+        </script>
+    }
     <div class="container-fluid p-2 rounded">
         <div class="row align-items-center">
             <!-- Título pegado a la izquierda -->
@@ -49,7 +82,7 @@
             <!-- Botones pegados a la derecha -->
             <div class="col-auto">
                 <div class="d-flex justify-content-end gap-2">
-                    <button class="btn btn-success" style="background-color: #00826F; border: none;">Volver</button>
+                    <a href="/Agenda" class="btn btn-success" style="background-color: #00826F; border: none;">Volver</a>
                     <button class="btn btn-success" style="background-color: #00826F; border: none;">Finalizar visita y salir</button>
                     <button class="btn btn-success" style="background-color: #00826F; border: none;">Finalizar visita y facturar</button>
                 </div>
@@ -131,11 +164,12 @@
 
             <!-- Columna principal con el formulario de historia clínica -->
             <div class="col-md-8">
+                <div class="form-header">
+                    <h5 class="mb-0">Registro de Historia Clínica</h5>
+                </div>
                 <!-- Formulario de Historia Clínica -->
-                <div class="form-section">
-                    <div class="form-header">
-                        <h5 class="mb-0">Registro de Historia Clínica</h5>
-                    </div>
+                
+                   
 
                     <form id="historiaClinicaForm" asp-action="Create" asp-route-citaId="@ViewBag.CitaId">
                         <!-- Motivo de consulta -->
@@ -227,9 +261,9 @@
                                     <input type="date" class="form-control" asp-for="FechaProcedimiento" value="@DateTime.Now.ToString("yyyy-MM-dd")">
                                 </div>
                                 <div class="col-md-6">
-                                    <label>Médico responsable</label>
+                                    <label>Profesional responsable</label>
                                     <select class="form-select" asp-for="IdMedico" required>
-                                        <option selected disabled value="">Seleccione un doctor</option>
+                                        <option selected disabled value="">Seleccione un profesional</option>
                                         @if (ViewBag.Doctores != null)
                                         {
                                             @foreach (var doctor in ViewBag.Doctores)
@@ -252,7 +286,8 @@
                             <button type="submit" class="btn btn-success" style="background-color: #00826F; border: none;">Guardar Historia Clínica</button>
                         </div>
                     </form>
-                </div>
+                    <br />
+          
 
                 <!-- Sección de visitas anteriores (manteniendo tu contenido original) -->
                 @if (ViewBag.HistoriasClinicas != null && ViewBag.HistoriasClinicas.Count > 0)
@@ -272,7 +307,7 @@
                                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-lg">
                                         <div class="modal-content">
-                                            <div class="modal-header" style="background-color: #00826F; border: none;">
+                                            <div class="modal-header p-2" style="background-color: #00826F; border: none;">
                                                 <h5 class="modal-title" id="exampleModalLabel">Visita Sucesiva</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
@@ -353,7 +388,8 @@
                                     }
                                     Visita @fechaTexto - @procedimientoTexto
                                 </summary>
-                                <div class="card-body text-success content">
+                                <div class="card-body content">
+                                    <h4 style="background-color: #00826F; border: none;" class="p-2 text-white rounded">Historia Clinica</h4>
                                     <p><strong>Motivo de Consulta:</strong> @historia.MotivoConsulta</p>
                                     <p><strong>Diagnóstico:</strong> @historia.Diagnostico</p>
                                     <p><strong>Conducta Médica:</strong> @historia.ConductaMedicaRecomendaciones</p>
@@ -372,15 +408,72 @@
                                             <li>No hay procedimientos registrados</li>
                                         }
                                     </ul>
+                                    <!-- Sección de Visitas Sucesivas -->
+                                    @if (ViewBag.VisitasSucesivas != null && ViewBag.VisitasSucesivas.Count > 0)
+                                    {
+                                        <div class="mt-4">
+                                            <h4 style="background-color: #00826F; border: none;" class="p-2 text-white rounded">Visitas Sucesivas</h4>
+
+                                            @foreach (var visita in ViewBag.VisitasSucesivas)
+                                            {
+                                                <details class="card border-success mb-3">
+                                                    <summary class="card-header text-white" style="background-color: #00826F; border: none;">
+                                                        Visita del @visita.FechaVisita.ToString("dd/MM/yyyy HH:mm") -
+                                                        Médico: @visita.MedicoResponsable
+                                                    </summary>
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h6>Evolución / Análisis:</h6>
+                                                                <p>@visita.EvolucionAnalisis</p>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h6>Conducta médica:</h6>
+                                                                <p>@visita.ConductaMedica</p>
+                                                            </div>
+                                                        </div>
+
+                                                        @if (visita.Procedimientos != null && visita.Procedimientos.Count > 0)
+                                                        {
+                                                            <div class="mt-3">
+                                                                <h5>Procedimientos realizados:</h5>
+                                                                @foreach (var proc in visita.Procedimientos)
+                                                                {
+                                                                    <div class="card mb-2">
+                                                                        <div class="card-body">
+                                                                            <p><strong>Fecha:</strong> @proc.FechaProcedimiento.ToString("dd/MM/yyyy")</p>
+                                                                            <p><strong>Profesional:</strong> @proc.Profesional</p>
+                                                                            <p><strong>Observaciones:</strong> @proc.Observaciones</p>
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </details>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-info mt-4">
+                                            No hay visitas sucesivas registradas para esta historia clínica.
+                                        </div>
+                                    }
                                 </div>
+                               
                             </details>
                         </div>
                     }
                 }
                 else
                 {
-                    <p>No hay historias clínicas registradas para este paciente.</p>
+                    <div class="alert alert-info mt-4">
+                       No hay historias clínicas registradas para este paciente.
+                    </div>
+                    
                 }
+
             </div>
         </div>
     </div>
