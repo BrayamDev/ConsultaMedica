@@ -15,6 +15,7 @@ namespace ConsultaMedica.Models
         [Required]
         public string MotivoConsulta { get; set; }
         public string EnfermedadActual { get; set; }
+        public string EnfermedadBase { get; set; }
 
         [Required]
         public string Diagnostico { get; set; }

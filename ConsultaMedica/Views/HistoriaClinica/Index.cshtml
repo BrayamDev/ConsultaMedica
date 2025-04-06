@@ -156,7 +156,18 @@
                         <h5 class="card-title text-white mb-0">Enfermedades actuales</h5>
                     </div>
                     <div class="card-body">
-                        <p><strong>#1 - 11/02/2025</strong></p>
+                        <!-- Enfermedad actual -->
+                        <div class="mb-3">
+                            @foreach (var historia in ViewBag.HistoriasClinicas)
+                            {
+                                <!-- Enfermedad Base -->
+                                <div class="mb-3">  
+                                    <p>
+                                        @historia.EnfermedadBase
+                                    </p>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -411,27 +422,103 @@
                                                 Visita @fechaTexto - @procedimientoTexto
                                             </summary>
                                             <div class="card-body content">
-                                                <h4 style="background-color: #00826F; border: none;" class="p-2 text-white rounded text-center">Historia Clinica</h4>
-                                                <p><strong>Motivo de Consulta:</strong> @historia.MotivoConsulta</p>
-                                                <p><strong>Diagnóstico:</strong> @historia.Diagnostico</p>
-                                                <p><strong>Conducta Médica:</strong> @historia.ConductaMedicaRecomendaciones</p>
+                                                <h4 style="background-color: #00826F; border: none;" class="p-2 text-white rounded text-center">Historia Clínica</h4>
 
-                                                <p><strong>Procedimientos:</strong></p>
-                                                <ul>
-                                                    @if (historia.Procedimientos != null && historia.Procedimientos.Count > 0)
+                                                <!-- Motivo de consulta -->
+                                                <div class="mb-3">
+                                                    <h5><strong>Motivo de Consulta:</strong></h5>
+                                                    <p>@historia.MotivoConsulta</p>
+                                                </div>
+
+                                                <!-- Enfermedad actual -->
+                                                <div class="mb-3">
+                                                    <h5><strong>Enfermedad Actual:</strong></h5>
+                                                    <p>@historia.EnfermedadActual</p>
+                                                </div>
+
+                                                <!-- Examen físico -->
+                                                <div class="mb-3">
+                                                    <h5><strong>Examen Físico:</strong></h5>
+                                                    @if (historia.ExamenFisico != null)
                                                     {
-                                                        @foreach (var procedimiento in historia.Procedimientos)
-                                                        {
-                                                            <li>@procedimiento.NombreProcedimiento - @procedimiento.NombreProfesional</li>
-                                                        }
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <p><strong>Temperatura:</strong> @historia.ExamenFisico.Temperatura</p>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <p><strong>Frecuencia Cardíaca:</strong> @historia.ExamenFisico.FrecuenciaCardiaca</p>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <p><strong>Tensión Arterial:</strong> @historia.ExamenFisico.TensionArterial</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <p><strong>Frecuencia Respiratoria:</strong> @historia.ExamenFisico.FrecuenciaRespiratoria</p>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <p><strong>Sat O2:</strong> @historia.ExamenFisico.SatO2</p>
+                                                            </div>
+                                                        </div>
                                                     }
                                                     else
                                                     {
-                                                        <li>No hay procedimientos registrados</li>
+                                                        <p>No se registró examen físico</p>
                                                     }
-                                                </ul>
+                                                </div>
 
-                                                <!-- Sección de Visitas Sucesivas para esta historia clínica -->
+                                                <!-- Diagnóstico -->
+                                                <div class="mb-3">
+                                                    <h5><strong>Diagnóstico:</strong></h5>
+                                                    <p>@historia.Diagnostico</p>
+                                                </div>
+
+                                                <!-- Evolución / Análisis -->
+                                                <div class="mb-3">
+                                                    <h5><strong>Evolución / Análisis:</strong></h5>
+                                                    <p>@historia.EvolucionAnalisis</p>
+                                                </div>
+
+                                                <!-- Conducta médica -->
+                                                <div class="mb-3">
+                                                    <h5><strong>Conducta Médica y Recomendaciones:</strong></h5>
+                                                    <p>@historia.ConductaMedicaRecomendaciones</p>
+                                                </div>
+
+                                                <!-- Procedimientos -->
+                                                <div class="mb-3">
+                                                    <h5><strong>Procedimientos:</strong></h5>
+                                                    @if (historia.Procedimientos != null && historia.Procedimientos.Count > 0)
+                                                    {
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Nombre</th>
+                                                                    <th>Fecha</th>
+                                                                    <th>Profesional</th>
+                                                                    <th>Observaciones</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var procedimiento in historia.Procedimientos)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@procedimiento.NombreProcedimiento</td>
+                                                                        <td>@(procedimiento.FechaProcedimiento?.ToString("dd/MM/yyyy") ?? "No especificada")</td>
+                                                                        <td>@procedimiento.NombreProfesional</td>
+                                                                        <td>@procedimiento.Observaciones</td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    }
+                                                    else
+                                                    {
+                                                        <p>No hay procedimientos registrados</p>
+                                                    }
+                                                </div>
+
+                                                <!-- Visitas sucesivas (se mantiene igual que antes) -->
                                                 @if (historia.VisitasSucesivas != null && historia.VisitasSucesivas.Count > 0)
                                                 {
                                                     <div class="mt-4">

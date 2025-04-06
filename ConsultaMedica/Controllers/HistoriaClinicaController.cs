@@ -42,51 +42,64 @@ namespace ConsultaMedica.Controllers
             // Obtener el ID del paciente desde la cita
             int idPaciente = cita.Paciente.Id;
 
-            // Obtener TODAS las historias clínicas del paciente (no solo las de esta cita)
             var historiasClinicas = _context.historiasClinicas
-                .Where(h => h.IdPaciente == idPaciente)
-                .OrderByDescending(h => h.FechaAlta) // Ordenar por fecha descendente
-                .Select(h => new
-                {
-                    h.Id,
-                    h.MotivoConsulta,
-                    h.Diagnostico,
-                    h.ConductaMedicaRecomendaciones,
-                    h.FechaAlta,
-                    h.CitaId,
-                    Procedimientos = _context.ProcedimientosProfesionales
-                        .Where(p => p.IdHistoriaClinica == h.Id)
-                        .Select(p => new
+            .Where(h => h.IdPaciente == idPaciente)
+            .OrderByDescending(h => h.FechaAlta)
+            .Select(h => new
+            {
+                h.Id,
+                h.MotivoConsulta,
+                h.EnfermedadBase,
+                h.EnfermedadActual,
+                h.Diagnostico,
+                h.EvolucionAnalisis,
+                h.ConductaMedicaRecomendaciones,
+                h.FechaAlta,
+                h.CitaId,
+                ExamenFisico = _context.ExamenesFisicos
+                    .Where(e => e.IdHistoriaClinica == h.Id)
+                    .Select(e => new
+                    {
+                        e.Temperatura,
+                        e.FrecuenciaCardiaca,
+                        e.TensionArterial,
+                        e.FrecuenciaRespiratoria,
+                        e.SatO2
+                    }).FirstOrDefault(),
+                Procedimientos = _context.ProcedimientosProfesionales
+                    .Where(p => p.IdHistoriaClinica == h.Id)
+                    .Select(p => new
+                    {
+                        p.NombreProcedimiento,
+                        p.NombreProfesional,
+                        p.Observaciones,
+                        p.FechaProcedimiento
+                    }).ToList(),
+                VisitasSucesivas = _context.visitaSucesivas
+                    .Where(v => v.IdHistoriaClinica == h.Id)
+                    .Include(v => v.Procedimientos)
+                    .Select(v => new
+                    {
+                        v.Id,
+                        v.FechaVisita,
+                        v.EvolucionAnalisis,
+                        v.ConductaMedica,
+                        MedicoResponsable = _context.doctores
+                            .Where(d => d.Id == v.IdMedicoResponsable)
+                            .Select(d => $"{d.Nombre} {d.PrimerApellido}")
+                            .FirstOrDefault(),
+                        Procedimientos = v.Procedimientos.Select(p => new
                         {
-                            p.NombreProcedimiento,
-                            p.NombreProfesional
-                        }).ToList(),
-                    // Obtener también las visitas sucesivas para cada historia clínica
-                    VisitasSucesivas = _context.visitaSucesivas
-                        .Where(v => v.IdHistoriaClinica == h.Id)
-                        .Include(v => v.Procedimientos)
-                        .Select(v => new
-                        {
-                            v.Id,
-                            v.FechaVisita,
-                            v.EvolucionAnalisis,
-                            v.ConductaMedica,
-                            MedicoResponsable = _context.doctores
-                                .Where(d => d.Id == v.IdMedicoResponsable)
+                            p.FechaProcedimiento,
+                            p.Observaciones,
+                            Profesional = _context.doctores
+                                .Where(d => d.Id == p.IdProfesional)
                                 .Select(d => $"{d.Nombre} {d.PrimerApellido}")
-                                .FirstOrDefault(),
-                            Procedimientos = v.Procedimientos.Select(p => new
-                            {
-                                p.FechaProcedimiento,
-                                p.Observaciones,
-                                Profesional = _context.doctores
-                                    .Where(d => d.Id == p.IdProfesional)
-                                    .Select(d => $"{d.Nombre} {d.PrimerApellido}")
-                                    .FirstOrDefault()
-                            }).ToList()
-                        })
-                        .ToList<dynamic>()
-                }).ToList();
+                                .FirstOrDefault()
+                        }).ToList()
+                    })
+                    .ToList<dynamic>()
+            }).ToList();
 
             // Obtener la historia clínica asociada a la cita actual (si existe)
             var historiaExistente = _context.historiasClinicas
@@ -199,7 +212,7 @@ namespace ConsultaMedica.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult InsertarVisitaSucesiva(int IdHistoriaClinica, int IdCita, string EvolucionAnalisis,
-    string ConductaMedica, int IdMedico, DateTime? FechaProcedimiento, string ObservacionesProcedimiento)
+            string ConductaMedica, int IdMedico, DateTime? FechaProcedimiento, string ObservacionesProcedimiento)
         {
             try
             {
