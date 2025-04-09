@@ -75,7 +75,7 @@
         <div class="row align-items-center">
             <!-- Título pegado a la izquierda -->
             <div class="col text-start">
-                <h1 class="m-0">Gestionar Historia Clínica</h1>
+                <h1 class="m-0 text-uppercase">Gestionar Historia Clínica</h1>
             </div>
 
             <!-- Botones pegados a la derecha -->
@@ -161,9 +161,9 @@
                             @foreach (var historia in ViewBag.HistoriasClinicas)
                             {
                                 <!-- Enfermedad Base -->
-                                <div class="mb-3">  
+                                <div class="mb-3">
                                     <p>
-                                        @historia.EnfermedadBase
+                                        <strong class="text-center text-uppercase">@historia.EnfermedadBase</strong>
                                     </p>
                                 </div>
                             }
@@ -179,8 +179,11 @@
                         <div class="col-md-6">
                             <div class="rounded">
                                 <div class="d-grid">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" style="background-color: #00826F; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                        <i class="ri-add-line"></i> Visita Sucesiva
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                            style="background-color: #00826F; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                                    @(ViewBag.HistoriasClinicas == null || ViewBag.HistoriasClinicas.Count == 0 ? "disabled" : "")
+                                            title="@(ViewBag.HistoriasClinicas == null || ViewBag.HistoriasClinicas.Count == 0 ? "Primero debe registrar una historia clínica" : "")">
+                                        <i class="ri-add-line"></i>  Registrar Visita Sucesiva
                                     </button>
                                 </div>
                             </div>
@@ -189,7 +192,7 @@
                             <div class="rounded">
                                 <div class="d-grid">
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#historiaClinicaModal" style="background-color: #00826F; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                        <i class="fas fa-file-medical"></i> Registrar Historia Clínica
+                                        <i class="ri-hospital-fill"></i> Registrar Historia Clínica
                                     </button>
                                 </div>
                             </div>
@@ -222,7 +225,11 @@
                                                     <textarea class="form-control" asp-for="EnfermedadActual" rows="3" required></textarea>
                                                     <span asp-validation-for="EnfermedadActual" class="text-danger"></span>
                                                 </div>
-
+                                                <!-- Enfermedad actual -->
+                                                <div class="form-group mb-3">
+                                                    <label asp-for="EnfermedadBase"><strong>Enfermedad Base</strong></label>
+                                                    <input class="form-control" asp-for="EnfermedadBase">
+                                                </div>
                                                 <!-- Examen físico -->
                                                 <div class="form-group mb-3">
                                                     <label><strong>Examen físico</strong></label>
@@ -274,45 +281,75 @@
                                                     <textarea class="form-control" asp-for="ConductaMedica" rows="3" required></textarea>
                                                     <span asp-validation-for="ConductaMedica" class="text-danger"></span>
                                                 </div>
-
-                                                <!-- Procedimientos profesionales -->
                                                 <div class="form-group mb-3">
-                                                    <label><strong>Procedimientos profesionales</strong></label>
+                                                    <label for="IdMedico">Profesional responsable</label>
+                                                    <select class="form-select" id="IdMedico" name="IdMedico" required>
+                                                        <option value="">Seleccione un profesional</option>
+                                                        @foreach (var doctor in ViewBag.Doctores)
+                                                        {
+                                                            <option value="@doctor.Value">@doctor.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <!-- Procedimientos profesionales - VERSIÓN CORREGIDA -->
+                                                <div class="form-group mb-3">
+                                                    <div id="procedimientos-container">
+                                                        <label><strong>Procedimientos profesionales</strong></label>
+                                                        <!-- Procedimiento inicial -->
+                                                        <div class="procedimiento-item mb-4 border p-3 rounded" data-index="0">
+                                                            <div class="form-group mb-2">
+                                                                <label for="NombreProcedimiento_0">Nombre del procedimiento</label>
+                                                                <input type="text" class="form-control"
+                                                                       id="NombreProcedimiento_0"
+                                                                       name="Procedimientos[0].NombreProcedimiento"
+                                                                       placeholder="Ej: Consulta general, Cirugía menor, etc.">
+                                                                <span class="text-danger field-validation-valid"
+                                                                      data-valmsg-for="Procedimientos[0].NombreProcedimiento"
+                                                                      data-valmsg-replace="true"></span>
+                                                            </div>
 
-                                                    <!-- Nuevo campo: Nombre del procedimiento -->
-                                                    <div class="form-group mb-2">
-                                                        <label asp-for="NombreProcedimiento">Nombre del procedimiento</label>
-                                                        <input type="text" class="form-control" asp-for="NombreProcedimiento" placeholder="Ej: Consulta general, Cirugía menor, etc.">
-                                                    </div>
+                                                            <div class="form-group mb-2">
+                                                                <label for="Observaciones_0">Observaciones</label>
+                                                                <textarea class="form-control"
+                                                                          id="Observaciones_0"
+                                                                          name="Procedimientos[0].Observaciones"
+                                                                          rows="2"></textarea>
+                                                                <span class="text-danger field-validation-valid"
+                                                                      data-valmsg-for="Procedimientos[0].Observaciones"
+                                                                      data-valmsg-replace="true"></span>
+                                                            </div>
 
-                                                    <!-- Observación del procedimiento -->
-                                                    <div class="form-group mb-2">
-                                                        <label asp-for="ObservacionesProcedimiento">Observación del procedimiento</label>
-                                                        <textarea class="form-control" asp-for="ObservacionesProcedimiento" rows="2"></textarea>
-                                                    </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6 mb-2">
+                                                                    <label for="FechaProcedimiento_0">Fecha del procedimiento</label>
+                                                                    <input type="date" class="form-control"
+                                                                           id="FechaProcedimiento_0"
+                                                                           name="Procedimientos[0].FechaProcedimiento"
+                                                                           value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                                                    <span class="text-danger field-validation-valid"
+                                                                          data-valmsg-for="Procedimientos[0].FechaProcedimiento"
+                                                                          data-valmsg-replace="true"></span>
+                                                                </div>
+                                                                <div class="col-md-6 mb-2">
+                                                                    <label for="IdMedico">Médico responsable</label>
+                                                                    <select class="form-select"
+                                                                            id="IdMedico"name="Procedimientos[0].IdMedico" required>
+                                                                        <option value="">Seleccione un médico</option>
+                                                                        @foreach (var doctor in ViewBag.Doctores)
+                                                                        {
+                                                                            <option value="@doctor.Value">@doctor.Text</option>
+                                                                        }
+                                                                    </select>
+                                                                    <span class="text-danger field-validation-valid"
+                                                                          data-valmsg-for="Procedimientos[0].IdMedico"
+                                                                          data-valmsg-replace="true"></span>
+                                                                </div>
+                                                            </div>
 
-                                                    <!-- Fecha y selección del médico -->
-                                                    <div class="row">
-                                                        <div class="col-md-6 mb-2">
-                                                            <label asp-for="FechaProcedimiento">Fecha del procedimiento</label>
-                                                            <input type="date" class="form-control" asp-for="FechaProcedimiento" value="@DateTime.Now.ToString("yyyy-MM-dd")">
-                                                        </div>
-                                                        <div class="col-md-6 mb-2">
-                                                            <label>Profesional responsable</label>
-                                                            <select class="form-select" asp-for="IdMedico" required>
-                                                                <option selected disabled value="">Seleccione un profesional</option>
-                                                                @if (ViewBag.Doctores != null)
-                                                                {
-                                                                    @foreach (var doctor in ViewBag.Doctores)
-                                                                    {
-                                                                        <option value="@doctor.Value">@doctor.Text</option>
-                                                                    }
-                                                                }
-                                                                else
-                                                                {
-                                                                    <option disabled>No hay doctores disponibles</option>
-                                                                }
-                                                            </select>
+                                                            <button type="button" class="btn btn-sm btn-danger remove-procedimiento float-end" style="display: none;">
+                                                                <i class="fas fa-trash"></i> Eliminar
+                                                            </button>
+                                                            <div class="clearfix"></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -320,6 +357,10 @@
                                                 <!-- Botones de acción -->
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="button" id="agregar-procedimiento" class="btn btn-success" style="background-color: #00826F; border: none;">
+                                                        <i class="fas fa-plus"></i> Agregar procedimiento
+                                                    </button>
+
                                                     <button type="submit" class="btn btn-success" style="background-color: #00826F; border: none;">
                                                         <i class="fas fa-save me-2"></i> Guardar Historia Clínica
                                                     </button>
@@ -339,8 +380,8 @@
                                         </div>
                                         <div class="modal-body">
                                             <form id="evolucionForm" asp-action="InsertarVisitaSucesiva" method="post">
-                                                <input type="hidden" id="IdHistoriaClinica" name="IdHistoriaClinica" value="@(ViewBag.IdHistoriaClinica ?? 0)" />
-                                                <input type="hidden" id="IdCita" name="IdCita" value="@ViewBag.CitaId" />
+                                                <input type="hidden" asp-for="IdHistoriaClinica" value="@ViewBag.IdHistoriaClinica" />
+                                                <input type="hidden" asp-for="IdCita" value="@ViewBag.CitaId" />
 
                                                 <!-- 1. Evolución / Análisis -->
                                                 <div class="mb-4">
@@ -359,50 +400,74 @@
                                                 <!-- 3. Procedimientos profesionales -->
                                                 <div class="mb-4">
                                                     <h5 class="fw-bold mb-3">3. Procedimientos profesionales</h5>
-                                                    <div class="card w-100">
-                                                        <div class="card-header bg-light fw-bold">Procedimiento 1</div>
-                                                        <div class="card-body">
-                                                            <div class="mb-3">
-                                                                <label asp-for="FechaProcedimiento" class="form-label">a. Fecha del procedimiento</label>
-                                                                <input type="date" class="form-control" asp-for="FechaProcedimiento">
-                                                                <span asp-validation-for="FechaProcedimiento" class="text-danger"></span>
+                                                    <div id="VS-procedimientos-container">
+                                                        <!-- Procedimiento inicial -->
+                                                        <div class="card w-100 mb-3 VS-procedimiento-item" data-index="0">
+                                                            <div class="card-header bg-light fw-bold d-flex justify-content-between align-items-center">
+                                                                <span>Procedimiento 1</span>
+                                                                <button type="button" class="btn btn-sm btn-danger VS-remove-procedimiento" style="display: none;">Eliminar</button>
                                                             </div>
-                                                            <div class="mb-3">
-                                                                <label asp-for="ObservacionesProcedimiento" class="form-label">b. Observación</label>
-                                                                <textarea class="form-control" asp-for="ObservacionesProcedimiento" rows="3"></textarea>
-                                                                <span asp-validation-for="ObservacionesProcedimiento" class="text-danger"></span>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label asp-for="IdMedico" class="form-label">c. Nombre del profesional</label>
-                                                                <select class="form-select" asp-for="IdMedico" required>
-                                                                    <option selected disabled value="">Seleccione un doctor</option>
-                                                                    @if (ViewBag.Doctores != null)
-                                                                    {
-                                                                        @foreach (var doctor in ViewBag.Doctores)
+                                                            <div class="card-body">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">a. Fecha del procedimiento</label>
+                                                                    <input type="date" class="form-control"
+                                                                           id="VS-FechaProcedimiento_0"
+                                                                           name="Procedimientos[0].FechaProcedimiento"
+                                                                           value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                                                    <span class="text-danger field-validation-valid"
+                                                                          data-valmsg-for="Procedimientos[0].FechaProcedimiento"
+                                                                          data-valmsg-replace="true"></span>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">b. Observación</label>
+                                                                    <textarea class="form-control"
+                                                                              id="VS-Observaciones_0"
+                                                                              name="Procedimientos[0].Observaciones"
+                                                                              rows="3"></textarea>
+                                                                    <span class="text-danger field-validation-valid"
+                                                                          data-valmsg-for="Procedimientos[0].Observaciones"
+                                                                          data-valmsg-replace="true"></span>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">c. Nombre del profesional</label>
+                                                                    <select class="form-select"
+                                                                            id="VS-IdMedico_0"
+                                                                            name="Procedimientos[0].IdMedico" required>
+                                                                        <option selected disabled value="">Seleccione un doctor</option>
+                                                                        @if (ViewBag.Doctores != null)
                                                                         {
-                                                                            <option value="@doctor.Value">@doctor.Text</option>
+                                                                            @foreach (var doctor in ViewBag.Doctores)
+                                                                            {
+                                                                                <option value="@doctor.Value">@doctor.Text</option>
+                                                                            }
                                                                         }
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <option disabled>No hay doctores disponibles</option>
-                                                                    }
-                                                                </select>
-                                                                <span asp-validation-for="IdMedico" class="text-danger"></span>
+                                                                        else
+                                                                        {
+                                                                            <option disabled>No hay doctores disponibles</option>
+                                                                        }
+                                                                    </select>
+                                                                    <span class="text-danger field-validation-valid"
+                                                                          data-valmsg-for="Procedimientos[0].IdMedico"
+                                                                          data-valmsg-replace="true"></span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
+
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                                    <button type="submit" class="btn btn-primary" style="background-color: #00826F; border: none;">Guardar Cambios</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="button" id="VS-agregar-procedimiento" class="btn btn-success" style="background-color: #00826F; border: none;">
+                                                        <i class="fas fa-plus me-2"></i>Agregar procedimiento
+                                                    </button>
+
+                                                    <button type="submit" class="btn btn-primary" style="background-color: #00826F; border: none;">Guardar Visita</button>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <!-- Sección de visitas anteriores -->
                             @if (ViewBag.HistoriasClinicas != null && ViewBag.HistoriasClinicas.Count > 0)
                             {
@@ -581,7 +646,216 @@
             </div>
         </div>
     </div>
+    @section Scripts {
+        <script>
+            $(document).ready(function() {
+    let VSProcedimientoIndex = 1;
 
+    // Agregar nuevo procedimiento para Visita Sucesiva
+    $('#VS-agregar-procedimiento').click(function() {
+        const newIndex = VSProcedimientoIndex++;
+        const newProcedimiento = $(`
+            <div class="card w-100 mb-3 VS-procedimiento-item" data-index="${newIndex}">
+                <div class="card-header bg-light fw-bold d-flex justify-content-between align-items-center">
+                    <span>Procedimiento ${newIndex + 1}</span>
+                    <button type="button" class="btn btn-sm btn-danger VS-remove-procedimiento">Eliminar</button>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">a. Fecha del procedimiento</label>
+                        <input type="date" class="form-control"
+                                id="VS-FechaProcedimiento_${newIndex}"
+                                name="Procedimientos[${newIndex}].FechaProcedimiento"
+                                value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                        <span class="text-danger field-validation-valid"
+                                data-valmsg-for="Procedimientos[${newIndex}].FechaProcedimiento"
+                                data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">b. Observación</label>
+                        <textarea class="form-control"
+                                    id="VS-Observaciones_${newIndex}"
+                                    name="Procedimientos[${newIndex}].Observaciones"
+                                    rows="3"></textarea>
+                        <span class="text-danger field-validation-valid"
+                                data-valmsg-for="Procedimientos[${newIndex}].Observaciones"
+                                data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">c. Nombre del profesional</label>
+                        <select class="form-select"
+                                id="VS-IdMedico_${newIndex}"
+                                name="Procedimientos[${newIndex}].IdMedico" required>
+                            <option selected disabled value="">Seleccione un doctor</option>
+                            @if (ViewBag.Doctores != null)
+                            {
+                                @foreach (var doctor in ViewBag.Doctores)
+                                {
+                                    <option value="@doctor.Value">@doctor.Text</option>
+                                }
+                            }
+                            else
+                            {
+                                    <option disabled>No hay doctores disponibles</option>
+                            }
+                        </select>
+                        <span class="text-danger field-validation-valid"
+                                data-valmsg-for="Procedimientos[${newIndex}].IdMedico"
+                                data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        $('#VS-procedimientos-container').append(newProcedimiento);
+
+        // Mostrar botón de eliminar en el primer procedimiento si hay más de uno
+        if (VSProcedimientoIndex > 1) {
+            $('.VS-procedimiento-item:first .VS-remove-procedimiento').show();
+        }
+    });
+
+    // Eliminar procedimiento en Visita Sucesiva
+    $(document).on('click', '.VS-remove-procedimiento', function() {
+        $(this).closest('.VS-procedimiento-item').remove();
+
+        // Reindexar los procedimientos restantes
+        $('.VS-procedimiento-item').each(function(index) {
+            $(this).attr('data-index', index);
+            $(this).find('.card-header span').text(`Procedimiento ${index + 1}`);
+
+            // Actualizar los atributos name e id de los inputs
+            $(this).find('[name]').each(function() {
+                const name = $(this).attr('name').replace(/\[\d+\]/, `[${index}]`);
+                $(this).attr('name', name);
+            });
+
+            $(this).find('[id]').each(function() {
+                const id = $(this).attr('id').replace(/_(\d+)/, `_${index}`);
+                $(this).attr('id', id);
+            });
+
+            $(this).find('[data-valmsg-for]').each(function() {
+                const valmsgFor = $(this).attr('data-valmsg-for').replace(/\[\d+\]/, `[${index}]`);
+                $(this).attr('data-valmsg-for', valmsgFor);
+            });
+        });
+
+        VSProcedimientoIndex = $('.VS-procedimiento-item').length;
+
+        // Ocultar botón de eliminar del primer procedimiento si solo queda uno
+        if (VSProcedimientoIndex === 1) {
+            $('.VS-procedimiento-item:first .VS-remove-procedimiento').hide();
+        }
+    });
+    });
+            $(document).ready(function() {
+                    let procedimientoIndex = 1;
+
+                    // Agregar nuevo procedimiento
+                    $('#agregar-procedimiento').click(function() {
+                        const newIndex = procedimientoIndex++;
+                        const newProcedimiento = $(`
+                            <div class="procedimiento-item mb-4 border p-3 rounded" data-index="${newIndex}">
+                                <div class="form-group mb-2">
+                                    <label for="NombreProcedimiento_${newIndex}">Nombre del procedimiento</label>
+                                    <input type="text" class="form-control"
+                                           id="NombreProcedimiento_${newIndex}"
+                                           name="Procedimientos[${newIndex}].NombreProcedimiento"
+                                           placeholder="Ej: Consulta general, Cirugía menor, etc.">
+                                    <span class="text-danger field-validation-valid"
+                                          data-valmsg-for="Procedimientos[${newIndex}].NombreProcedimiento"
+                                          data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="form-group mb-2">
+                                    <label for="Observaciones_${newIndex}">Observaciones</label>
+                                    <textarea class="form-control"
+                                              id="Observaciones_${newIndex}"
+                                              name="Procedimientos[${newIndex}].Observaciones"
+                                              rows="2"></textarea>
+                                    <span class="text-danger field-validation-valid"
+                                          data-valmsg-for="Procedimientos[${newIndex}].Observaciones"
+                                          data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label for="FechaProcedimiento_${newIndex}">Fecha del procedimiento</label>
+                                        <input type="date" class="form-control"
+                                               id="FechaProcedimiento_${newIndex}"
+                                               name="Procedimientos[${newIndex}].FechaProcedimiento"
+                                               value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                        <span class="text-danger field-validation-valid"
+                                              data-valmsg-for="Procedimientos[${newIndex}].FechaProcedimiento"
+                                              data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label for="IdMedico_${newIndex}">Médico responsable</label>
+                                        <select class="form-select"
+                                                id="IdMedico_${newIndex}" name="Procedimientos[${newIndex}].IdMedico" required>
+                                            <option value="">Seleccione un médico</option>
+                                            @foreach (var doctor in ViewBag.Doctores)
+                                            {
+                                                <option value="@doctor.Value">@doctor.Text</option>
+                                            }
+                                        </select>
+                                        <span class="text-danger field-validation-valid"
+                                              data-valmsg-for="Procedimientos[${newIndex}].IdMedico"
+                                              data-valmsg-replace="true"></span>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-sm btn-danger remove-procedimiento float-end">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                                <div class="clearfix"></div>
+                            </div>
+                        `);
+
+                        $('#procedimientos-container').append(newProcedimiento);
+
+                        // Mostrar botón de eliminar en el primer procedimiento si hay más de uno
+                        if (procedimientoIndex > 1) {
+                            $('.procedimiento-item:first .remove-procedimiento').show();
+                        }
+                    });
+
+                    // Eliminar procedimiento
+                    $(document).on('click', '.remove-procedimiento', function() {
+                        $(this).closest('.procedimiento-item').remove();
+
+                        // Reindexar los procedimientos restantes
+                        $('.procedimiento-item').each(function(index) {
+                            $(this).attr('data-index', index);
+
+                            // Actualizar los atributos name e id de los inputs
+                            $(this).find('[name]').each(function() {
+                                const name = $(this).attr('name').replace(/\[\d+\]/, `[${index}]`);
+                                $(this).attr('name', name);
+                            });
+
+                            $(this).find('[id]').each(function() {
+                                const id = $(this).attr('id').replace(/_(\d+)/, `_${index}`);
+                                $(this).attr('id', id);
+                            });
+
+                            $(this).find('[data-valmsg-for]').each(function() {
+                                const valmsgFor = $(this).attr('data-valmsg-for').replace(/\[\d+\]/, `[${index}]`);
+                                $(this).attr('data-valmsg-for', valmsgFor);
+                            });
+                        });
+
+                        procedimientoIndex = $('.procedimiento-item').length;
+
+                        // Ocultar botón de eliminar del primer procedimiento si solo queda uno
+                        if (procedimientoIndex === 1) {
+                            $('.procedimiento-item:first .remove-procedimiento').hide();
+                        }
+                    });
+                });
+        </script>
+    }
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

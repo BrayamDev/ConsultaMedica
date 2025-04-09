@@ -18,8 +18,10 @@ namespace ConsultaMedica.Controllers
         {
             _context = context;
         }
+
+
         public IActionResult Index(int id)
-        {
+        { 
             // Obtener la cita con el paciente relacionado
             var cita = _context.citas
                 .Include(c => c.Paciente)
@@ -48,81 +50,75 @@ namespace ConsultaMedica.Controllers
             .Select(h => new
             {
                 h.Id,
-                h.MotivoConsulta,
-                h.EnfermedadBase,
-                h.EnfermedadActual,
-                h.Diagnostico,
-                h.EvolucionAnalisis,
-                h.ConductaMedicaRecomendaciones,
+                MotivoConsulta = h.MotivoConsulta ?? string.Empty,
+                EnfermedadBase = h.EnfermedadBase ?? string.Empty, // Manejo explícito de NULL
+                EnfermedadActual = h.EnfermedadActual ?? string.Empty,
+                Diagnostico = h.Diagnostico ?? string.Empty,
+                EvolucionAnalisis = h.EvolucionAnalisis ?? string.Empty,
+                ConductaMedicaRecomendaciones = h.ConductaMedicaRecomendaciones ?? string.Empty,
                 h.FechaAlta,
                 h.CitaId,
                 ExamenFisico = _context.ExamenesFisicos
                     .Where(e => e.IdHistoriaClinica == h.Id)
                     .Select(e => new
                     {
-                        e.Temperatura,
-                        e.FrecuenciaCardiaca,
-                        e.TensionArterial,
-                        e.FrecuenciaRespiratoria,
-                        e.SatO2
+                        Temperatura = (string)e.Temperatura,
+                        FrecuenciaCardiaca = (string)e.FrecuenciaCardiaca,
+                        TensionArterial = (string)e.TensionArterial ?? string.Empty,
+                        FrecuenciaRespiratoria = (string)e.FrecuenciaRespiratoria,
+                        SatO2 = (string)e.SatO2
                     }).FirstOrDefault(),
                 Procedimientos = _context.ProcedimientosProfesionales
                     .Where(p => p.IdHistoriaClinica == h.Id)
                     .Select(p => new
                     {
                         p.NombreProcedimiento,
-                        p.NombreProfesional,
-                        p.Observaciones,
+                        NombreProfesional = p.NombreProfesional ?? string.Empty,
+                        Observaciones = p.Observaciones ?? string.Empty,
                         p.FechaProcedimiento
                     }).ToList(),
                 VisitasSucesivas = _context.visitaSucesivas
                     .Where(v => v.IdHistoriaClinica == h.Id)
-                    .Include(v => v.Procedimientos)
                     .Select(v => new
                     {
                         v.Id,
                         v.FechaVisita,
-                        v.EvolucionAnalisis,
-                        v.ConductaMedica,
+                        EvolucionAnalisis = v.EvolucionAnalisis ?? string.Empty,
+                        ConductaMedica = v.ConductaMedica ?? string.Empty,
                         MedicoResponsable = _context.doctores
                             .Where(d => d.Id == v.IdMedicoResponsable)
-                            .Select(d => $"{d.Nombre} {d.PrimerApellido}")
-                            .FirstOrDefault(),
+                            .Select(d => $"{d.Nombre ?? ""} {d.PrimerApellido ?? ""}")
+                            .FirstOrDefault() ?? string.Empty,
                         Procedimientos = v.Procedimientos.Select(p => new
                         {
                             p.FechaProcedimiento,
-                            p.Observaciones,
+                            Observaciones = p.Observaciones ?? string.Empty,
                             Profesional = _context.doctores
                                 .Where(d => d.Id == p.IdProfesional)
-                                .Select(d => $"{d.Nombre} {d.PrimerApellido}")
-                                .FirstOrDefault()
+                                .Select(d => $"{d.Nombre ?? ""} {d.PrimerApellido ?? ""}")
+                                .FirstOrDefault() ?? string.Empty
                         }).ToList()
-                    })
-                    .ToList<dynamic>()
+                    }).ToList()
             }).ToList();
 
-            // Obtener la historia clínica asociada a la cita actual (si existe)
             var historiaExistente = _context.historiasClinicas
                 .FirstOrDefault(h => h.CitaId == id);
 
-            // Pasar los datos necesarios a la vista
             ViewBag.Paciente = cita.Paciente;
             ViewBag.CitaId = id;
-            ViewBag.MedicoId = User.FindFirstValue(ClaimTypes.NameIdentifier); // ID del médico logueado
+            ViewBag.MedicoId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             ViewBag.HistoriasClinicas = historiasClinicas;
             ViewBag.HistoriaClinica = historiaExistente;
             ViewBag.IdHistoriaClinica = historiaExistente?.Id;
 
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(int citaId, HistoriaClinicaViewModel model)
-        { 
+        {
             try
             {
-                // Obtener información de la cita
                 var cita = _context.citas
                     .Include(c => c.Paciente)
                     .FirstOrDefault(c => c.Id == citaId);
@@ -131,10 +127,42 @@ namespace ConsultaMedica.Controllers
                 {
                     TempData["Mensaje"] = "Cita no encontrada";
                     TempData["TipoMensaje"] = "error";
-                    return RedirectToAction("Index", "Agenda"); // Redirige a Agenda
+                    return RedirectToAction("Index", "Agenda");
                 }
 
-                // Crear historia clínica (permite múltiples historias para el mismo paciente/cita)
+                // Validar procedimientos
+                if (model.Procedimientos != null)
+                {
+                    foreach (var proc in model.Procedimientos)
+                    {
+                        if (string.IsNullOrWhiteSpace(proc.NombreProcedimiento))
+                        {
+                            ModelState.AddModelError("", "El nombre del procedimiento es requerido");
+                        }
+
+                        if (proc.IdMedico == 0)
+                        {
+                            ModelState.AddModelError("", "Debe seleccionar un médico para cada procedimiento");
+                        }
+                    }
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Paciente = cita.Paciente;
+                    ViewBag.CitaId = citaId;
+                    ViewBag.Doctores = _context.doctores
+                        .Select(d => new SelectListItem
+                        {
+                            Value = d.Id.ToString(),
+                            Text = $"{d.PrimerApellido} {d.SegundoApellido} {d.Nombre}"
+                        })
+                        .ToList();
+
+                    return View("Index", model);
+                }
+
+                // Crear historia clínica
                 var historiaClinica = new HistoriasClinicas
                 {
                     IdPaciente = cita.PacienteId,
@@ -145,7 +173,9 @@ namespace ConsultaMedica.Controllers
                     Diagnostico = model.Diagnostico ?? "No especificado",
                     EvolucionAnalisis = model.EvolucionAnalisis ?? "No especificada",
                     ConductaMedicaRecomendaciones = model.ConductaMedica ?? "No especificada",
-                    IdMedico = model.IdMedico
+                    IdMedico = model.IdMedico,
+                    EnfermedadBase = model.EnfermedadBase ?? String.Empty,
+      
                 };
 
                 _context.historiasClinicas.Add(historiaClinica);
@@ -164,38 +194,41 @@ namespace ConsultaMedica.Controllers
 
                 _context.ExamenesFisicos.Add(examenFisico);
 
-                // Crear procedimiento profesional
-                var doctor = _context.doctores.FirstOrDefault(d => d.Id == model.IdMedico);
-
-                if (doctor == null)
+                // Guardar procedimientos
+                if (model.Procedimientos != null && model.Procedimientos.Any())
                 {
-                    TempData["Mensaje"] = "El médico seleccionado no existe.";
-                    TempData["TipoMensaje"] = "error";
-                    return RedirectToAction("Index", "Agenda"); // Redirige a Agenda
+                    foreach (var proc in model.Procedimientos)
+                    {
+                        var doctor = _context.doctores.FirstOrDefault(d => d.Id == proc.IdMedico);
+
+                        if (doctor == null)
+                        {
+                            continue;
+                        }
+
+                        var procedimiento = new ProcedimientoProfesional
+                        {
+                            IdHistoriaClinica = historiaClinica.Id,
+                            NombreProcedimiento = proc.NombreProcedimiento ?? "Procedimiento médico",
+                            Observaciones = proc.Observaciones ?? "No hay observaciones",
+                            FechaProcedimiento = proc.FechaProcedimiento ?? DateTime.Now,
+                            NombreProfesional = $"{doctor.Nombre} {doctor.PrimerApellido}"
+                        };
+                        _context.ProcedimientosProfesionales.Add(procedimiento);
+                    }
                 }
 
-                var procedimiento = new ProcedimientoProfesional
-                {
-                    IdHistoriaClinica = historiaClinica.Id,
-                    NombreProcedimiento = model.NombreProcedimiento ?? "Consulta médica",
-                    Observaciones = model.ObservacionesProcedimiento ?? "No hay observaciones",
-                    FechaProcedimiento = model.FechaProcedimiento ?? DateTime.Now,
-                    NombreProfesional = doctor.Nombre
-                };
-
-                _context.ProcedimientosProfesionales.Add(procedimiento);
                 _context.SaveChanges();
 
                 TempData["Mensaje"] = "Historia clínica guardada correctamente";
                 TempData["TipoMensaje"] = "success";
-                return RedirectToAction("Index", "Agenda"); // Redirige a Agenda
+                return RedirectToAction("Index", "Agenda");
             }
             catch (Exception ex)
             {
-                TempData["Mensaje"] = "Error al guardar la historia clínica: " + ex.Message;
+                TempData["Mensaje"] = $"Error al guardar la historia clínica: {ex.Message}";
                 TempData["TipoMensaje"] = "error";
 
-                // Recargar datos para la vista si falla
                 var citaForView = _context.citas
                     .Include(c => c.Paciente)
                     .FirstOrDefault(c => c.Id == citaId);
@@ -204,6 +237,13 @@ namespace ConsultaMedica.Controllers
 
                 ViewBag.Paciente = citaForView.Paciente;
                 ViewBag.CitaId = citaId;
+                ViewBag.Doctores = _context.doctores
+                    .Select(d => new SelectListItem
+                    {
+                        Value = d.Id.ToString(),
+                        Text = $"{d.PrimerApellido} {d.SegundoApellido} {d.Nombre}"
+                    })
+                    .ToList();
 
                 return View("Index", model);
             }
@@ -211,71 +251,95 @@ namespace ConsultaMedica.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult InsertarVisitaSucesiva(int IdHistoriaClinica, int IdCita, string EvolucionAnalisis,
-            string ConductaMedica, int IdMedico, DateTime? FechaProcedimiento, string ObservacionesProcedimiento)
+        public IActionResult InsertarVisitaSucesiva(VisitaSucesivaViewModel model)
         {
             try
             {
-                // Validaciones iniciales
-                var historiaClinica = _context.historiasClinicas.FirstOrDefault(h => h.Id == IdHistoriaClinica);
+                // Obtener la historia clínica con el médico asociado
+                var historiaClinica = _context.historiasClinicas
+                    .Include(h => h.Medico) // Asegúrate de incluir el médico
+                    .FirstOrDefault(h => h.Id == model.IdHistoriaClinica);
+
                 if (historiaClinica == null)
                 {
                     TempData["Mensaje"] = "Historia clínica no encontrada";
                     TempData["TipoMensaje"] = "error";
-                    return RedirectToAction("Index", "HistoriaClinica", new { id = IdCita });
+                    return RedirectToAction("Index", "HistoriaClinica", new { id = model.IdCita });
                 }
 
-                var cita = _context.citas.Include(c => c.Paciente).FirstOrDefault(c => c.Id == IdCita);
-                if (cita == null)
+                // Forzar que el médico responsable sea el mismo que el de la historia clínica
+                model.IdMedico = historiaClinica.IdMedico; // Asigna el médico de la historia clínica
+
+                // Validar campos principales
+                if (string.IsNullOrWhiteSpace(model.EvolucionAnalisis))
                 {
-                    TempData["Mensaje"] = "Cita no encontrada";
-                    TempData["TipoMensaje"] = "error";
-                    return RedirectToAction("Index", "Agenda");
+                    ModelState.AddModelError("EvolucionAnalisis", "El campo Evolución/Análisis es requerido");
                 }
 
-                // Verificar médico/profesional
-                var medico = _context.doctores.FirstOrDefault(m => m.Id == IdMedico);
-                if (medico == null)
+                if (string.IsNullOrWhiteSpace(model.ConductaMedica))
                 {
-                    TempData["Mensaje"] = "Médico/profesional no encontrado";
-                    TempData["TipoMensaje"] = "error";
-                    return RedirectToAction("Index", "HistoriaClinica", new { id = IdCita });
+                    ModelState.AddModelError("ConductaMedica", "El campo Conducta médica es requerido");
                 }
+
+                // Validar procedimientos
+                if (model.Procedimientos != null)
+                {
+                    foreach (var proc in model.Procedimientos)
+                    {
+                        if (proc.FechaProcedimiento == null)
+                        {
+                            ModelState.AddModelError("", "La fecha del procedimiento es requerida");
+                        }
+                    }
+                }
+
+                //if (!ModelState.IsValid)
+                //{
+                //    TempData["Mensaje"] = "Por favor complete todos los campos requeridos";
+                //    TempData["TipoMensaje"] = "error";
+                //    return RedirectToAction("Index", "HistoriaClinica", new { id = model.IdCita });
+                //}
 
                 using (var transaction = _context.Database.BeginTransaction())
                 {
                     try
                     {
-                        // 1. Insertar en visitaSucesivas
+                        // Crear registro principal de visita sucesiva
                         var visitaSucesiva = new VisitaSucesiva
                         {
-                            IdHistoriaClinica = IdHistoriaClinica,
-                            IdCita = IdCita,
+                            IdHistoriaClinica = model.IdHistoriaClinica,
+                            IdCita = model.IdCita,
                             FechaVisita = DateTime.Now,
-                            EvolucionAnalisis = EvolucionAnalisis ?? "No especificada",
-                            ConductaMedica = ConductaMedica ?? "No especificada",
-                            IdMedicoResponsable = IdMedico,
+                            EvolucionAnalisis = model.EvolucionAnalisis,
+                            ConductaMedica = model.ConductaMedica,
+                            IdMedicoResponsable = historiaClinica.IdMedico, // Usamos el médico de la historia
                             FechaCreacion = DateTime.Now
                         };
 
                         _context.visitaSucesivas.Add(visitaSucesiva);
                         _context.SaveChanges();
 
-                        // 2. Insertar en procedimientoVisitaSucessivas
-                        var procedimiento = new ProcedimientoVisitaSucesiva
+                        // Agregar procedimientos
+                        if (model.Procedimientos != null && model.Procedimientos.Any())
                         {
-                            IdVisitaSucesiva = visitaSucesiva.Id,
-                            FechaProcedimiento = FechaProcedimiento ?? DateTime.Now,
-                            Observaciones = ObservacionesProcedimiento ?? "No hay observaciones",
-                            IdProfesional = IdMedico
-                        };
+                            foreach (var proc in model.Procedimientos)
+                            {
+                                var procedimiento = new ProcedimientoVisitaSucesiva
+                                {
+                                    IdVisitaSucesiva = visitaSucesiva.Id,
+                                    Observaciones = proc.Observaciones ?? "No hay observaciones",
+                                    FechaProcedimiento = proc.FechaProcedimiento.Value,
+                                    IdProfesional = proc.IdMedico
+                                };
 
-                        _context.procedimientoVisitaSucesivas.Add(procedimiento);
+                                _context.procedimientoVisitaSucesivas.Add(procedimiento);
+                            }
+                        }
+
                         _context.SaveChanges();
-
                         transaction.Commit();
 
-                        TempData["Mensaje"] = "Visita sucesiva y procedimiento registrados correctamente";
+                        TempData["Mensaje"] = "Visita sucesiva registrada correctamente";
                         TempData["TipoMensaje"] = "success";
                     }
                     catch (Exception ex)
@@ -283,17 +347,17 @@ namespace ConsultaMedica.Controllers
                         transaction.Rollback();
                         TempData["Mensaje"] = $"Error al registrar: {ex.Message}";
                         TempData["TipoMensaje"] = "error";
-                        return RedirectToAction("Index", "HistoriaClinica", new { id = IdCita });
+                        return RedirectToAction("Index", "HistoriaClinica", new { id = model.IdCita });
                     }
                 }
 
-                return RedirectToAction("Index", "HistoriaClinica", new { id = IdCita });
+                return RedirectToAction("Index", "HistoriaClinica", new { id = model.IdCita });
             }
             catch (Exception ex)
             {
                 TempData["Mensaje"] = $"Error general: {ex.Message}";
                 TempData["TipoMensaje"] = "error";
-                return RedirectToAction("Index", "HistoriaClinica", new { id = IdCita });
+                return RedirectToAction("Index", "HistoriaClinica", new { id = model.IdCita });
             }
         }
 

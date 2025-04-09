@@ -313,3 +313,6 @@ document.getElementById('fotografia').addEventListener('change', function (event
 
 
 /* ****************************************  FICHA DEL DOCTOR  ****************************************** */
+/* ****************************************  HISTORIA CLINICA AÑADIR PROCEDIMIENTO  ****************************************** */
+
+/* ****************************************  HISTORIA CLINICA AÑADIR PROCEDIMIENTO   ****************************************** */
