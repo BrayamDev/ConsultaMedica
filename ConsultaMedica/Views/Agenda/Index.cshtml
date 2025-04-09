@@ -172,12 +172,19 @@
                                         <i class="ri-stethoscope-line"></i> Especialidades <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select" id="especialidad" asp-for="EspecialidadId" required>
-                                        <option selected>Seleccione una especialidad</option>
+                                        <option value="">Seleccione una especialidad</option>
                                         @if (ViewBag.Especialidades != null)
                                         {
                                             @foreach (var especialidad in ViewBag.Especialidades)
                                             {
-                                                <option value="@especialidad.Value">@especialidad.Text</option>
+                                                if (especialidad.Text == "Medicina General")
+                                                {
+                                                    <option value="@especialidad.Value" selected>@especialidad.Text</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@especialidad.Value">@especialidad.Text</option>
+                                                }
                                             }
                                         }
                                         else
@@ -186,6 +193,7 @@
                                         }
                                     </select>
                                 </div>
+
                             </div>
 
                             <!-- Tipo de visita y Paciente en la misma fila -->
@@ -461,7 +469,7 @@
                                 <label for="observaciones" class="form-label">
                                     <i class="ri-file-text-line"></i> Observaciones de la cita
                                 </label>
-                                <textarea class="form-control" id="observaciones" asp-for="Observaciones" rows="3"></textarea>
+                                <textarea class="form-control" id="observaciones" asp-for="Observaciones" rows="3" placeholder="Escribe las observaciones aquí"></textarea>
                             </div>
 
                             <div class="row mb-3 text-center">
@@ -598,7 +606,37 @@
         </div>
     </div>
 
+    @section Scripts {
+        <script>
+            $(document).ready(function() {
+                // Manejar el cambio en el checkbox
+                $('#mostrarObservaciones').change(function() {
+                    if ($(this).is(':checked')) {
+                        // Mostrar las observaciones actuales
+                        $('#observaciones').show();
+                    } else {
+                        // Ocultar el textarea pero mantener el valor
+                        $('#observaciones').hide();
+                    }
+                });
 
+                // Establecer el valor por defecto al enviar el formulario
+                $('form').submit(function(e) {
+                    var observaciones = $('#observaciones').val().trim();
+                    if (!observaciones) {
+                        $('#observaciones').val('Ninguna Observación');
+                    }
+                    // Puedes continuar con el envío del formulario
+                    return true;
+                });
+
+                // Inicializar el estado al cargar la página
+                if (!$('#mostrarObservaciones').is(':checked')) {
+                    $('#observaciones').hide();
+                }
+            });
+        </script>
+    }
     <script>
         document.getElementById('nuevaAlta').addEventListener('change', function() {
             const submenu = document.getElementById('submenuNuevaAlta');
