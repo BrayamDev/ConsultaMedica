@@ -130,13 +130,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = 'Facturacion/Index?id=' + arg.event.id;
             });
 
+            // Configurar el icono de edición
             var editarIcon = document.createElement('i');
             editarIcon.classList.add('ri-edit-2-line');
             editarIcon.title = 'Editar cita';
+            editarIcon.style.cursor = 'pointer';
             editarIcon.addEventListener('click', function (e) {
                 e.stopPropagation();
-                abrirModalEditarCita(arg.event);
+                window.location.href = 'Agenda/EditarCitas?id=' + arg.event.id; // Cambia 'Citas' por tu ruta
             });
+
+
+            iconContainer.appendChild(editarIcon);
 
             var historiaIcon = document.createElement('i');
             historiaIcon.classList.add('ri-file-user-line');
@@ -243,29 +248,8 @@ document.addEventListener('DOMContentLoaded', function () {
     calendar.render();
 });
 
-// Función para abrir modal de edición (se mantiene para el icono de editar)
-function abrirModalEditarCita(evento) {
-    const cita = {
-        id: evento.id,
-        title: evento.title,
-        start: evento.start,
-        end: evento.end,
-        extendedProps: evento.extendedProps
-    };
 
-    document.getElementById('citaId').value = cita.id;
-    document.getElementById('estadoCita').value = cita.extendedProps.estado || 'Activa';
-    document.getElementById('fechaHora').value = cita.start.toISOString().slice(0, 16);
-    document.getElementById('especialidad').value = cita.extendedProps.especialidad || 'Medicina General';
-    document.getElementById('tratamiento').value = cita.extendedProps.tratamiento || '';
-    document.getElementById('tiempoVisita').value = (cita.end - cita.start) / (1000 * 60);
-    document.getElementById('paciente').value = cita.extendedProps.paciente || '';
-    document.getElementById('observaciones').value = cita.extendedProps.observaciones || '';
-    document.getElementById('destaca').checked = cita.extendedProps.destaca || false;
 
-    const modal = new bootstrap.Modal(document.getElementById('editarCitaModal'));
-    modal.show();
-}
 /* **************************************** FULL CALENDAR en nueva ANGENDA ****************************************** */
 
 

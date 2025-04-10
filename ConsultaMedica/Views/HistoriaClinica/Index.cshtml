@@ -13,7 +13,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Historia Clinica</title>
+    <!-- En tu vista -->
+    <title>@ViewBag.Title</title>
     <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
     <!-- Remix Icon CSS (para los iconos) -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -36,6 +37,9 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
@@ -644,8 +648,6 @@
         <script>
             $(document).ready(function() {
     let VSProcedimientoIndex = 1;
-
-    // Agregar nuevo procedimiento para Visita Sucesiva
     $('#VS-agregar-procedimiento').click(function() {
         const newIndex = VSProcedimientoIndex++;
         const newProcedimiento = $(`
@@ -703,7 +705,6 @@
 
         $('#VS-procedimientos-container').append(newProcedimiento);
 
-        // Mostrar botón de eliminar en el primer procedimiento si hay más de uno
         if (VSProcedimientoIndex > 1) {
             $('.VS-procedimiento-item:first .VS-remove-procedimiento').show();
         }
@@ -712,13 +713,10 @@
     // Eliminar procedimiento en Visita Sucesiva
     $(document).on('click', '.VS-remove-procedimiento', function() {
         $(this).closest('.VS-procedimiento-item').remove();
-
-        // Reindexar los procedimientos restantes
         $('.VS-procedimiento-item').each(function(index) {
             $(this).attr('data-index', index);
             $(this).find('.card-header span').text(`Procedimiento ${index + 1}`);
 
-            // Actualizar los atributos name e id de los inputs
             $(this).find('[name]').each(function() {
                 const name = $(this).attr('name').replace(/\[\d+\]/, `[${index}]`);
                 $(this).attr('name', name);
@@ -736,8 +734,6 @@
         });
 
         VSProcedimientoIndex = $('.VS-procedimiento-item').length;
-
-        // Ocultar botón de eliminar del primer procedimiento si solo queda uno
         if (VSProcedimientoIndex === 1) {
             $('.VS-procedimiento-item:first .VS-remove-procedimiento').hide();
         }
@@ -746,7 +742,6 @@
             $(document).ready(function() {
                     let procedimientoIndex = 1;
 
-                    // Agregar nuevo procedimiento
                     $('#agregar-procedimiento').click(function() {
                         const newIndex = procedimientoIndex++;
                         const newProcedimiento = $(`
@@ -808,8 +803,6 @@
                         `);
 
                         $('#procedimientos-container').append(newProcedimiento);
-
-                        // Mostrar botón de eliminar en el primer procedimiento si hay más de uno
                         if (procedimientoIndex > 1) {
                             $('.procedimiento-item:first .remove-procedimiento').show();
                         }
@@ -819,11 +812,9 @@
                     $(document).on('click', '.remove-procedimiento', function() {
                         $(this).closest('.procedimiento-item').remove();
 
-                        // Reindexar los procedimientos restantes
                         $('.procedimiento-item').each(function(index) {
                             $(this).attr('data-index', index);
 
-                            // Actualizar los atributos name e id de los inputs
                             $(this).find('[name]').each(function() {
                                 const name = $(this).attr('name').replace(/\[\d+\]/, `[${index}]`);
                                 $(this).attr('name', name);
@@ -842,12 +833,344 @@
 
                         procedimientoIndex = $('.procedimiento-item').length;
 
-                        // Ocultar botón de eliminar del primer procedimiento si solo queda uno
                         if (procedimientoIndex === 1) {
                             $('.procedimiento-item:first .remove-procedimiento').hide();
                         }
                     });
                 });
+                //EXPORTAR PDF
+                                       function exportToPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Configuración inicial
+                doc.setFont('helvetica');
+                let yPosition = 20;
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const margin = 15;
+                const lineHeight = 7;
+                const maxY = doc.internal.pageSize.getHeight() - 20;
+
+                // Estilos reutilizables
+                const styles = {
+                    title: { size: 18, color: [0, 130, 111], align: 'center' },
+                    subtitle: { size: 14, color: [0, 130, 111], bold: true },
+                    sectionTitle: { size: 11, color: [0, 130, 111], bold: true },
+                    bodyText: { size: 10, color: [0, 0, 0] },
+                    smallText: { size: 8, color: [100, 100, 100] }
+                };
+
+                // Función para aplicar estilos
+                const applyStyle = (style) => {
+                    doc.setFontSize(style.size);
+                    doc.setTextColor(...style.color);
+                    doc.setFont(undefined, style.bold ? 'bold' : 'normal');
+                };
+
+                // Función para agregar texto con manejo de saltos de página
+                const addText = (text, x, y, options = {}) => {
+                    if (y > maxY) {
+                        doc.addPage();
+                        y = 20;
+                    }
+
+                    const maxWidth = options.maxWidth || (pageWidth - 2 * margin);
+                    const lines = doc.splitTextToSize(text, maxWidth);
+
+                    doc.text(lines, x, y, options);
+                    return y + (lines.length * lineHeight) + (options.extraSpace || 0);
+                };
+
+                // Título del documento
+                applyStyle(styles.title);
+                doc.text('HISTORIA CLÍNICA', pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 12;
+
+                // Línea decorativa
+                doc.setDrawColor(0, 130, 111);
+                doc.setLineWidth(0.8);
+                doc.line(margin, yPosition, pageWidth - margin, yPosition);
+                yPosition += 15;
+
+                // Información del paciente en tabla
+                const patientData = {
+                    nombre: $('.card-body p:contains("Nombre:")').text().replace("Nombre:", "").trim(),
+                    documento: $('.card-body p:contains("Documento:")').text().replace("Documento:", "").trim(),
+                    email: $('.card-body p:contains("Email:")').text().replace("Email:", "").trim(),
+                    telefono: $('.card-body p:contains("Teléfono:")').text().replace("Teléfono:", "").trim(),
+                    fechaNacimiento: $('.card-body p:contains("Fecha Nacimiento:")').text().replace("Fecha Nacimiento:", "").trim() || 'No especificada'
+                };
+
+                // Tabla de información del paciente
+                applyStyle(styles.subtitle);
+                doc.text('INFORMACIÓN DEL PACIENTE', margin, yPosition);
+                yPosition += 10;
+
+                doc.autoTable({
+                    startY: yPosition,
+                    head: [['Campo', 'Valor']],
+                    body: [
+                        ['Nombre completo', patientData.nombre],
+                        ['Documento', patientData.documento],
+                        ['Email', patientData.email],
+                        ['Teléfono', patientData.telefono],
+                        ['Fecha de nacimiento', patientData.fechaNacimiento]
+                    ],
+                    margin: { left: margin, right: margin },
+                    styles: {
+                        fontSize: 10,
+                        cellPadding: 4,
+                        valign: 'middle'
+                    },
+                    headStyles: {
+                        fillColor: [0, 130, 111],
+                        textColor: 255,
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [240, 240, 240]
+                    },
+                    columnStyles: {
+                        0: { fontStyle: 'bold', cellWidth: 50 }
+                    },
+                    theme: 'grid'
+                });
+
+                yPosition = doc.lastAutoTable.finalY + 15;
+
+                // Procesar cada visita médica
+                $('.details details').each(function(index) {
+                    if (yPosition > maxY - 50) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+
+                    const content = $(this).find('.content');
+
+                    // Procesar secciones de la visita principal
+                    const sections = content.find('div.mb-3');
+                    if (sections.length > 0) {
+                        sections.each(function() {
+                            const title = $(this).find('h5 strong').text().replace(':', '').trim();
+                            const text = $(this).find('p').text().trim();
+
+                            if (title && text) {
+                                applyStyle(styles.sectionTitle);
+                                doc.text(`${title}:`, margin, yPosition);
+
+                                doc.setDrawColor(200, 200, 200);
+                                doc.setLineWidth(0.2);
+                                doc.line(margin, yPosition + 1.5, margin + 30, yPosition + 1.5);
+
+                                yPosition += lineHeight;
+
+                                applyStyle(styles.bodyText);
+                                yPosition = addText(text, margin + 5, yPosition, { maxWidth: pageWidth - 2 * margin - 5 }) + 5;
+                            }
+                        });
+                    }
+
+                    // Procesar procedimientos de la visita principal
+                    const procedimientosTable = content.find('table');
+                    if (procedimientosTable.length > 0) {
+                        applyStyle(styles.sectionTitle);
+                        yPosition = addText('PROCEDIMIENTOS REALIZADOS:', margin, yPosition) + 3;
+
+                        const headers = ["Nombre", "Fecha", "Profesional", "Observaciones"];
+                        const rows = [];
+
+                        procedimientosTable.find('tbody tr').each(function() {
+                            const row = [];
+                            $(this).find('td').each(function() {
+                                row.push($(this).text().trim());
+                            });
+                            rows.push(row);
+                        });
+
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [headers],
+                            body: rows,
+                            margin: { left: margin, right: margin },
+                            styles: {
+                                fontSize: 8,
+                                cellPadding: 3,
+                                overflow: 'linebreak'
+                            },
+                            headStyles: {
+                                fillColor: [0, 130, 111],
+                                textColor: 255,
+                                fontSize: 9
+                            },
+                            alternateRowStyles: {
+                                fillColor: [245, 245, 245]
+                            },
+                            columnStyles: {
+                                0: { cellWidth: 40 },
+                                1: { cellWidth: 25 },
+                                2: { cellWidth: 35 },
+                                3: { cellWidth: 'auto' }
+                            }
+                        });
+
+                        yPosition = doc.lastAutoTable.finalY + 12;
+                    }
+
+                    // Procesar visitas sucesivas - Primero creamos una tabla resumen
+                    const visitasSucesivas = content.find('details.card');
+                    if (visitasSucesivas.length > 0) {
+                        // Tabla resumen de visitas sucesivas
+                        applyStyle(styles.sectionTitle);
+                        doc.text('RESUMEN DE VISITAS SUCESIVAS', margin, yPosition);
+                        yPosition += 10;
+
+                        // Preparar datos para la tabla resumen
+                        const resumenVisitas = [];
+
+                        visitasSucesivas.each(function() {
+                            const visitaSummary = $(this).find('summary').text().trim();
+                            const visitaContent = $(this).find('.card-body');
+
+                            // Extraer información básica de cada visita
+                            const visitaSections = visitaContent.find('div.row:first-child');
+                            const evolucion = visitaSections.find('h6:contains("Evolución")').parent().find('p').text().trim().substring(0, 50) + '...';
+                            const procedimientosCount = visitaContent.find('.card.mb-2').length;
+
+                            resumenVisitas.push([
+                                visitaSummary,
+                                evolucion,
+                                procedimientosCount > 0 ? `${procedimientosCount} procedimiento(s)` : 'Sin procedimientos'
+                            ]);
+                        });
+
+                        // Tabla resumen
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [['Fecha Visita', 'Resumen Evolución', 'Procedimientos']],
+                            body: resumenVisitas,
+                            margin: { left: margin, right: margin },
+                            styles: {
+                                fontSize: 9,
+                                cellPadding: 3,
+                                overflow: 'linebreak'
+                            },
+                            headStyles: {
+                                fillColor: [0, 100, 80],
+                                textColor: 255,
+                                fontSize: 9
+                            },
+                            alternateRowStyles: {
+                                fillColor: [245, 245, 245]
+                            },
+                            columnStyles: {
+                                0: { cellWidth: 30 },
+                                1: { cellWidth: 'auto' },
+                                2: { cellWidth: 30 }
+                            }
+                        });
+
+                        yPosition = doc.lastAutoTable.finalY + 15;
+
+                        // Detalle completo de cada visita sucesiva
+                        applyStyle(styles.sectionTitle);
+                        doc.text('DETALLE DE VISITAS SUCESIVAS', margin, yPosition);
+                        yPosition += 10;
+
+                        visitasSucesivas.each(function() {
+                            const visitaSummary = $(this).find('summary').text().trim();
+                            const visitaContent = $(this).find('.card-body');
+
+                            // Encabezado de visita con estilo
+                            applyStyle({ ...styles.sectionTitle, size: 12 });
+                            doc.setFillColor(230, 244, 242);
+                            doc.rect(margin, yPosition - 3, pageWidth - 2 * margin, 8, 'F');
+                            doc.text(visitaSummary, margin + 5, yPosition);
+                            yPosition += 10;
+
+                            // Contenido de la visita
+                            const visitaSections = visitaContent.find('div.row:first-child');
+                            if (visitaSections.length > 0) {
+                                // Evolución/Análisis
+                                const evolucion = visitaSections.find('h6:contains("Evolución")').parent().find('p').text().trim();
+                                if (evolucion) {
+                                    applyStyle({ ...styles.bodyText, bold: true });
+                                    yPosition = addText('Evolución/Análisis:', margin + 10, yPosition);
+
+                                    applyStyle(styles.bodyText);
+                                    yPosition = addText(evolucion, margin + 15, yPosition, { maxWidth: pageWidth - 2 * margin - 15 }) + 3;
+                                }
+
+                                // Conducta médica
+                                const conducta = visitaSections.find('h6:contains("Conducta")').parent().find('p').text().trim();
+                                if (conducta) {
+                                    applyStyle({ ...styles.bodyText, bold: true });
+                                    yPosition = addText('Conducta Médica:', margin + 10, yPosition);
+
+                                    applyStyle(styles.bodyText);
+                                    yPosition = addText(conducta, margin + 15, yPosition, { maxWidth: pageWidth - 2 * margin - 15 }) + 5;
+                                }
+                            }
+
+                            // Procedimientos de visita sucesiva
+                            const procedimientosVisita = visitaContent.find('.card.mb-2');
+                            if (procedimientosVisita.length > 0) {
+                                applyStyle({ ...styles.sectionTitle, size: 10 });
+                                yPosition = addText('Procedimientos:', margin + 10, yPosition) + 2;
+
+                                procedimientosVisita.each(function() {
+                                    const fecha = $(this).find('p:contains("Fecha:")').text().replace("Fecha:", "").trim();
+                                    const profesional = $(this).find('p:contains("Profesional:")').text().replace("Profesional:", "").trim();
+                                    const observaciones = $(this).find('p:contains("Observaciones:")').text().replace("Observaciones:", "").trim();
+
+                                    applyStyle({ ...styles.bodyText, size: 9, bold: true });
+                                    yPosition = addText(`◦ ${fecha} - ${profesional}`, margin + 15, yPosition);
+
+                                    if (observaciones) {
+                                        applyStyle({ ...styles.bodyText, size: 9 });
+                                        yPosition = addText(observaciones, margin + 20, yPosition, {
+                                            maxWidth: pageWidth - 2 * margin - 20
+                                        }) + 1;
+                                    }
+
+                                    yPosition += 3;
+                                });
+                            }
+
+                            yPosition += 8;
+                        });
+                    }
+
+                    yPosition += 15;
+                });
+
+                // Pie de página
+                doc.setFontSize(styles.smallText.size);
+                doc.setTextColor(...styles.smallText.color);
+                doc.text(`Documento generado el ${new Date().toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+
+                doc.setDrawColor(200, 200, 200);
+                doc.setLineWidth(0.3);
+                doc.line(margin, doc.internal.pageSize.getHeight() - 12, pageWidth - margin, doc.internal.pageSize.getHeight() - 12);
+
+                // Guardar el PDF
+                const formatDate = (date) => {
+                    return date.toISOString().slice(0,10).split('-').reverse().join('-');
+                };
+
+                const fileName = `Historia_Clinica_${patientData.nombre.replace(/ /g, '_')}_${formatDate(new Date())}.pdf`;
+                doc.save(fileName);
+            }
+
+            // Asignar la función al botón Exportar
+            $(document).ready(function() {
+                $('.btn-success:contains("Exportar")').click(exportToPDF);
+            });
         </script>
     }
     <!-- Bootstrap JS -->

@@ -139,5 +139,115 @@ namespace ConsultaMedica.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult EditarCitas(int id)
+        {
+            var cita = _context.citas
+                .Include(c => c.Paciente)
+                .Include(c => c.Especialidad)
+                .FirstOrDefault(c => c.Id == id);
+
+            if (cita == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Especialidades = _context.especialidades
+                .Select(e => new SelectListItem
+                {
+                    Value = e.Id.ToString(),
+                    Text = e.Nombre
+                })
+                .ToList();
+
+            return View(cita);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditarCitasPost(Citas cita)
+        {
+        
+            try
+            {
+                // Verificar si la cita existe
+                var citaExistente = _context.citas.Find(cita.Id);
+                if (citaExistente == null)
+                {
+                    return NotFound();
+                }
+
+                // Actualizar los campos necesarios
+                citaExistente.FechaHora = cita.FechaHora;
+                citaExistente.EspecialidadId = cita.EspecialidadId;
+                citaExistente.TiempoVisita = cita.TiempoVisita;
+                citaExistente.Observaciones = cita.Observaciones;
+
+                _context.Update(citaExistente);
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Cita actualizada correctamente";
+                return RedirectToAction("Index"); 
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Ocurrió un error al actualizar la cita: " + ex.Message);
+            }
+            
+            ViewBag.Especialidades = _context.especialidades
+                .Select(e => new SelectListItem
+                {
+                    Value = e.Id.ToString(),
+                    Text = e.Nombre
+                })
+                .ToList();
+
+            return View("EditarCitas", cita);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EliminarCita(int id)
+        {
+            using var transaction = _context.Database.BeginTransaction();
+
+            try
+            {
+                // 1. Eliminar los procedimientos de las visitas sucesivas
+                var procedimientos = _context.procedimientoVisitaSucesivas
+                    .Where(p => p.VisitaSucesiva.IdCita == id)
+                    .ToList();
+
+                _context.procedimientoVisitaSucesivas.RemoveRange(procedimientos);
+
+                // 2. Eliminar las visitas sucesivas
+                var visitasSucesivas = _context.visitaSucesivas
+                    .Where(v => v.IdCita == id)
+                    .ToList();
+
+                _context.visitaSucesivas.RemoveRange(visitasSucesivas);
+
+                // 3. Finalmente eliminar la cita principal
+                var cita = _context.citas.Find(id);
+                if (cita == null)
+                {
+                    return NotFound();
+                }
+
+                _context.citas.Remove(cita);
+
+                _context.SaveChanges();
+                transaction.Commit();
+
+                TempData["SuccessMessage"] = "Cita, visitas relacionadas y procedimientos eliminados correctamente";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                TempData["ErrorMessage"] = $"Error al eliminar: {ex.Message}";
+                return RedirectToAction("EditarCitas", new { id });
+            }
+        }
     }
 }

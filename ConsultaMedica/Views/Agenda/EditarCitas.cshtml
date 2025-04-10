@@ -1,0 +1,188 @@
+﻿@model ConsultaMedica.Models.Citas
+
+@{
+    ViewData["Title"] = "Editar Cita";
+}
+
+<div class="container-fluid">
+<div class="card shadow">
+    <div class="card-header text-center text-white" style="background-color: #00826F; border: none;">
+        <h2 class="mb-0"> Editar Cita</h2>
+    </div>
+    <div class="card-body">
+        <form asp-action="EditarCitasPost" method="post" class="needs-validation" novalidate>
+            <input type="hidden" asp-for="Id" />
+
+            <!-- Sección de Información de la Cita -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="FechaHora" class="form-label fw-bold">Fecha y Hora</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="ri-calendar-line"></i></span>
+                            <input asp-for="FechaHora" class="form-control datetimepicker" type="datetime-local" required />
+                        </div>
+                        <span asp-validation-for="FechaHora" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="EspecialidadId" class="form-label fw-bold">Especialidad*</label>
+                        <select asp-for="EspecialidadId" asp-items="ViewBag.Especialidades" class="form-select" required>
+                            <option value="">Seleccione una especialidad</option>
+                        </select>
+                        <span asp-validation-for="EspecialidadId" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="TiempoVisita" class="form-label fw-bold">Tiempo vista (min)*</label>
+                        <input asp-for="TiempoVisita" class="form-control" type="number" min="15" max="120" required />
+                        <span asp-validation-for="TiempoVisita" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="PacienteId" class="form-label fw-bold">Paciente*</label>
+                        <input asp-for="Paciente.Nombre" class="form-control" readonly />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección Observaciones -->
+            <div class="form-group mb-4">
+                <label asp-for="Observaciones" class="form-label fw-bold">Observadores</label>
+                <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Ingrese observaciones relevantes..."></textarea>
+
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="citaMultiple">
+                    <label class="form-check-label" for="citaMultiple">
+                        Cita múltiple profesional
+                    </label>
+                </div>
+            </div>
+
+            <!-- Sección de Descargas -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">Descargar:</label>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary">
+                        <i class="ri-file-download-line"></i> Justificante de la visita
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary">
+                        <i class="ri-file-download-line"></i> Recordadorio de la visita
+                    </button>
+                </div>
+                </div>
+
+            <!-- Botones inferiores -->
+            <div class="d-flex justify-content-between mt-4">
+                <div class="d-flex gap-2">
+
+                    <button type="button" class="btn btn-danger" onclick="confirmarEliminacion(@Model.Id)">
+                        <i class="ri-delete-bin-line"></i> Eliminar
+                    </button>
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="ri-close-line"></i> Editar Cita
+                    </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line"></i> Nueva Cita
+                        </button>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="ri-arrow-left-line"></i> Cancelar
+                    </a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+                function confirmarEliminacion(citaId) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡No podrás revertir esta acción!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    eliminarCita(citaId);
+                }
+            });
+        }
+
+        function eliminarCita(id) {
+            // Crear un formulario dinámicamente
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/Agenda/EliminarCita'; // Ajusta esta ruta según tu enrutamiento
+
+            // Agregar el ID de la cita
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+            form.appendChild(idInput);
+
+            // Agregar el token anti-falsificación
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            form.appendChild(tokenInput);
+
+            // Agregar el formulario al body y enviarlo
+            document.body.appendChild(form);
+            form.submit();
+        }
+        (function () {
+            'use strict'
+
+            var forms = document.querySelectorAll('.needs-validation')
+
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // Configuración del datetime picker
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInput = document.querySelector('.datetimepicker');
+            if (fechaInput && fechaInput.value) {
+                const fecha = new Date(fechaInput.value);
+                const offset = fecha.getTimezoneOffset();
+                fecha.setMinutes(fecha.getMinutes() - offset);
+                fechaInput.value = fecha.toISOString().slice(0, 16);
+            }
+        });
+    </script>
+}

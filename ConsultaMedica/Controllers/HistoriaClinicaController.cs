@@ -21,7 +21,9 @@ namespace ConsultaMedica.Controllers
 
 
         public IActionResult Index(int id)
-        { 
+        {
+            ViewBag.Title = $"Historia Clínica";
+
             // Obtener la cita con el paciente relacionado
             var cita = _context.citas
                 .Include(c => c.Paciente)
