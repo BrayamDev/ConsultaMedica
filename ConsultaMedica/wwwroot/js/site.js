@@ -88,6 +88,26 @@ document.addEventListener('DOMContentLoaded', function () {
             hour12: true,
             meridiem: 'short'
         },
+        // Agrega este nuevo manejador de eventos
+        dateClick: function (info) {
+            // Formatea la fecha para el input datetime-local
+            var fechaSeleccionada = info.dateStr; // Formato YYYY-MM-DD
+            var horaActual = new Date().toTimeString().substring(0, 5); // HH:MM
+
+            // Combina fecha y hora para el input
+            var fechaHora = fechaSeleccionada + 'T' + horaActual;
+
+            // Establece el valor en el campo de fecha y abre el modal
+            document.getElementById('fechaHora').value = fechaHora;
+
+            // Abre el modal de nueva cita
+            var modal = new bootstrap.Modal(document.getElementById('nuevaCitaModal'));
+            modal.show();
+
+            // Opcional: puedes cambiar el color de fondo del día seleccionado
+            info.dayEl.style.backgroundColor = 'rgba(0, 130, 111, 0.1)';
+        },
+
         events: function (fetchInfo, successCallback, failureCallback) {
             fetch('/Agenda/GetCitas')
                 .then(response => response.json())
