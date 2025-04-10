@@ -42,10 +42,10 @@ namespace ConsultaMedica.Controllers
             ViewBag.Doctores = doctores;
 
             // Obtener el ID del paciente desde la cita
-            int idPaciente = cita.Paciente.Id;
+            int idPaciente1 = cita.Paciente.Id;
 
             var historiasClinicas = _context.historiasClinicas
-            .Where(h => h.IdPaciente == idPaciente)
+            .Where(h => h.IdPaciente == idPaciente1)
             .OrderByDescending(h => h.FechaAlta)
             .Select(h => new
             {
@@ -113,6 +113,8 @@ namespace ConsultaMedica.Controllers
 
             return View();
         }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(int citaId, HistoriaClinicaViewModel model)
@@ -251,12 +253,29 @@ namespace ConsultaMedica.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult InsertarVisitaSucesiva(VisitaSucesivaViewModel model)
+        public IActionResult InsertarVisitaSucesiva(VisitaSucesivaViewModel model )
         {
             try
             {
-                // Obtener la historia clínica con el médico asociado
+                // Obtener la cita con el paciente relacionado
+                var cita = _context.citas
+                    .Include(c => c.Paciente)
+                    .FirstOrDefault(c => c.Id == model.IdCita);
+
+                if (cita == null)
+                {
+                    return NotFound();
+                }
+
+                // Obtener la historia clínica más reciente del paciente
                 var historiaClinica = _context.historiasClinicas
+                    .Where(h => h.IdPaciente == cita.Paciente.Id)  // Filtra por IdPaciente
+                    .OrderByDescending(h => h.FechaAlta)          // Opcional: Ordena por fecha más reciente
+                    .FirstOrDefault();
+
+
+                // Obtener la historia clínica con el médico asociado
+                var historiaClinica1 = _context.historiasClinicas
                     .Include(h => h.Medico) // Asegúrate de incluir el médico
                     .FirstOrDefault(h => h.Id == model.IdHistoriaClinica);
 
@@ -266,6 +285,9 @@ namespace ConsultaMedica.Controllers
                     TempData["TipoMensaje"] = "error";
                     return RedirectToAction("Index", "HistoriaClinica", new { id = model.IdCita });
                 }
+
+                // Asignar el ID de la historia clínica al modelo
+                model.IdHistoriaClinica = historiaClinica.Id;
 
                 // Forzar que el médico responsable sea el mismo que el de la historia clínica
                 model.IdMedico = historiaClinica.IdMedico; // Asigna el médico de la historia clínica
