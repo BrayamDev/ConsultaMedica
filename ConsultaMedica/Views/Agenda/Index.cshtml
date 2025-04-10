@@ -139,6 +139,9 @@
                                 <button class="btn btn-success" style="background-color: #00826F; border: none;">
                                     <i class="ri-user-line"></i> Citas paciente
                                 </button>
+                                <button type="button" class="btn btn-primary" style="background-color: #00826F; border: none;" data-bs-toggle="modal" data-bs-target="#nuevaAltaModal">
+                                    <i class="ri-checkbox-circle-line"></i> Registrar Nueva Alta
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -223,182 +226,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            @* <!-- Primera visita y Nueva alta en la misma fila -->
-                            <div class="row mb-3 text-center">
-                                <div class="col-md-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input custom-checkbox" type="checkbox" id="nuevaAlta">
-                                        <label class="form-check-label custom-label" for="nuevaAlta">
-                                            <strong><i class="ri-checkbox-circle-line"></i> Registrar Nueva alta</strong>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>  
-
-                            <!-- Submenú desplegable para Nueva Alta -->
-                            <div id="submenuNuevaAlta" class="mb-3" style="display: none;">
-                                <form asp-controller="Paciente" asp-action="CrearPacienteCita" method="post">
-                                    <div class="row mb-3">
-                                        <!-- Columna 1 -->
-                                        <div class="col-md-4">
-                                            <label for="nombreAlta" class="form-label">
-                                                <i class="ri-user-line"></i> Nombre <span class="text-danger">*</span>
-                                            </label>
-                                            <input type="text" class="form-control" id="nombreAlta" name="Nombre" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="primerApellidoAlta" class="form-label">
-                                                <i class="ri-user-line"></i> Primer apellido <span class="text-danger">*</span>
-                                            </label>
-                                            <input type="text" class="form-control" id="primerApellidoAlta" name="PrimerApellido" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="segundoApellidoAlta" class="form-label">
-                                                <i class="ri-user-line"></i> Segundo apellido
-                                            </label>
-                                            <input type="text" class="form-control" id="segundoApellidoAlta" name="SegundoApellido">
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-4">
-                                            <label for="fechaNacimientoAlta" class="form-label">
-                                                <i class="ri-calendar-line"></i> Fecha de nacimiento
-                                            </label>
-                                            <input type="date" class="form-control" id="fechaNacimientoAlta" name="FechaNacimiento">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="sexoAlta" class="form-label">
-                                                <i class="ri-user-line"></i> Sexo
-                                            </label>
-                                            <select class="form-select" id="sexoAlta" name="Sexo">
-                                                <option value="Masculino" selected>Masculino</option>
-                                                <option value="Femenino">Femenino</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="pais" class="form-label">
-                                                <i class="ri-map-pin-line"></i> País de origen/Nacionalidad
-                                            </label>
-                                            <input type="text" id="pais" class="form-control" name="PaisOrigen" placeholder="Escribe tu país">
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-4">
-                                            <label for="provinciaAlta" class="form-label">
-                                                <i class="ri-map-pin-line"></i> Provincia
-                                            </label>
-                                            <input type="text" class="form-control" id="provinciaAlta" name="Provincia"
-                                                   placeholder="Ingrese una provincia">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="poblacionAlta" class="form-label">
-                                                <i class="ri-map-pin-line"></i> Población
-                                            </label>
-                                            <input type="text" class="form-control" id="poblacionAlta" name="Poblacion" placeholder="Ingrese la población">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="tipoDocumentoAlta" class="form-label">
-                                                <i class="ri-id-card-line"></i> Tipo de documento
-                                            </label>
-                                            <select class="form-select" id="tipoDocumentoAlta" name="TipoDocumentoId">
-                                                <option value="">Seleccione un tipo</option>
-                                                @if (ViewBag.TiposDocumento != null)
-                                                {
-                                                    foreach (var item in ViewBag.TiposDocumento as List<SelectListItem>)
-                                                    {
-                                                        <option value="@item.Value">@item.Text</option>
-                                                    }
-                                                }
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label for="numeroDocumentoAlta" class="form-label">
-                                                <i class="ri-id-card-line"></i> Número de documento
-                                            </label>
-                                            <input type="text" class="form-control" id="numeroDocumentoAlta" name="NumeroDocumento">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="direccionAlta" class="form-label">
-                                                <i class="ri-map-pin-line"></i> Dirección
-                                            </label>
-                                            <input type="text" class="form-control" id="direccionAlta" name="Direccion">
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-4">
-                                            <label for="codigoPostalAlta" class="form-label">
-                                                <i class="ri-map-pin-line"></i> Código postal
-                                            </label>
-                                            <input type="text" class="form-control" id="codigoPostalAlta" name="CodigoPostal">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="telefonoAlta" class="form-label">
-                                                <i class="ri-phone-line"></i> Teléfono
-                                            </label>
-                                            <input type="text" class="form-control" id="telefonoAlta" name="Telefono">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="movilAlta" class="form-label">
-                                                <i class="ri-smartphone-line"></i> Móvil
-                                            </label>
-                                            <input type="text" class="form-control" id="movilAlta" name="Movil">
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-4">
-                                            <label for="emailAlta" class="form-label">
-                                                <i class="ri-mail-line"></i> E-mail
-                                            </label>
-                                            <input type="email" class="form-control" id="emailAlta" name="Email">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="procedenciaAlta" class="form-label">
-                                                <i class="ri-map-pin-line"></i> Procedencia
-                                            </label>
-                                            <input type="text" class="form-control" id="procedencia" name="Procedencia"
-                                                   placeholder="Procedencia">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="tarifasMutuasAlta" class="form-label">
-                                                <i class="ri-money-dollar-circle-line"></i> Aseguradora
-                                            </label>
-                                            <input type="text" class="form-control" id="tarifasMutuasAlta" name="Aseguradora"
-                                                   placeholder="Aseguradora">
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <label for="observacionesAlta" class="form-label">
-                                                <i class="ri-file-text-line"></i> Observaciones de la cita
-                                            </label>
-                                            <textarea class="form-control" id="observacionesAlta" name="Observaciones"
-                                                      rows="3"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="alertarObservaciones" name="MostrarObservaciones">
-                                                <label class="form-check-label" for="alertarObservaciones">
-                                                    <i class="ri-alert-line"></i> Mostrar observaciones del paciente
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Botón Agregar Paciente con Bootstrap 5 -->
-                                    <div class="row mb-4">
-                                        <div class="col-12 d-flex justify-content-center">
-                                            <button type="submit" class="btn btn-success btn-lg rounded-pill" style="background-color: #00826F; border: none;">
-                                                <i class="ri-user-add-fill me-2"></i> Agregar Paciente
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div> *@
 
                             <!-- Modal para buscar pacientes -->
                             <div class="modal fade" id="modalPacientes" tabindex="-1" aria-labelledby="modalPacientesLabel" aria-hidden="true">
@@ -502,7 +329,163 @@
                 </div>
             </div>
         </div>
+        <!-- Modal de Nueva Alta -->
+        <div class="modal fade" id="nuevaAltaModal" tabindex="-1" aria-labelledby="nuevaAltaModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #00826F; border: none;">
+                        <h5 class="modal-title" id="nuevaAltaModalLabel">
+                            <i class="ri-user-add-line"></i> Registrar Nuevo Paciente
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-controller="Paciente" asp-action="CrearPacienteCita" method="post">
+                            <div class="row mb-3">
+                                <!-- Columna 1 -->
+                                <div class="col-md-4">
+                                    <label for="nombreAlta" class="form-label">
+                                        <i class="ri-user-line"></i> Nombre <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="nombreAlta" name="Nombre" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="primerApellidoAlta" class="form-label">
+                                        <i class="ri-user-line"></i> Primer apellido <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="primerApellidoAlta" name="PrimerApellido" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="segundoApellidoAlta" class="form-label">
+                                        <i class="ri-user-line"></i> Segundo apellido <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="segundoApellidoAlta" name="SegundoApellido" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="fechaNacimientoAlta" class="form-label">
+                                        <i class="ri-calendar-line"></i> Fecha de nacimiento <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date" class="form-control" id="fechaNacimientoAlta" name="FechaNacimiento" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="sexoAlta" class="form-label">
+                                        <i class="ri-user-line"></i> Sexo <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="sexoAlta" name="Sexo" required>
+                                        <option value="">Seleccione un sexo</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="pais" class="form-label">
+                                        <i class="ri-map-pin-line"></i> País de origen/Nacionalidad <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" id="pais" class="form-control" name="PaisOrigen" placeholder="Escribe tu país" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="provinciaAlta" class="form-label">
+                                        <i class="ri-map-pin-line"></i> Provincia <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="provinciaAlta" name="Provincia"
+                                           placeholder="Ingrese una provincia" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="poblacionAlta" class="form-label">
+                                        <i class="ri-map-pin-line"></i> Población <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="poblacionAlta" name="Poblacion" placeholder="Ingrese la población" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="tipoDocumentoAlta" class="form-label">
+                                        <i class="ri-id-card-line"></i> Tipo de documento <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="tipoDocumentoAlta" name="TipoDocumentoId" required>
+                                        <option value="">Seleccione un tipo</option>
+                                        @if (ViewBag.TiposDocumento != null)
+                                        {
+                                            foreach (var item in ViewBag.TiposDocumento as List<SelectListItem>)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="numeroDocumentoAlta" class="form-label">
+                                        <i class="ri-id-card-line"></i> Número de documento <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="numeroDocumentoAlta" name="NumeroDocumento" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="direccionAlta" class="form-label">
+                                        <i class="ri-map-pin-line"></i> Dirección <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="direccionAlta" name="Direccion" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="codigoPostalAlta" class="form-label">
+                                        <i class="ri-map-pin-line"></i> Código postal <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="codigoPostalAlta" name="CodigoPostal" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="telefonoAlta" class="form-label">
+                                        <i class="ri-phone-line"></i> Teléfono <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="telefonoAlta" name="Telefono" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="movilAlta" class="form-label">
+                                        <i class="ri-smartphone-line"></i> Móvil <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="movilAlta" name="Movil" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="emailAlta" class="form-label">
+                                        <i class="ri-mail-line"></i> E-mail <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" class="form-control" id="emailAlta" name="Email" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="procedenciaAlta" class="form-label">
+                                        <i class="ri-map-pin-line"></i> Procedencia <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="procedencia" name="Procedencia"
+                                           placeholder="Procedencia" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="tarifasMutuasAlta" class="form-label">
+                                        <i class="ri-money-dollar-circle-line"></i> Aseguradora <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="tarifasMutuasAlta" name="Aseguradora"
+                                           placeholder="Aseguradora" required>
+                                </div>
+                            </div>
 
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="ri-close-line"></i> Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-success" style="background-color: #00826F; border: none;">
+                                    <i class="ri-user-add-fill me-2"></i> Agregar Paciente
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="container-fluid">

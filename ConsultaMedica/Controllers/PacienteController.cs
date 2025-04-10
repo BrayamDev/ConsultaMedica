@@ -1,7 +1,9 @@
 ﻿using ConsultaMedica.Data;
 using ConsultaMedica.Models;
+using ConsultaMedica.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ConsultaMedica.Controllers
 {
@@ -37,33 +39,90 @@ namespace ConsultaMedica.Controllers
             return View();
         }
 
-        // POST: Paciente/CrearPacienteCita
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CrearPacienteCita(Pacientes paciente)
+        public IActionResult CrearPacienteCita(CitaPacienteViewModel model)
         {
             try
             {
-                if (ModelState.IsValid)
+                // Validación adicional para documento
+                if (model.TipoDocumentoId.HasValue && string.IsNullOrWhiteSpace(model.NumeroDocumento))
                 {
-
-                    // Agregar el paciente a la base de datos
-                    _context.pacientes.Add(paciente);
-                    await _context.SaveChangesAsync();
-
-                    // Redirigir a alguna vista de éxito o a la lista de pacientes
-                    TempData["SuccessMessage"] = "Paciente creado exitosamente";
-                    return RedirectToAction("Index", "Home"); // Cambia esto por tu acción deseada
+                    ModelState.AddModelError("NumeroDocumento", "Debe ingresar un número de documento cuando selecciona un tipo");
                 }
 
-                // Si el modelo no es válido, regresar a la vista con los errores
-                return View(paciente);
+                // Validar documento único si se proporcionó
+                if (!string.IsNullOrWhiteSpace(model.NumeroDocumento) && model.TipoDocumentoId.HasValue)
+                {
+                    var existeDocumento = _context.pacientes
+                        .Any(p => p.NumeroDocumento == model.NumeroDocumento &&
+                                 p.TipoDocumentoId == model.TipoDocumentoId);
+
+                    if (existeDocumento)
+                    {
+                        ModelState.AddModelError("NumeroDocumento", "Ya existe un paciente con este número de documento");
+                    }
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.TiposDocumento = _context.TiposDocumento
+                        .Select(t => new SelectListItem
+                        {
+                            Value = t.Id.ToString(),
+                            Text = t.Nombre
+                        })
+                        .ToList();
+
+                    TempData["TipoMensaje"] = "error";
+                    TempData["Mensaje"] = "Por favor corrija los errores en el formulario";
+                    return View(model);
+                }
+
+                // Crear el paciente
+                var paciente = new Pacientes
+                {
+                    Nombre = model.Nombre,
+                    PrimerApellido = model.PrimerApellido,
+                    SegundoApellido = model.SegundoApellido,
+                    FechaNacimiento = model.FechaNacimiento,
+                    Sexo = model.Sexo ?? "No especificado",
+                    PaisOrigen = model.PaisOrigen,
+                    Provincia = model.Provincia,
+                    Poblacion = model.Poblacion,
+                    TipoDocumentoId = (int)model.TipoDocumentoId,
+                    NumeroDocumento = model.NumeroDocumento,
+                    Direccion = model.Direccion,
+                    CodigoPostal = model.CodigoPostal,
+                    Telefono = model.Telefono,
+                    Movil = model.Movil,
+                    Email = model.Email,
+                    Procedencia = model.Procedencia,
+                    Aseguradora = model.Aseguradora,
+                };
+
+                _context.pacientes.Add(paciente);
+                _context.SaveChanges();
+
+
+                TempData["Mensaje"] = "Paciente registrado correctamente";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("Index", "Agenda");
             }
             catch (Exception ex)
             {
-                // Loggear el error (puedes implementar un sistema de logging)
-                ModelState.AddModelError("", "Ocurrió un error al crear el paciente. Por favor intente nuevamente.");
-                return View(paciente);
+                TempData["Mensaje"] = $"Error al guardar el paciente: {ex.Message}";
+                TempData["TipoMensaje"] = "error";
+
+                ViewBag.TiposDocumento = _context.TiposDocumento
+                    .Select(t => new SelectListItem
+                    {
+                        Value = t.Id.ToString(),
+                        Text = t.Nombre
+                    })
+                    .ToList();
+
+                return View(model);
             }
         }
     }
