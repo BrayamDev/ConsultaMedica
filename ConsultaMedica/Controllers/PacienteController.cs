@@ -20,7 +20,7 @@ namespace ConsultaMedica.Controllers
         // GET: PacienteController
         public IActionResult Index()
         {
-            var listaPacientes = _context.pacientes.ToList();
+            var listaPacientes = _context.Pacientes.ToList();
             ViewBag.Pacientes = listaPacientes;
 
             return View(listaPacientes);
@@ -54,7 +54,7 @@ namespace ConsultaMedica.Controllers
                 // Validar documento único si se proporcionó
                 if (!string.IsNullOrWhiteSpace(model.NumeroDocumento) && model.TipoDocumentoId.HasValue)
                 {
-                    var existeDocumento = _context.pacientes
+                    var existeDocumento = _context.Pacientes
                         .Any(p => p.NumeroDocumento == model.NumeroDocumento &&
                                  p.TipoDocumentoId == model.TipoDocumentoId);
 
@@ -101,7 +101,7 @@ namespace ConsultaMedica.Controllers
                     Aseguradora = model.Aseguradora,
                 };
 
-                _context.pacientes.Add(paciente);
+                _context.Pacientes.Add(paciente);
                 _context.SaveChanges();
 
 

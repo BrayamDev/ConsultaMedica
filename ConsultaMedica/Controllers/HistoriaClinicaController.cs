@@ -25,7 +25,7 @@ namespace ConsultaMedica.Controllers
             ViewBag.Title = $"Historia Clínica";
 
             // Obtener la cita con el paciente relacionado
-            var cita = _context.citas
+            var cita = _context.Citas
                 .Include(c => c.Paciente)
                 .FirstOrDefault(c => c.Id == id);
 
@@ -34,7 +34,7 @@ namespace ConsultaMedica.Controllers
                 return NotFound();
             }
 
-            var doctores = _context.doctores
+            var doctores = _context.Doctores
                .Select(d => new SelectListItem
                {
                    Value = d.Id.ToString(),
@@ -46,7 +46,7 @@ namespace ConsultaMedica.Controllers
             // Obtener el ID del paciente desde la cita
             int idPaciente1 = cita.Paciente.Id;
 
-            var historiasClinicas = _context.historiasClinicas
+            var historiasClinicas = _context.HistoriasClinicas
             .Where(h => h.IdPaciente == idPaciente1)
             .OrderByDescending(h => h.FechaAlta)
             .Select(h => new
@@ -79,7 +79,7 @@ namespace ConsultaMedica.Controllers
                         Observaciones = p.Observaciones ?? string.Empty,
                         p.FechaProcedimiento
                     }).ToList(),
-                VisitasSucesivas = _context.visitaSucesivas
+                VisitasSucesivas = _context.VisitasSucesivas
                     .Where(v => v.IdHistoriaClinica == h.Id)
                     .Select(v => new
                     {
@@ -87,7 +87,7 @@ namespace ConsultaMedica.Controllers
                         v.FechaVisita,
                         EvolucionAnalisis = v.EvolucionAnalisis ?? string.Empty,
                         ConductaMedica = v.ConductaMedica ?? string.Empty,
-                        MedicoResponsable = _context.doctores
+                        MedicoResponsable = _context.Doctores
                             .Where(d => d.Id == v.IdMedicoResponsable)
                             .Select(d => $"{d.Nombre ?? ""} {d.PrimerApellido ?? ""}")
                             .FirstOrDefault() ?? string.Empty,
@@ -95,15 +95,15 @@ namespace ConsultaMedica.Controllers
                         {
                             p.FechaProcedimiento,
                             Observaciones = p.Observaciones ?? string.Empty,
-                            Profesional = _context.doctores
-                                .Where(d => d.Id == p.IdProfesional)
+                            Profesional = _context.Doctores
+                                .Where(d => d.Id == p.ProfesionalId)
                                 .Select(d => $"{d.Nombre ?? ""} {d.PrimerApellido ?? ""}")
                                 .FirstOrDefault() ?? string.Empty
                         }).ToList()
                     }).ToList()
             }).ToList();
 
-            var historiaExistente = _context.historiasClinicas
+            var historiaExistente = _context.HistoriasClinicas
                 .FirstOrDefault(h => h.CitaId == id);
 
             ViewBag.Paciente = cita.Paciente;
@@ -123,7 +123,7 @@ namespace ConsultaMedica.Controllers
         {
             try
             {
-                var cita = _context.citas
+                var cita = _context.Citas
                     .Include(c => c.Paciente)
                     .FirstOrDefault(c => c.Id == citaId);
 
@@ -155,7 +155,7 @@ namespace ConsultaMedica.Controllers
                 {
                     ViewBag.Paciente = cita.Paciente;
                     ViewBag.CitaId = citaId;
-                    ViewBag.Doctores = _context.doctores
+                    ViewBag.Doctores = _context.Doctores
                         .Select(d => new SelectListItem
                         {
                             Value = d.Id.ToString(),
@@ -182,7 +182,7 @@ namespace ConsultaMedica.Controllers
       
                 };
 
-                _context.historiasClinicas.Add(historiaClinica);
+                _context.HistoriasClinicas.Add(historiaClinica);
                 _context.SaveChanges();
 
                 // Crear examen físico
@@ -193,7 +193,8 @@ namespace ConsultaMedica.Controllers
                     FrecuenciaCardiaca = model.FrecuenciaCardiaca ?? "No registrada",
                     TensionArterial = model.TensionArterial ?? "No registrada",
                     FrecuenciaRespiratoria = model.FrecuenciaRespiratoria ?? "No registrada",
-                    SatO2 = model.SatO2 ?? "No registrada"
+                    SatO2 = model.SatO2 ?? "No registrada",
+                    ObservacionesExamenFisico = model.ObservacionesExamenFisico
                 };
 
                 _context.ExamenesFisicos.Add(examenFisico);
@@ -203,7 +204,7 @@ namespace ConsultaMedica.Controllers
                 {
                     foreach (var proc in model.Procedimientos)
                     {
-                        var doctor = _context.doctores.FirstOrDefault(d => d.Id == proc.IdMedico);
+                        var doctor = _context.Doctores.FirstOrDefault(d => d.Id == proc.IdMedico);
 
                         if (doctor == null)
                         {
@@ -216,7 +217,8 @@ namespace ConsultaMedica.Controllers
                             NombreProcedimiento = proc.NombreProcedimiento ?? "Procedimiento médico",
                             Observaciones = proc.Observaciones ?? "No hay observaciones",
                             FechaProcedimiento = proc.FechaProcedimiento ?? DateTime.Now,
-                            NombreProfesional = $"{doctor.Nombre} {doctor.PrimerApellido}"
+                            NombreProfesional = $"{doctor.Nombre} {doctor.PrimerApellido}",
+                            
                         };
                         _context.ProcedimientosProfesionales.Add(procedimiento);
                     }
@@ -233,7 +235,7 @@ namespace ConsultaMedica.Controllers
                 TempData["Mensaje"] = $"Error al guardar la historia clínica: {ex.Message}";
                 TempData["TipoMensaje"] = "error";
 
-                var citaForView = _context.citas
+                var citaForView = _context.Citas
                     .Include(c => c.Paciente)
                     .FirstOrDefault(c => c.Id == citaId);
 
@@ -241,7 +243,7 @@ namespace ConsultaMedica.Controllers
 
                 ViewBag.Paciente = citaForView.Paciente;
                 ViewBag.CitaId = citaId;
-                ViewBag.Doctores = _context.doctores
+                ViewBag.Doctores = _context.Doctores
                     .Select(d => new SelectListItem
                     {
                         Value = d.Id.ToString(),
@@ -255,12 +257,12 @@ namespace ConsultaMedica.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult InsertarVisitaSucesiva(VisitaSucesivaViewModel model )
+        public IActionResult InsertarVisitaSucesiva(VisitaSucesivaViewModel model)
         {
             try
             {
                 // Obtener la cita con el paciente relacionado
-                var cita = _context.citas
+                var cita = _context.Citas
                     .Include(c => c.Paciente)
                     .FirstOrDefault(c => c.Id == model.IdCita);
 
@@ -269,17 +271,12 @@ namespace ConsultaMedica.Controllers
                     return NotFound();
                 }
 
-                // Obtener la historia clínica más reciente del paciente
-                var historiaClinica = _context.historiasClinicas
-                    .Where(h => h.IdPaciente == cita.Paciente.Id)  // Filtra por IdPaciente
-                    .OrderByDescending(h => h.FechaAlta)          // Opcional: Ordena por fecha más reciente
-                    .FirstOrDefault();
-
-
-                // Obtener la historia clínica con el médico asociado
-                var historiaClinica1 = _context.historiasClinicas
+                // Obtener la historia clínica más reciente del paciente con el médico asociado
+                var historiaClinica = _context.HistoriasClinicas
                     .Include(h => h.Medico) // Asegúrate de incluir el médico
-                    .FirstOrDefault(h => h.Id == model.IdHistoriaClinica);
+                    .Where(h => h.IdPaciente == cita.Paciente.Id)
+                    .OrderByDescending(h => h.FechaAlta)
+                    .FirstOrDefault();
 
                 if (historiaClinica == null)
                 {
@@ -288,41 +285,11 @@ namespace ConsultaMedica.Controllers
                     return RedirectToAction("Index", "HistoriaClinica", new { id = model.IdCita });
                 }
 
-                // Asignar el ID de la historia clínica al modelo
+                // Asignar el ID de la historia clínica y el médico al modelo
                 model.IdHistoriaClinica = historiaClinica.Id;
+                var idMedicoHistoria = historiaClinica.IdMedico; // Médico que creó la historia clínica
 
-                // Forzar que el médico responsable sea el mismo que el de la historia clínica
-                model.IdMedico = historiaClinica.IdMedico; // Asigna el médico de la historia clínica
-
-                // Validar campos principales
-                if (string.IsNullOrWhiteSpace(model.EvolucionAnalisis))
-                {
-                    ModelState.AddModelError("EvolucionAnalisis", "El campo Evolución/Análisis es requerido");
-                }
-
-                if (string.IsNullOrWhiteSpace(model.ConductaMedica))
-                {
-                    ModelState.AddModelError("ConductaMedica", "El campo Conducta médica es requerido");
-                }
-
-                // Validar procedimientos
-                if (model.Procedimientos != null)
-                {
-                    foreach (var proc in model.Procedimientos)
-                    {
-                        if (proc.FechaProcedimiento == null)
-                        {
-                            ModelState.AddModelError("", "La fecha del procedimiento es requerida");
-                        }
-                    }
-                }
-
-                //if (!ModelState.IsValid)
-                //{
-                //    TempData["Mensaje"] = "Por favor complete todos los campos requeridos";
-                //    TempData["TipoMensaje"] = "error";
-                //    return RedirectToAction("Index", "HistoriaClinica", new { id = model.IdCita });
-                //}
+                // Validaciones (mantén las que ya tienes)...
 
                 using (var transaction = _context.Database.BeginTransaction())
                 {
@@ -336,14 +303,14 @@ namespace ConsultaMedica.Controllers
                             FechaVisita = DateTime.Now,
                             EvolucionAnalisis = model.EvolucionAnalisis,
                             ConductaMedica = model.ConductaMedica,
-                            IdMedicoResponsable = historiaClinica.IdMedico, // Usamos el médico de la historia
+                            IdMedicoResponsable = idMedicoHistoria, // Usamos el médico de la historia
                             FechaCreacion = DateTime.Now
                         };
 
-                        _context.visitaSucesivas.Add(visitaSucesiva);
+                        _context.VisitasSucesivas.Add(visitaSucesiva);
                         _context.SaveChanges();
 
-                        // Agregar procedimientos
+                        // Agregar procedimientos - TODOS con el mismo médico de la historia clínica
                         if (model.Procedimientos != null && model.Procedimientos.Any())
                         {
                             foreach (var proc in model.Procedimientos)
@@ -353,10 +320,10 @@ namespace ConsultaMedica.Controllers
                                     IdVisitaSucesiva = visitaSucesiva.Id,
                                     Observaciones = proc.Observaciones ?? "No hay observaciones",
                                     FechaProcedimiento = proc.FechaProcedimiento.Value,
-                                    IdProfesional = proc.IdMedico
+                                    ProfesionalId = proc.IdProfesional
                                 };
 
-                                _context.procedimientoVisitaSucesivas.Add(procedimiento);
+                                _context.ProcedimientosVisitaSucesiva.Add(procedimiento);
                             }
                         }
 

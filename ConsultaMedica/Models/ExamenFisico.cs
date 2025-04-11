@@ -19,5 +19,6 @@ namespace ConsultaMedica.Models
         public string TensionArterial { get; set; }
         public string FrecuenciaRespiratoria { get; set; }
         public string SatO2 { get; set; }
+        public string? ObservacionesExamenFisico { get; set; }
     }
 }

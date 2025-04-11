@@ -6,21 +6,15 @@ namespace ConsultaMedica.Models
     public class ProcedimientoVisitaSucesiva
     {
         public int Id { get; set; }
-
-        [Required]
         public int IdVisitaSucesiva { get; set; }
-
-        [Required]
-        public DateTime FechaProcedimiento { get; set; } = DateTime.Now;
-
-        [Required]
+        public DateTime FechaProcedimiento { get; set; }
         public string Observaciones { get; set; }
 
-        [Required]
-        public int IdProfesional { get; set; }
+        // Solo mantener esta
+        public int ProfesionalId { get; set; }
 
-        // Relaciones
-        public VisitaSucesiva VisitaSucesiva { get; set; }
-        public Doctores Profesional { get; set; }
+        // Propiedades de navegación
+        public virtual VisitaSucesiva VisitaSucesiva { get; set; }
+        public virtual Doctores Profesional { get; set; }
     }
 }

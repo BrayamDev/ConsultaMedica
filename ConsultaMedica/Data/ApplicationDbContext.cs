@@ -1,132 +1,153 @@
-﻿using ConsultaMedica.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using ConsultaMedica.Models;
 
 namespace ConsultaMedica.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        // Tablas existentes
-        public DbSet<Citas> citas { get; set; }
-        public DbSet<Especialidades> especialidades { get; set; }
-        public DbSet<Pacientes> pacientes { get; set; }
-        public DbSet<Doctores> doctores { get; set; }
-        public DbSet<HistoriasClinicas> historiasClinicas { get; set; }
+        public DbSet<Citas> Citas { get; set; }
+        public DbSet<Doctores> Doctores { get; set; }
+        public DbSet<Especialidades> Especialidades { get; set; }
         public DbSet<ExamenFisico> ExamenesFisicos { get; set; }
         public DbSet<ExamenFisicoAdicional> ExamenesFisicosAdicionales { get; set; }
+        public DbSet<HistoriasClinicas> HistoriasClinicas { get; set; }
+        public DbSet<Pacientes> Pacientes { get; set; }
         public DbSet<ProcedimientoProfesional> ProcedimientosProfesionales { get; set; }
-        public DbSet<ProcedimientoVisitaSucesiva> procedimientoVisitaSucesivas { get; set; }
-        public DbSet<VisitaSucesiva> visitaSucesivas { get; set; }
+        public DbSet<ProcedimientoVisitaSucesiva> ProcedimientosVisitaSucesiva { get; set; }
         public DbSet<TipoDocumento> TiposDocumento { get; set; }
+        public DbSet<VisitaSucesiva> VisitasSucesivas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // PRIMERO configurar TipoDocumento
-            modelBuilder.Entity<TipoDocumento>(entity =>
-            {
-                entity.ToTable("TiposDocumento");
-
-                // Configuración de la relación inversa
-                entity.HasMany(t => t.Pacientes)
-                      .WithOne(p => p.TipoDocumento)
-                      .HasForeignKey(p => p.TipoDocumentoId)
-                      .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            // LUEGO configurar Pacientes
-            modelBuilder.Entity<Pacientes>(entity =>
-            {
-                // Esta parte ya no es necesaria porque está definida en TipoDocumento
-                // entity.HasOne(p => p.TipoDocumento)... 
-
-                // Configuración EXPLÍCITA del nombre de columna
-                entity.Property(p => p.TipoDocumentoId)
-                      .HasColumnName("IdTipoDocumento");
-
-                // Restricción única para documento
-                entity.HasIndex(p => new { p.TipoDocumentoId, p.NumeroDocumento })
-                      .IsUnique();
-
-                entity.HasMany(p => p.HistoriasClinicas)
-                      .WithOne(h => h.Paciente)
-                      .HasForeignKey(h => h.IdPaciente)
-                      .OnDelete(DeleteBehavior.Restrict);
-            });
-
             // Configuración de Citas
-            modelBuilder.Entity<Citas>(entity =>
-            {
-                entity.HasOne(c => c.Paciente)
-                      .WithMany(p => p.Citas)
-                      .HasForeignKey(c => c.PacienteId)
-                      .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Citas>()
+                .HasOne(c => c.Paciente)
+                .WithMany(p => p.Citas)
+                .HasForeignKey(c => c.PacienteId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(c => c.Especialidad)
-                      .WithMany(e => e.Citas)
-                      .HasForeignKey(c => c.EspecialidadId)
-                      .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Citas>()
+                .HasOne(c => c.Especialidad)
+                .WithMany(e => e.Citas)
+                .HasForeignKey(c => c.EspecialidadId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(c => c.HistoriaClinica)
-                      .WithOne(h => h.Cita)
-                      .HasForeignKey<HistoriasClinicas>(h => h.CitaId)
-                      .IsRequired(false);
-            });
+            modelBuilder.Entity<Citas>()
+                .HasMany(c => c.HistoriasClinicas)
+                .WithOne(h => h.Cita)
+                .HasForeignKey(h => h.CitaId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Configuración de Doctores
-            modelBuilder.Entity<Doctores>(entity =>
-            {
-                entity.HasIndex(d => d.NumColegiado)
-                      .IsUnique();
-            });
+            // Configuración de Historias Clinicas
+            modelBuilder.Entity<HistoriasClinicas>()
+                .HasOne(h => h.Paciente)
+                .WithMany(p => p.HistoriasClinicas)
+                .HasForeignKey(h => h.IdPaciente)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuración de HistoriasClinicas
-            modelBuilder.Entity<HistoriasClinicas>(entity =>
-            {
-                entity.HasOne(h => h.Medico)
-                      .WithMany()
-                      .HasForeignKey(h => h.IdMedico)
-                      .OnDelete(DeleteBehavior.Restrict);
-            });
+            modelBuilder.Entity<HistoriasClinicas>()
+                .HasOne(h => h.Medico)
+                .WithMany()
+                .HasForeignKey(h => h.IdMedico)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuración de VisitaSucesiva
-            modelBuilder.Entity<VisitaSucesiva>(entity =>
-            {
-                entity.HasOne(v => v.HistoriaClinica)
-                      .WithMany()
-                      .HasForeignKey(v => v.IdHistoriaClinica)
-                      .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<HistoriasClinicas>()
+                .HasMany(h => h.ExamenesFisicos)
+                .WithOne(e => e.HistoriaClinica)
+                .HasForeignKey(e => e.IdHistoriaClinica)
+                .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(v => v.Cita)
-                      .WithMany()
-                      .HasForeignKey(v => v.IdCita)
-                      .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<HistoriasClinicas>()
+                .HasMany(h => h.ExamenesFisicosAdicionales)
+                .WithOne(e => e.HistoriaClinica)
+                .HasForeignKey(e => e.IdHistoriaClinica)
+                .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(v => v.MedicoResponsable)
-                      .WithMany()
-                      .HasForeignKey(v => v.IdMedicoResponsable)
-                      .OnDelete(DeleteBehavior.Restrict);
-            });
+            modelBuilder.Entity<HistoriasClinicas>()
+                .HasMany(h => h.ProcedimientosProfesionales)
+                .WithOne(p => p.HistoriaClinica)
+                .HasForeignKey(p => p.IdHistoriaClinica)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Configuración de ProcedimientoVisitaSucesiva
-            modelBuilder.Entity<ProcedimientoVisitaSucesiva>(entity =>
-            {
-                entity.HasOne(p => p.VisitaSucesiva)
-                      .WithMany(v => v.Procedimientos)
-                      .HasForeignKey(p => p.IdVisitaSucesiva)
-                      .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<HistoriasClinicas>()
+                .HasMany(h => h.VisitasSucesivas)
+                .WithOne(v => v.HistoriaClinica)
+                .HasForeignKey(v => v.IdHistoriaClinica)
+                .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(p => p.Profesional)
-                      .WithMany()
-                      .HasForeignKey(p => p.IdProfesional)
-                      .OnDelete(DeleteBehavior.Restrict);
-            });
+            // Configuración de Visitas Sucesivas
+            modelBuilder.Entity<VisitaSucesiva>()
+                .HasOne(v => v.Cita)
+                .WithMany()
+                .HasForeignKey(v => v.IdCita)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VisitaSucesiva>()
+                .HasOne(v => v.MedicoResponsable)
+                .WithMany()
+                .HasForeignKey(v => v.IdMedicoResponsable)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VisitaSucesiva>()
+                .HasMany(v => v.Procedimientos)
+                .WithOne(p => p.VisitaSucesiva)
+                .HasForeignKey(p => p.IdVisitaSucesiva)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configuración de Pacientes
+            modelBuilder.Entity<Pacientes>()
+                .HasOne(p => p.TipoDocumento)
+                .WithMany(t => t.Pacientes)
+                .HasForeignKey(p => p.TipoDocumentoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuración de índices únicos
+            modelBuilder.Entity<Pacientes>()
+                .HasIndex(p => p.NumeroDocumento)
+                .IsUnique();
+
+            modelBuilder.Entity<Doctores>()
+                .HasIndex(d => d.NumColegiado)
+                .IsUnique();
+
+            // Configuración de valores por defecto
+            modelBuilder.Entity<Especialidades>()
+                .Property(e => e.Estado)
+                .HasDefaultValue(true);
+
+            modelBuilder.Entity<Especialidades>()
+                .Property(e => e.FechaCreacion)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<HistoriasClinicas>()
+                .Property(h => h.FechaAlta)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<ProcedimientoProfesional>()
+                .Property(p => p.FechaProcedimiento)
+                .HasDefaultValueSql("GETDATE()");
+
+            // Configuración para ProcedimientoVisitaSucesiva
+            modelBuilder.Entity<ProcedimientoVisitaSucesiva>()
+                .HasOne(p => p.Profesional)
+                .WithMany()
+                .HasForeignKey(p => p.ProfesionalId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VisitaSucesiva>()
+                .Property(v => v.FechaVisita)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<VisitaSucesiva>()
+                .Property(v => v.FechaCreacion)
+                .HasDefaultValueSql("GETDATE()");
         }
     }
 }

@@ -5,7 +5,6 @@ namespace ConsultaMedica.Models
 {
     public class HistoriasClinicas
     {
-
         public int Id { get; set; }
         public int IdPaciente { get; set; }
         public int CitaId { get; set; }
@@ -26,5 +25,9 @@ namespace ConsultaMedica.Models
         public Pacientes Paciente { get; set; }
         public Citas Cita { get; set; }
         public Doctores Medico { get; set; }
+        public ICollection<ExamenFisico> ExamenesFisicos { get; set; } = new List<ExamenFisico>();
+        public ICollection<ExamenFisicoAdicional> ExamenesFisicosAdicionales { get; set; } = new List<ExamenFisicoAdicional>();
+        public ICollection<ProcedimientoProfesional> ProcedimientosProfesionales { get; set; } = new List<ProcedimientoProfesional>();
+        public ICollection<VisitaSucesiva> VisitasSucesivas { get; set; } = new List<VisitaSucesiva>();
     }
 }

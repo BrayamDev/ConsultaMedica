@@ -18,10 +18,10 @@ namespace ConsultaMedica.Models
         public int PacienteId { get; set; }
         public string Observaciones { get; set; }
         public bool Estado { get; set; }
+
         // Propiedades de navegación
         public Pacientes Paciente { get; set; }
-        public Especialidades Especialidad { get; set; } // Cambiado de "Especialidades" a "Especialidad"
-        public HistoriasClinicas HistoriaClinica { get; set; } // Añadido
-
+        public Especialidades Especialidad { get; set; }
+        public ICollection<HistoriasClinicas> HistoriasClinicas { get; set; } = new List<HistoriasClinicas>();
     }
 }

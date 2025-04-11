@@ -106,7 +106,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <p><strong>ID:</strong> @($"{paciente.Nombre?[0]}{DateTime.Now:yyyyMMdd}{paciente.NumeroDocumento}")</p>
-                                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Foto de perfil" class="img-fluid rounded" style="max-width: 250px; height: 250px;">
+                                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Foto de perfil" class="img-fluid rounded" style="max-width: 180px; height: 180px;">
                             </div>
                             <div class="col-md-6">
                                 <br /> <br /> <br />
@@ -129,7 +129,7 @@
                         </div>
                         <div class="mt-3">
                             <div class="row">
-                                <div class="col-6 mb-2">
+                                <div class="col-12 mb-2">
                                     <button class="btn btn-success btn-sm w-100" style="background-color: #00826F; border: none;">Episodios</button>
                                 </div>
                             </div>
@@ -152,7 +152,7 @@
 
                 <div class="card shadow-sm mt-3 ">
                     <div class="card-header" style="background-color: #00826F; border: none;">
-                        <h5 class="card-title text-white mb-0">Enfermedades actuales</h5>
+                        <h5 class="card-title text-white mb-0">Antecedentes </h5>
                     </div>
                     <div class="card-body">
                         <!-- Enfermedad actual -->
@@ -223,10 +223,16 @@
                                                     <textarea class="form-control" asp-for="EnfermedadActual" rows="3" required></textarea>
                                                     <span asp-validation-for="EnfermedadActual" class="text-danger"></span>
                                                 </div>
-                                                <!-- Enfermedad actual -->
+                                                <!-- Enfermedad Base -->
                                                 <div class="form-group mb-3">
-                                                    <label asp-for="EnfermedadBase"><strong>Enfermedad Base</strong></label>
+                                                    <label asp-for="EnfermedadBase"><strong>Antecedentes</strong></label>
                                                     <input class="form-control" asp-for="EnfermedadBase">
+                                                </div>
+
+                                                <!-- Observaciones fisicas -->
+                                                <div class="form-group mb-3">
+                                                    <label asp-for="ObservacionesExamenFisico"><strong>Observaciones Examen Fisico</strong></label>
+                                                    <input class="form-control" asp-for="ObservacionesExamenFisico">
                                                 </div>
                                                 <!-- Examen físico -->
                                                 <div class="form-group mb-3">
@@ -245,6 +251,7 @@
                                                             <label asp-for="TensionArterial">Tensión arterial</label>
                                                             <input type="text" class="form-control" asp-for="TensionArterial" placeholder="mmHg">
                                                         </div>
+
                                                     </div>
 
                                                     <div class="row mt-2">
@@ -430,7 +437,7 @@
                                                                     <label class="form-label">c. Nombre del profesional</label>
                                                                     <select class="form-select"
                                                                             id="VS-IdMedico_0"
-                                                                            name="Procedimientos[0].IdMedico" required>
+                                                                            name="Procedimientos[0].IdProfesional" required>
                                                                         <option selected disabled value="">Seleccione un doctor</option>
                                                                         @if (ViewBag.Doctores != null)
                                                                         {
@@ -445,7 +452,7 @@
                                                                         }
                                                                     </select>
                                                                     <span class="text-danger field-validation-valid"
-                                                                          data-valmsg-for="Procedimientos[0].IdMedico"
+                                                                          data-valmsg-for="Procedimientos[0].IdProfesional"
                                                                           data-valmsg-replace="true"></span>
                                                                 </div>
                                                             </div>
@@ -681,7 +688,7 @@
                         <label class="form-label">c. Nombre del profesional</label>
                         <select class="form-select"
                                 id="VS-IdMedico_${newIndex}"
-                                name="Procedimientos[${newIndex}].IdMedico" required>
+                                        name="Procedimientos[${newIndex}].IdProfesional" required>
                             <option selected disabled value="">Seleccione un doctor</option>
                             @if (ViewBag.Doctores != null)
                             {
@@ -696,7 +703,7 @@
                             }
                         </select>
                         <span class="text-danger field-validation-valid"
-                                data-valmsg-for="Procedimientos[${newIndex}].IdMedico"
+                                        data-valmsg-for="Procedimientos[${newIndex}].IdProfesional"
                                 data-valmsg-replace="true"></span>
                     </div>
                 </div>

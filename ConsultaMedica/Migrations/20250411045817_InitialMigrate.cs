@@ -12,46 +12,7 @@ namespace ConsultaMedica.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AspNetRoles",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "doctores",
+                name: "Doctores",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -71,23 +32,23 @@ namespace ConsultaMedica.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_doctores", x => x.Id);
+                    table.PrimaryKey("PK_Doctores", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "especialidades",
+                name: "Especialidades",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Estado = table.Column<bool>(type: "bit", nullable: false),
-                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Estado = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_especialidades", x => x.Id);
+                    table.PrimaryKey("PK_Especialidades", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -106,113 +67,7 @@ namespace ConsultaMedica.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetRoleClaims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUserClaims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUserLogins",
-                columns: table => new
-                {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUserRoles",
-                columns: table => new
-                {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUserTokens",
-                columns: table => new
-                {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "pacientes",
+                name: "Pacientes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -238,9 +93,9 @@ namespace ConsultaMedica.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_pacientes", x => x.Id);
+                    table.PrimaryKey("PK_Pacientes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_pacientes_TiposDocumento_IdTipoDocumento",
+                        name: "FK_Pacientes_TiposDocumento_IdTipoDocumento",
                         column: x => x.IdTipoDocumento,
                         principalTable: "TiposDocumento",
                         principalColumn: "Id",
@@ -248,7 +103,7 @@ namespace ConsultaMedica.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "citas",
+                name: "Citas",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -262,23 +117,23 @@ namespace ConsultaMedica.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_citas", x => x.Id);
+                    table.PrimaryKey("PK_Citas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_citas_especialidades_EspecialidadId",
+                        name: "FK_Citas_Especialidades_EspecialidadId",
                         column: x => x.EspecialidadId,
-                        principalTable: "especialidades",
+                        principalTable: "Especialidades",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_citas_pacientes_PacienteId",
+                        name: "FK_Citas_Pacientes_PacienteId",
                         column: x => x.PacienteId,
-                        principalTable: "pacientes",
+                        principalTable: "Pacientes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "historiasClinicas",
+                name: "HistoriasClinicas",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -286,31 +141,39 @@ namespace ConsultaMedica.Migrations
                     IdPaciente = table.Column<int>(type: "int", nullable: false),
                     CitaId = table.Column<int>(type: "int", nullable: false),
                     IdMedico = table.Column<int>(type: "int", nullable: false),
-                    FechaAlta = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaAlta = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     MotivoConsulta = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EnfermedadActual = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EnfermedadBase = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Diagnostico = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EvolucionAnalisis = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ConductaMedicaRecomendaciones = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ConductaMedicaRecomendaciones = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DoctoresId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_historiasClinicas", x => x.Id);
+                    table.PrimaryKey("PK_HistoriasClinicas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_historiasClinicas_citas_CitaId",
+                        name: "FK_HistoriasClinicas_Citas_CitaId",
                         column: x => x.CitaId,
-                        principalTable: "citas",
+                        principalTable: "Citas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_HistoriasClinicas_Doctores_DoctoresId",
+                        column: x => x.DoctoresId,
+                        principalTable: "Doctores",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_historiasClinicas_doctores_IdMedico",
+                        name: "FK_HistoriasClinicas_Doctores_IdMedico",
                         column: x => x.IdMedico,
-                        principalTable: "doctores",
+                        principalTable: "Doctores",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_historiasClinicas_pacientes_IdPaciente",
+                        name: "FK_HistoriasClinicas_Pacientes_IdPaciente",
                         column: x => x.IdPaciente,
-                        principalTable: "pacientes",
+                        principalTable: "Pacientes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -326,15 +189,16 @@ namespace ConsultaMedica.Migrations
                     FrecuenciaCardiaca = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TensionArterial = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FrecuenciaRespiratoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SatO2 = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    SatO2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ObservacionesExamenFisico = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExamenesFisicos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExamenesFisicos_historiasClinicas_IdHistoriaClinica",
+                        name: "FK_ExamenesFisicos_HistoriasClinicas_IdHistoriaClinica",
                         column: x => x.IdHistoriaClinica,
-                        principalTable: "historiasClinicas",
+                        principalTable: "HistoriasClinicas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -353,9 +217,9 @@ namespace ConsultaMedica.Migrations
                 {
                     table.PrimaryKey("PK_ExamenesFisicosAdicionales", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExamenesFisicosAdicionales_historiasClinicas_IdHistoriaClinica",
+                        name: "FK_ExamenesFisicosAdicionales_HistoriasClinicas_IdHistoriaClinica",
                         column: x => x.IdHistoriaClinica,
-                        principalTable: "historiasClinicas",
+                        principalTable: "HistoriasClinicas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -369,59 +233,65 @@ namespace ConsultaMedica.Migrations
                     IdHistoriaClinica = table.Column<int>(type: "int", nullable: false),
                     NombreProcedimiento = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FechaProcedimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaProcedimiento = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     NombreProfesional = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProcedimientosProfesionales", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProcedimientosProfesionales_historiasClinicas_IdHistoriaClinica",
+                        name: "FK_ProcedimientosProfesionales_HistoriasClinicas_IdHistoriaClinica",
                         column: x => x.IdHistoriaClinica,
-                        principalTable: "historiasClinicas",
+                        principalTable: "HistoriasClinicas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "visitaSucesivas",
+                name: "VisitasSucesivas",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IdHistoriaClinica = table.Column<int>(type: "int", nullable: false),
                     IdCita = table.Column<int>(type: "int", nullable: false),
-                    FechaVisita = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaVisita = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     EvolucionAnalisis = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ConductaMedica = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IdMedicoResponsable = table.Column<int>(type: "int", nullable: false),
-                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    DoctoresId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_visitaSucesivas", x => x.Id);
+                    table.PrimaryKey("PK_VisitasSucesivas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_visitaSucesivas_citas_IdCita",
+                        name: "FK_VisitasSucesivas_Citas_IdCita",
                         column: x => x.IdCita,
-                        principalTable: "citas",
+                        principalTable: "Citas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_visitaSucesivas_doctores_IdMedicoResponsable",
+                        name: "FK_VisitasSucesivas_Doctores_DoctoresId",
+                        column: x => x.DoctoresId,
+                        principalTable: "Doctores",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_VisitasSucesivas_Doctores_IdMedicoResponsable",
                         column: x => x.IdMedicoResponsable,
-                        principalTable: "doctores",
+                        principalTable: "Doctores",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_visitaSucesivas_historiasClinicas_IdHistoriaClinica",
+                        name: "FK_VisitasSucesivas_HistoriasClinicas_IdHistoriaClinica",
                         column: x => x.IdHistoriaClinica,
-                        principalTable: "historiasClinicas",
+                        principalTable: "HistoriasClinicas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "procedimientoVisitaSucesivas",
+                name: "ProcedimientosVisitaSucesiva",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -429,77 +299,44 @@ namespace ConsultaMedica.Migrations
                     IdVisitaSucesiva = table.Column<int>(type: "int", nullable: false),
                     FechaProcedimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IdProfesional = table.Column<int>(type: "int", nullable: false)
+                    ProfesionalId = table.Column<int>(type: "int", nullable: false),
+                    DoctoresId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_procedimientoVisitaSucesivas", x => x.Id);
+                    table.PrimaryKey("PK_ProcedimientosVisitaSucesiva", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_procedimientoVisitaSucesivas_doctores_IdProfesional",
-                        column: x => x.IdProfesional,
-                        principalTable: "doctores",
+                        name: "FK_ProcedimientosVisitaSucesiva_Doctores_DoctoresId",
+                        column: x => x.DoctoresId,
+                        principalTable: "Doctores",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ProcedimientosVisitaSucesiva_Doctores_ProfesionalId",
+                        column: x => x.ProfesionalId,
+                        principalTable: "Doctores",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_procedimientoVisitaSucesivas_visitaSucesivas_IdVisitaSucesiva",
+                        name: "FK_ProcedimientosVisitaSucesiva_VisitasSucesivas_IdVisitaSucesiva",
                         column: x => x.IdVisitaSucesiva,
-                        principalTable: "visitaSucesivas",
+                        principalTable: "VisitasSucesivas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetRoleClaims_RoleId",
-                table: "AspNetRoleClaims",
-                column: "RoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "RoleNameIndex",
-                table: "AspNetRoles",
-                column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserClaims_UserId",
-                table: "AspNetUserClaims",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserLogins_UserId",
-                table: "AspNetUserLogins",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserRoles_RoleId",
-                table: "AspNetUserRoles",
-                column: "RoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "EmailIndex",
-                table: "AspNetUsers",
-                column: "NormalizedEmail");
-
-            migrationBuilder.CreateIndex(
-                name: "UserNameIndex",
-                table: "AspNetUsers",
-                column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_citas_EspecialidadId",
-                table: "citas",
+                name: "IX_Citas_EspecialidadId",
+                table: "Citas",
                 column: "EspecialidadId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_citas_PacienteId",
-                table: "citas",
+                name: "IX_Citas_PacienteId",
+                table: "Citas",
                 column: "PacienteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_doctores_NumColegiado",
-                table: "doctores",
+                name: "IX_Doctores_NumColegiado",
+                table: "Doctores",
                 column: "NumColegiado",
                 unique: true);
 
@@ -514,25 +351,34 @@ namespace ConsultaMedica.Migrations
                 column: "IdHistoriaClinica");
 
             migrationBuilder.CreateIndex(
-                name: "IX_historiasClinicas_CitaId",
-                table: "historiasClinicas",
-                column: "CitaId",
-                unique: true);
+                name: "IX_HistoriasClinicas_CitaId",
+                table: "HistoriasClinicas",
+                column: "CitaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_historiasClinicas_IdMedico",
-                table: "historiasClinicas",
+                name: "IX_HistoriasClinicas_DoctoresId",
+                table: "HistoriasClinicas",
+                column: "DoctoresId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HistoriasClinicas_IdMedico",
+                table: "HistoriasClinicas",
                 column: "IdMedico");
 
             migrationBuilder.CreateIndex(
-                name: "IX_historiasClinicas_IdPaciente",
-                table: "historiasClinicas",
+                name: "IX_HistoriasClinicas_IdPaciente",
+                table: "HistoriasClinicas",
                 column: "IdPaciente");
 
             migrationBuilder.CreateIndex(
-                name: "IX_pacientes_IdTipoDocumento_NumeroDocumento",
-                table: "pacientes",
-                columns: new[] { "IdTipoDocumento", "NumeroDocumento" },
+                name: "IX_Pacientes_IdTipoDocumento",
+                table: "Pacientes",
+                column: "IdTipoDocumento");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pacientes_NumeroDocumento",
+                table: "Pacientes",
+                column: "NumeroDocumento",
                 unique: true,
                 filter: "[NumeroDocumento] IS NOT NULL");
 
@@ -542,49 +388,44 @@ namespace ConsultaMedica.Migrations
                 column: "IdHistoriaClinica");
 
             migrationBuilder.CreateIndex(
-                name: "IX_procedimientoVisitaSucesivas_IdProfesional",
-                table: "procedimientoVisitaSucesivas",
-                column: "IdProfesional");
+                name: "IX_ProcedimientosVisitaSucesiva_DoctoresId",
+                table: "ProcedimientosVisitaSucesiva",
+                column: "DoctoresId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_procedimientoVisitaSucesivas_IdVisitaSucesiva",
-                table: "procedimientoVisitaSucesivas",
+                name: "IX_ProcedimientosVisitaSucesiva_IdVisitaSucesiva",
+                table: "ProcedimientosVisitaSucesiva",
                 column: "IdVisitaSucesiva");
 
             migrationBuilder.CreateIndex(
-                name: "IX_visitaSucesivas_IdCita",
-                table: "visitaSucesivas",
+                name: "IX_ProcedimientosVisitaSucesiva_ProfesionalId",
+                table: "ProcedimientosVisitaSucesiva",
+                column: "ProfesionalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitasSucesivas_DoctoresId",
+                table: "VisitasSucesivas",
+                column: "DoctoresId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitasSucesivas_IdCita",
+                table: "VisitasSucesivas",
                 column: "IdCita");
 
             migrationBuilder.CreateIndex(
-                name: "IX_visitaSucesivas_IdHistoriaClinica",
-                table: "visitaSucesivas",
+                name: "IX_VisitasSucesivas_IdHistoriaClinica",
+                table: "VisitasSucesivas",
                 column: "IdHistoriaClinica");
 
             migrationBuilder.CreateIndex(
-                name: "IX_visitaSucesivas_IdMedicoResponsable",
-                table: "visitaSucesivas",
+                name: "IX_VisitasSucesivas_IdMedicoResponsable",
+                table: "VisitasSucesivas",
                 column: "IdMedicoResponsable");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "AspNetRoleClaims");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUserClaims");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUserLogins");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUserRoles");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUserTokens");
-
             migrationBuilder.DropTable(
                 name: "ExamenesFisicos");
 
@@ -595,31 +436,25 @@ namespace ConsultaMedica.Migrations
                 name: "ProcedimientosProfesionales");
 
             migrationBuilder.DropTable(
-                name: "procedimientoVisitaSucesivas");
+                name: "ProcedimientosVisitaSucesiva");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "VisitasSucesivas");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "HistoriasClinicas");
 
             migrationBuilder.DropTable(
-                name: "visitaSucesivas");
+                name: "Citas");
 
             migrationBuilder.DropTable(
-                name: "historiasClinicas");
+                name: "Doctores");
 
             migrationBuilder.DropTable(
-                name: "citas");
+                name: "Especialidades");
 
             migrationBuilder.DropTable(
-                name: "doctores");
-
-            migrationBuilder.DropTable(
-                name: "especialidades");
-
-            migrationBuilder.DropTable(
-                name: "pacientes");
+                name: "Pacientes");
 
             migrationBuilder.DropTable(
                 name: "TiposDocumento");

@@ -21,10 +21,10 @@ namespace ConsultaMedica.Controllers
         public ActionResult Index(int? id)
         {
             // Código existente para dropdowns
-            var especialidades = _context.especialidades.ToList();
+            var especialidades = _context.Especialidades.ToList();
             ViewBag.Especialidades = new SelectList(especialidades, "Id", "Nombre");
 
-            var pacientes = _context.pacientes
+            var pacientes = _context.Pacientes
                .Select(p => new SelectListItem
                {
                    Value = p.Id.ToString(),
@@ -33,7 +33,7 @@ namespace ConsultaMedica.Controllers
                .ToList();
             ViewBag.Pacientes = pacientes;
 
-            var doctores = _context.doctores
+            var doctores = _context.Doctores
                .Select(d => new SelectListItem
                {
                    Value = d.Id.ToString(),
@@ -55,7 +55,7 @@ namespace ConsultaMedica.Controllers
             // Nuevo código para manejar el ID de paciente
             if (id.HasValue)
             {
-                var cita = _context.citas
+                var cita = _context.Citas
                     .Include(c => c.Paciente)
                     .FirstOrDefault(c => c.Id == id.Value);
 
@@ -73,7 +73,7 @@ namespace ConsultaMedica.Controllers
         // Método para obtener las citas en formato JSON
         public IActionResult GetCitas()
         {
-            var citas = _context.citas
+            var citas = _context.Citas
                 .Include(c => c.Paciente) // Incluye la relación con Paciente
                 .Select(c => new
                 {
@@ -103,7 +103,7 @@ namespace ConsultaMedica.Controllers
             try
             {
                 // Guardar la cita en la base de datos
-                _context.citas.Add(cita);
+                _context.Citas.Add(cita);
                 _context.SaveChanges();
 
                 // Enviar un mensaje de éxito usando TempData
@@ -142,7 +142,7 @@ namespace ConsultaMedica.Controllers
         [HttpGet]
         public IActionResult EditarCitas(int id)
         {
-            var cita = _context.citas
+            var cita = _context.Citas
                 .Include(c => c.Paciente)
                 .Include(c => c.Especialidad)
                 .FirstOrDefault(c => c.Id == id);
@@ -152,7 +152,7 @@ namespace ConsultaMedica.Controllers
                 return NotFound();
             }
 
-            ViewBag.Especialidades = _context.especialidades
+            ViewBag.Especialidades = _context.Especialidades
                 .Select(e => new SelectListItem
                 {
                     Value = e.Id.ToString(),
@@ -171,7 +171,7 @@ namespace ConsultaMedica.Controllers
             try
             {
                 // Verificar si la cita existe
-                var citaExistente = _context.citas.Find(cita.Id);
+                var citaExistente = _context.Citas.Find(cita.Id);
                 if (citaExistente == null)
                 {
                     return NotFound();
@@ -194,7 +194,7 @@ namespace ConsultaMedica.Controllers
                 ModelState.AddModelError("", "Ocurrió un error al actualizar la cita: " + ex.Message);
             }
             
-            ViewBag.Especialidades = _context.especialidades
+            ViewBag.Especialidades = _context.Especialidades
                 .Select(e => new SelectListItem
                 {
                     Value = e.Id.ToString(),
@@ -214,27 +214,27 @@ namespace ConsultaMedica.Controllers
             try
             {
                 // 1. Eliminar los procedimientos de las visitas sucesivas
-                var procedimientos = _context.procedimientoVisitaSucesivas
+                var procedimientos = _context.ProcedimientosVisitaSucesiva
                     .Where(p => p.VisitaSucesiva.IdCita == id)
                     .ToList();
 
-                _context.procedimientoVisitaSucesivas.RemoveRange(procedimientos);
+                _context.ProcedimientosVisitaSucesiva.RemoveRange(procedimientos);
 
                 // 2. Eliminar las visitas sucesivas
-                var visitasSucesivas = _context.visitaSucesivas
+                var visitasSucesivas = _context.VisitasSucesivas
                     .Where(v => v.IdCita == id)
                     .ToList();
 
-                _context.visitaSucesivas.RemoveRange(visitasSucesivas);
+                _context.VisitasSucesivas.RemoveRange(visitasSucesivas);
 
                 // 3. Finalmente eliminar la cita principal
-                var cita = _context.citas.Find(id);
+                var cita = _context.Citas.Find(id);
                 if (cita == null)
                 {
                     return NotFound();
                 }
 
-                _context.citas.Remove(cita);
+                _context.Citas.Remove(cita);
 
                 _context.SaveChanges();
                 transaction.Commit();

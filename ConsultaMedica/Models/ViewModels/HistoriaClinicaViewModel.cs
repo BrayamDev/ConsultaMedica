@@ -24,6 +24,7 @@ namespace ConsultaMedica.Models.ViewModels
         public string FrecuenciaRespiratoria { get; set; }
         public string SatO2 { get; set; }
         public int IdMedico { get; set; }
+        public string ObservacionesExamenFisico { get; set; }
 
         public List<ProcedimientoViewModel> Procedimientos { get; set; } = new List<ProcedimientoViewModel>();
     }
@@ -35,8 +36,6 @@ namespace ConsultaMedica.Models.ViewModels
         public int IdCita { get; set; }
         public string EvolucionAnalisis { get; set; }
         public string ConductaMedica { get; set; }
-        public int IdMedico { get; set; }
-
         public List<ProcedimientoViewModel> Procedimientos { get; set; }
     }
 
@@ -46,6 +45,7 @@ namespace ConsultaMedica.Models.ViewModels
         public DateTime? FechaProcedimiento { get; set; }
         public string Observaciones { get; set; }
         public int IdMedico { get; set; }
+        public int IdProfesional { get; set; }
         public string NombreProcedimiento { get; set; }
     }
 }

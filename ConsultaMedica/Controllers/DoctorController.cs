@@ -17,7 +17,7 @@ namespace ConsultaMedica.Controllers
         public ActionResult Index(int id)
         {
 
-            var doctor = _context.doctores.FirstOrDefault(c => c.Id == id);
+            var doctor = _context.Doctores.FirstOrDefault(c => c.Id == id);
             if (doctor == null)
             {
                 return NotFound("El doctor no fue encontrado.");
