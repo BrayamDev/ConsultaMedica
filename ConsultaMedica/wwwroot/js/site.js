@@ -41,6 +41,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 /* **************************************** FULL CALENDAR en nueva ANGENDA ****************************************** */
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Configuración del mini calendario
+    var miniCalendarEl = document.getElementById('miniCalendar');
+    var miniCalendar = new FullCalendar.Calendar(miniCalendarEl, {
+        locale: 'es',
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev',
+            center: 'title',
+            right: 'next'
+        },
+        fixedWeekCount: false,
+        height: 'auto',
+        contentHeight: 'auto',
+        aspectRatio: 1,
+        dayMaxEventRows: 1,
+        dayHeaderFormat: {
+            weekday: 'short'
+        },
+        // Reducir tamaño del texto en los días
+        dayCellContent: function (info) {
+            info.dayNumberText = info.dayNumberText.replace(/^0/, '');
+            return { html: '<small>' + info.dayNumberText + '</small>' };
+        },
+        // Reducir tamaño del título del mes
+        titleFormat: {
+            year: 'numeric',
+            month: 'short'
+        },
+        dateClick: function (info) {
+            // Prevenir que el dropdown se cierre
+            info.jsEvent.stopPropagation();
+
+            // Obtener la instancia del calendario principal
+            var mainCalendar = FullCalendar.Calendar.getCalendarById('calendar');
+
+            if (mainCalendar) {
+                // Cambiar la vista del calendario principal al día seleccionado
+                mainCalendar.gotoDate(info.date);
+                mainCalendar.changeView('timeGridDay'); // Cambiar a vista de día
+
+                // Opcional: Cerrar el dropdown después de seleccionar
+                var dropdown = bootstrap.Dropdown.getInstance(document.getElementById('miniCalendarDropdown'));
+                dropdown.hide();
+            }
+
+            // Resaltar la fecha seleccionada
+            miniCalendarEl.querySelectorAll('.fc-day').forEach(day => {
+                day.classList.remove('fc-day-selected');
+            });
+            info.dayEl.classList.add('fc-day-selected');
+        },
+        events: function (fetchInfo, successCallback, failureCallback) {
+            fetch('/Agenda/GetCitas')
+                .then(response => response.json())
+                .then(data => {
+                    successCallback(data);
+                })
+                .catch(error => {
+                    console.error('Error al cargar las citas:', error);
+                    failureCallback(error);
+                });
+        },
+        eventClick: function (info) {
+            // Redirigir a la edición de la cita
+            window.location.href = 'Agenda/EditarCitas?id=' + info.event.id;
+            info.jsEvent.stopPropagation();
+        }
+    });
+
+    miniCalendar.render();
+
+    // Actualizar tamaño cuando se abre el dropdown
+    document.getElementById('miniCalendarDropdown').addEventListener('shown.bs.dropdown', function () {
+        miniCalendar.updateSize();
+    });
+
+    // Prevenir que el dropdown se cierre al hacer clic dentro
+    document.querySelector('#miniCalendarDropdown + .dropdown-menu').addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+});
+
+
 document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -129,22 +214,28 @@ document.addEventListener('DOMContentLoaded', function () {
             var content = document.createElement('div');
             content.classList.add('event-container');
             content.style.display = 'flex';
+            content.style.flexDirection = 'row'; // Asegura disposición horizontal
             content.style.alignItems = 'center';
-            content.style.gap = '5px';
+            content.style.gap = '3px'; // Reducir espacio entre elementos
             content.style.width = '100%';
+            content.style.height = '100%'; // Asegurar que ocupe toda la altura
+            content.style.fontSize = '1.1rem'; // Texto más pequeño
 
-            // Contenedor de iconos
+            // Contenedor de iconos - más compacto
             var iconContainer = document.createElement('div');
             iconContainer.classList.add('event-icons');
             iconContainer.style.display = 'flex';
-            iconContainer.style.flexDirection = 'column';
-            iconContainer.style.gap = '3px';
-            iconContainer.style.marginRight = '5px';
+            iconContainer.style.flexDirection = 'row'; // Iconos en horizontal
+            iconContainer.style.gap = '2px';
+            iconContainer.style.marginRight = '3px';
 
+          
             // Iconos de acciones
             var facturacionIcon = document.createElement('i');
             facturacionIcon.classList.add('ri-bill-line');
             facturacionIcon.title = 'Facturación';
+            facturacionIcon.style.fontSize = '16px'; // Aumentado de 12px/14px
+            facturacionIcon.style.padding = '3px'; // Aumentado de 1px/2px
             facturacionIcon.addEventListener('click', function (e) {
                 e.stopPropagation();
                 window.location.href = 'Facturacion/Index?id=' + arg.event.id;
@@ -155,6 +246,8 @@ document.addEventListener('DOMContentLoaded', function () {
             editarIcon.classList.add('ri-edit-2-line');
             editarIcon.title = 'Editar cita';
             editarIcon.style.cursor = 'pointer';
+            editarIcon.style.fontSize = '16px';
+            editarIcon.style.padding = '3px';
             editarIcon.addEventListener('click', function (e) {
                 e.stopPropagation();
                 window.location.href = 'Agenda/EditarCitas?id=' + arg.event.id; // Cambia 'Citas' por tu ruta
@@ -166,6 +259,8 @@ document.addEventListener('DOMContentLoaded', function () {
             var historiaIcon = document.createElement('i');
             historiaIcon.classList.add('ri-file-user-line');
             historiaIcon.title = 'Historia clínica';
+            historiaIcon.style.fontSize = '16px';
+            historiaIcon.style.padding = '3px';
             historiaIcon.addEventListener('click', function (e) {
                 e.stopPropagation();
                 window.location.href = 'HistoriaClinica/Index?id=' + arg.event.id;
@@ -175,18 +270,23 @@ document.addEventListener('DOMContentLoaded', function () {
             iconContainer.appendChild(editarIcon);
             iconContainer.appendChild(historiaIcon);
 
-            // Contenido del evento
+            // Contenido del evento - más compacto
             var eventContent = document.createElement('div');
             eventContent.classList.add('event-content');
             eventContent.style.overflow = 'hidden';
+            eventContent.style.display = 'flex';
+            eventContent.style.flexDirection = 'column';
+            eventContent.style.justifyContent = 'center';
+            eventContent.style.height = '100%';
 
-            // Título (Nombre + Apellido)
+            // Título más compacto
             var title = document.createElement('div');
             title.classList.add('event-title');
             title.style.fontWeight = 'bold';
             title.style.whiteSpace = 'nowrap';
             title.style.overflow = 'hidden';
             title.style.textOverflow = 'ellipsis';
+            title.style.lineHeight = '1.2'; // Menor altura de línea
             title.textContent = arg.event.title;
             eventContent.appendChild(title);
 
@@ -194,19 +294,20 @@ document.addEventListener('DOMContentLoaded', function () {
             if (arg.view.type !== 'dayGridMonth') {
                 var time = document.createElement('div');
                 time.classList.add('event-time');
-                time.style.fontSize = '0.85em';
+                time.style.fontSize = '0.75em'; // Más pequeño
                 time.style.color = '#555';
                 time.textContent = arg.timeText;
                 eventContent.insertBefore(time, title);
             }
 
-            // Observaciones
+            // Observaciones más compactas
             if (observaciones) {
                 var obs = document.createElement('div');
                 obs.classList.add('event-observations');
-                obs.style.fontSize = '0.8em';
-                obs.style.color = '#fff';
-                obs.style.marginTop = '3px';
+                obs.style.fontSize = '15px'; // Más pequeño
+                obs.style.color = '#ffff';
+                obs.style.marginTop = '1px';
+                obs.style.lineHeight = '1.1';
                 obs.textContent = observaciones;
                 eventContent.appendChild(obs);
             }
@@ -267,6 +368,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     calendar.render();
 });
+
 
 
 
