@@ -15,6 +15,5 @@ namespace ConsultaMedica.Models
 
         // Propiedades de navegación
         public virtual VisitaSucesiva VisitaSucesiva { get; set; }
-        public virtual Doctores Profesional { get; set; }
     }
 }

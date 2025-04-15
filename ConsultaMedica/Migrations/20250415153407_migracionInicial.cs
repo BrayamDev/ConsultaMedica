@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ConsultaMedica.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigrate : Migration
+    public partial class migracionInicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -340,12 +340,6 @@ namespace ConsultaMedica.Migrations
                         principalTable: "Doctores",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_VisitasSucesivas_Doctores_IdMedicoResponsable",
-                        column: x => x.IdMedicoResponsable,
-                        principalTable: "Doctores",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_VisitasSucesivas_HistoriasClinicas_IdHistoriaClinica",
                         column: x => x.IdHistoriaClinica,
                         principalTable: "HistoriasClinicas",
@@ -505,11 +499,6 @@ namespace ConsultaMedica.Migrations
                 name: "IX_VisitasSucesivas_IdHistoriaClinica",
                 table: "VisitasSucesivas",
                 column: "IdHistoriaClinica");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VisitasSucesivas_IdMedicoResponsable",
-                table: "VisitasSucesivas",
-                column: "IdMedicoResponsable");
         }
 
         /// <inheritdoc />

@@ -91,12 +91,6 @@ namespace ConsultaMedica.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<VisitaSucesiva>()
-                .HasOne(v => v.MedicoResponsable)
-                .WithMany()
-                .HasForeignKey(v => v.IdMedicoResponsable)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<VisitaSucesiva>()
                 .HasMany(v => v.Procedimientos)
                 .WithOne(p => p.VisitaSucesiva)
                 .HasForeignKey(p => p.IdVisitaSucesiva)
@@ -137,7 +131,7 @@ namespace ConsultaMedica.Data
 
             // Configuración para ProcedimientoVisitaSucesiva
             modelBuilder.Entity<ProcedimientoVisitaSucesiva>()
-                .HasOne(p => p.Profesional)
+                .HasOne<Doctores>()  // Especificamos el tipo directamente
                 .WithMany()
                 .HasForeignKey(p => p.ProfesionalId)
                 .OnDelete(DeleteBehavior.Restrict);

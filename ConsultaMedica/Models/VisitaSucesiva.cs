@@ -30,7 +30,6 @@ namespace ConsultaMedica.Models
         // Relaciones
         public HistoriasClinicas HistoriaClinica { get; set; }
         public Citas Cita { get; set; }
-        public Doctores MedicoResponsable { get; set; }
         public ICollection<ProcedimientoVisitaSucesiva> Procedimientos { get; set; }
     }
 }

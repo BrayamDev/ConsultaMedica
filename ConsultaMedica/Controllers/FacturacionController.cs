@@ -80,5 +80,12 @@ namespace ConsultaMedica.Controllers
             // 5. Redireccionar con el ID de la cita encontrada
             return Redirect($"~/Facturacion/Index?id={CitaId}");
         }
+
+        [HttpPost]
+        public IActionResult ProcesarFacturacion()
+        {
+           
+            return View();
+        }
     }
 }

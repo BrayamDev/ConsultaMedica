@@ -603,8 +603,6 @@ namespace ConsultaMedica.Migrations
 
                     b.HasIndex("IdHistoriaClinica");
 
-                    b.HasIndex("IdMedicoResponsable");
-
                     b.ToTable("VisitasSucesivas");
                 });
 
@@ -739,13 +737,11 @@ namespace ConsultaMedica.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ConsultaMedica.Models.Doctores", "Profesional")
+                    b.HasOne("ConsultaMedica.Models.Doctores", null)
                         .WithMany()
                         .HasForeignKey("ProfesionalId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Profesional");
 
                     b.Navigation("VisitaSucesiva");
                 });
@@ -779,17 +775,9 @@ namespace ConsultaMedica.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ConsultaMedica.Models.Doctores", "MedicoResponsable")
-                        .WithMany()
-                        .HasForeignKey("IdMedicoResponsable")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Cita");
 
                     b.Navigation("HistoriaClinica");
-
-                    b.Navigation("MedicoResponsable");
                 });
 
             modelBuilder.Entity("ConsultaMedica.Models.Citas", b =>
