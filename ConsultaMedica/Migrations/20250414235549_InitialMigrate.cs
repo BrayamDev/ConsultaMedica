@@ -67,6 +67,29 @@ namespace ConsultaMedica.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tratamientos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Codigo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    NombreTratamiento = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Observaciones = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    ImporteUnitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EspecialidadId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tratamientos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tratamientos_Especialidades_EspecialidadId",
+                        column: x => x.EspecialidadId,
+                        principalTable: "Especialidades",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Pacientes",
                 columns: table => new
                 {
@@ -128,6 +151,46 @@ namespace ConsultaMedica.Migrations
                         name: "FK_Citas_Pacientes_PacienteId",
                         column: x => x.PacienteId,
                         principalTable: "Pacientes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Facturas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NumeroFactura = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaFactura = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Empresa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TipoCobro = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ObservacionesCobro = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    ImporteTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Unidad = table.Column<int>(type: "int", nullable: false),
+                    PacienteId = table.Column<int>(type: "int", nullable: false),
+                    CitaId = table.Column<int>(type: "int", nullable: true),
+                    TratamientoId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Facturas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Facturas_Citas_CitaId",
+                        column: x => x.CitaId,
+                        principalTable: "Citas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Facturas_Pacientes_PacienteId",
+                        column: x => x.PacienteId,
+                        principalTable: "Pacientes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Facturas_Tratamientos_TratamientoId",
+                        column: x => x.TratamientoId,
+                        principalTable: "Tratamientos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -351,6 +414,21 @@ namespace ConsultaMedica.Migrations
                 column: "IdHistoriaClinica");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Facturas_CitaId",
+                table: "Facturas",
+                column: "CitaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Facturas_PacienteId",
+                table: "Facturas",
+                column: "PacienteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Facturas_TratamientoId",
+                table: "Facturas",
+                column: "TratamientoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_HistoriasClinicas_CitaId",
                 table: "HistoriasClinicas",
                 column: "CitaId");
@@ -403,6 +481,17 @@ namespace ConsultaMedica.Migrations
                 column: "ProfesionalId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tratamientos_Codigo",
+                table: "Tratamientos",
+                column: "Codigo",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tratamientos_EspecialidadId",
+                table: "Tratamientos",
+                column: "EspecialidadId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_VisitasSucesivas_DoctoresId",
                 table: "VisitasSucesivas",
                 column: "DoctoresId");
@@ -433,10 +522,16 @@ namespace ConsultaMedica.Migrations
                 name: "ExamenesFisicosAdicionales");
 
             migrationBuilder.DropTable(
+                name: "Facturas");
+
+            migrationBuilder.DropTable(
                 name: "ProcedimientosProfesionales");
 
             migrationBuilder.DropTable(
                 name: "ProcedimientosVisitaSucesiva");
+
+            migrationBuilder.DropTable(
+                name: "Tratamientos");
 
             migrationBuilder.DropTable(
                 name: "VisitasSucesivas");

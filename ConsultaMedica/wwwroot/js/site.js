@@ -419,6 +419,101 @@ document.getElementById('fotografia').addEventListener('change', function (event
 
 
 /* ****************************************  FICHA DEL DOCTOR  ****************************************** */
-/* ****************************************  HISTORIA CLINICA AÑADIR PROCEDIMIENTO  ****************************************** */
+/* ****************************************  FACTURACION JAVASCRIPT  ****************************************** */
+// Función para cargar datos en el modal de edición
+function cargarDatosModal(tratamientoId, codigo, nombreTratamiento, observaciones, unidades, importeUnitario) {
+    document.getElementById('editarTratamientoId').value = tratamientoId;
+    document.getElementById('editarNombreTratamiento').value = nombreTratamiento;
+    document.getElementById('importeUnitario').value = importeUnitario; // Asigna al campo editable
+    document.getElementById('editarUnidades').value = unidades;
+    document.getElementById('editarObservaciones').value = observaciones || '';
 
-/* ****************************************  HISTORIA CLINICA AÑADIR PROCEDIMIENTO   ****************************************** */
+    // Abre el modal
+    var modal = new bootstrap.Modal(document.getElementById('editarTratamientoModal'));
+    modal.show();
+}
+// Función para filtrar la tabla de tratamientos
+function filtrarTabla(busqueda) {
+    const filas = document.querySelectorAll('#tablaTratamientos tbody tr');
+    const textoBusqueda = busqueda.toLowerCase();
+
+    filas.forEach(fila => {
+        const textoFila = fila.textContent.toLowerCase();
+        fila.style.display = textoFila.includes(textoBusqueda) ? '' : 'none';
+    });
+}
+
+// Función para seleccionar/deseleccionar todos los checkboxes
+function toggleTodos(source) {
+    const checkboxes = document.querySelectorAll('input[name="tratamientosSeleccionados"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = source.checked;
+    });
+}
+function filtrarTabla(busqueda) {
+    const filas = document.querySelectorAll('#tablaTratamientos tbody tr');
+    const textoBusqueda = busqueda.toLowerCase();
+
+    filas.forEach(fila => {
+        const textoFila = fila.textContent.toLowerCase();
+        fila.style.display = textoFila.includes(textoBusqueda) ? '' : 'none';
+    });
+}
+
+// Formatea el precio como moneda
+function formatearMoneda(input) {
+    // Remover símbolos de moneda y convertir a número
+    let valor = parseFloat(input.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+    // Formatear como moneda
+    input.value = valor.toLocaleString('es-ES', {
+        style: 'currency',
+        currency: 'EUR'
+    });
+    return valor; // Devuelve el valor numérico
+}
+
+// Calcula el total de una fila y el total general
+function calcularTotal(elemento) {
+    const fila = elemento.closest('tr');
+    const unidades = parseFloat(fila.querySelector('.unidades').value) || 0;
+    const precioTexto = fila.querySelector('.precio-unitario').value;
+
+    // Convertir precio de vuelta a número
+    const precio = parseFloat(precioTexto.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+
+    // Calcular y formatear total de la fila
+    const totalFila = unidades * precio;
+    fila.querySelector('.total').textContent = totalFila.toLocaleString('es-ES', {
+        style: 'currency',
+        currency: 'EUR'
+    });
+
+    // Calcular el total general
+    actualizarImporteTotal();
+}
+
+// Actualiza el importe total sumando todos los tratamientos
+function actualizarImporteTotal() {
+    let totalGeneral = 0;
+
+    document.querySelectorAll('tbody tr[id^="tratamiento-"]').forEach(fila => {
+        const unidades = parseFloat(fila.querySelector('.unidades').value) || 0;
+        const precioTexto = fila.querySelector('.precio-unitario').value;
+        const precio = parseFloat(precioTexto.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+
+        totalGeneral += unidades * precio;
+    });
+
+    // Actualizar el campo de importe total usando el ID
+    const importeTotalInput = document.getElementById('importeTotal');
+    if (importeTotalInput) {
+        importeTotalInput.value = totalGeneral.toLocaleString('es-ES', {
+            style: 'currency',
+            currency: 'EUR'
+        });
+    }
+}
+
+
+
+/* ****************************************  FACTURACION JAVASCRIPT   ****************************************** */

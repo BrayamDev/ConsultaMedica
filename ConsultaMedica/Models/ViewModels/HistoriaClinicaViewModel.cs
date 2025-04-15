@@ -38,8 +38,6 @@ namespace ConsultaMedica.Models.ViewModels
         public string ConductaMedica { get; set; }
         public List<ProcedimientoViewModel> Procedimientos { get; set; }
     }
-
-
     public class ProcedimientoViewModel
     {
         public DateTime? FechaProcedimiento { get; set; }

@@ -67,6 +67,15 @@ namespace ConsultaMedica.Models
         public ICollection<HistoriasClinicas> HistoriasClinicas { get; set; } = new List<HistoriasClinicas>();
         public ICollection<Citas> Citas { get; set; } = new List<Citas>();
 
+        public ICollection<Factura> Facturas { get; set; } = new List<Factura>(); // Nueva relación
 
+        // Método para obtener nombre completo
+        public string NombreCompleto => $"{PrimerApellido} {SegundoApellido}, {Nombre}";
+
+        // Método para obtener edad
+        public int? Edad => FechaNacimiento.HasValue
+            ? DateTime.Now.Year - FechaNacimiento.Value.Year -
+              (DateTime.Now.DayOfYear < FechaNacimiento.Value.DayOfYear ? 1 : 0)
+            : null;
     }
 }

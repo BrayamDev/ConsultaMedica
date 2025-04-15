@@ -21,7 +21,8 @@ namespace ConsultaMedica.Data
         public DbSet<ProcedimientoVisitaSucesiva> ProcedimientosVisitaSucesiva { get; set; }
         public DbSet<TipoDocumento> TiposDocumento { get; set; }
         public DbSet<VisitaSucesiva> VisitasSucesivas { get; set; }
-
+        public DbSet<Tratamiento> Tratamientos { get; set; }
+        public DbSet<Factura> Facturas { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -148,6 +149,36 @@ namespace ConsultaMedica.Data
             modelBuilder.Entity<VisitaSucesiva>()
                 .Property(v => v.FechaCreacion)
                 .HasDefaultValueSql("GETDATE()");
+
+            // Configuración de Tratamientos
+            modelBuilder.Entity<Tratamiento>()
+                .HasOne(t => t.Especialidad)
+                .WithMany(e => e.Tratamientos)
+                .HasForeignKey(t => t.EspecialidadId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Índice único para código de tratamiento
+            modelBuilder.Entity<Tratamiento>()
+                .HasIndex(t => t.Codigo)
+                .IsUnique();
+            // Configuración de Factura
+            modelBuilder.Entity<Factura>()
+                .HasOne(f => f.Paciente)
+                .WithMany(p => p.Facturas)
+                .HasForeignKey(f => f.PacienteId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Factura>()
+                .HasOne(f => f.Cita)
+                .WithMany()
+                .HasForeignKey(f => f.CitaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Factura>()
+                .HasOne(f => f.Tratamiento)
+                .WithMany()
+                .HasForeignKey(f => f.TratamientoId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

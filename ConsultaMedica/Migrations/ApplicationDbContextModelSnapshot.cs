@@ -218,6 +218,60 @@ namespace ConsultaMedica.Migrations
                     b.ToTable("ExamenesFisicosAdicionales");
                 });
 
+            modelBuilder.Entity("ConsultaMedica.Models.Factura", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CitaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Empresa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaFactura")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("ImporteTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("NumeroFactura")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ObservacionesCobro")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("PacienteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TipoCobro")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TratamientoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Unidad")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CitaId");
+
+                    b.HasIndex("PacienteId");
+
+                    b.HasIndex("TratamientoId");
+
+                    b.ToTable("Facturas");
+                });
+
             modelBuilder.Entity("ConsultaMedica.Models.HistoriasClinicas", b =>
                 {
                     b.Property<int>("Id")
@@ -464,6 +518,45 @@ namespace ConsultaMedica.Migrations
                     b.ToTable("TiposDocumento");
                 });
 
+            modelBuilder.Entity("ConsultaMedica.Models.Tratamiento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("EspecialidadId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ImporteUnitario")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("NombreTratamiento")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Observaciones")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Codigo")
+                        .IsUnique();
+
+                    b.HasIndex("EspecialidadId");
+
+                    b.ToTable("Tratamientos");
+                });
+
             modelBuilder.Entity("ConsultaMedica.Models.VisitaSucesiva", b =>
                 {
                     b.Property<int>("Id")
@@ -556,6 +649,31 @@ namespace ConsultaMedica.Migrations
                     b.Navigation("HistoriaClinica");
                 });
 
+            modelBuilder.Entity("ConsultaMedica.Models.Factura", b =>
+                {
+                    b.HasOne("ConsultaMedica.Models.Citas", "Cita")
+                        .WithMany()
+                        .HasForeignKey("CitaId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ConsultaMedica.Models.Pacientes", "Paciente")
+                        .WithMany("Facturas")
+                        .HasForeignKey("PacienteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ConsultaMedica.Models.Tratamiento", "Tratamiento")
+                        .WithMany()
+                        .HasForeignKey("TratamientoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Cita");
+
+                    b.Navigation("Paciente");
+
+                    b.Navigation("Tratamiento");
+                });
+
             modelBuilder.Entity("ConsultaMedica.Models.HistoriasClinicas", b =>
                 {
                     b.HasOne("ConsultaMedica.Models.Citas", "Cita")
@@ -632,6 +750,17 @@ namespace ConsultaMedica.Migrations
                     b.Navigation("VisitaSucesiva");
                 });
 
+            modelBuilder.Entity("ConsultaMedica.Models.Tratamiento", b =>
+                {
+                    b.HasOne("ConsultaMedica.Models.Especialidades", "Especialidad")
+                        .WithMany("Tratamientos")
+                        .HasForeignKey("EspecialidadId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Especialidad");
+                });
+
             modelBuilder.Entity("ConsultaMedica.Models.VisitaSucesiva", b =>
                 {
                     b.HasOne("ConsultaMedica.Models.Doctores", null)
@@ -680,6 +809,8 @@ namespace ConsultaMedica.Migrations
             modelBuilder.Entity("ConsultaMedica.Models.Especialidades", b =>
                 {
                     b.Navigation("Citas");
+
+                    b.Navigation("Tratamientos");
                 });
 
             modelBuilder.Entity("ConsultaMedica.Models.HistoriasClinicas", b =>
@@ -696,6 +827,8 @@ namespace ConsultaMedica.Migrations
             modelBuilder.Entity("ConsultaMedica.Models.Pacientes", b =>
                 {
                     b.Navigation("Citas");
+
+                    b.Navigation("Facturas");
 
                     b.Navigation("HistoriasClinicas");
                 });
