@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ConsultaMedica.Migrations
 {
     /// <inheritdoc />
-    public partial class migracionInicial : Migration
+    public partial class InitialMigrate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -210,8 +210,7 @@ namespace ConsultaMedica.Migrations
                     EnfermedadBase = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Diagnostico = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EvolucionAnalisis = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ConductaMedicaRecomendaciones = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DoctoresId = table.Column<int>(type: "int", nullable: true)
+                    ConductaMedicaRecomendaciones = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -222,11 +221,6 @@ namespace ConsultaMedica.Migrations
                         principalTable: "Citas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_HistoriasClinicas_Doctores_DoctoresId",
-                        column: x => x.DoctoresId,
-                        principalTable: "Doctores",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_HistoriasClinicas_Doctores_IdMedico",
                         column: x => x.IdMedico,
@@ -239,6 +233,37 @@ namespace ConsultaMedica.Migrations
                         principalTable: "Pacientes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TratamientosFacturados",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FacturaId = table.Column<int>(type: "int", nullable: false),
+                    TratamientoId = table.Column<int>(type: "int", nullable: false),
+                    NombreTratamiento = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Unidades = table.Column<int>(type: "int", nullable: false),
+                    ImporteUnitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ObservacionesTratamiento = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TratamientosFacturados", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TratamientosFacturados_Facturas_FacturaId",
+                        column: x => x.FacturaId,
+                        principalTable: "Facturas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TratamientosFacturados_Tratamientos_TratamientoId",
+                        column: x => x.TratamientoId,
+                        principalTable: "Tratamientos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -322,8 +347,7 @@ namespace ConsultaMedica.Migrations
                     EvolucionAnalisis = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ConductaMedica = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IdMedicoResponsable = table.Column<int>(type: "int", nullable: false),
-                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
-                    DoctoresId = table.Column<int>(type: "int", nullable: true)
+                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -334,11 +358,6 @@ namespace ConsultaMedica.Migrations
                         principalTable: "Citas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_VisitasSucesivas_Doctores_DoctoresId",
-                        column: x => x.DoctoresId,
-                        principalTable: "Doctores",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_VisitasSucesivas_HistoriasClinicas_IdHistoriaClinica",
                         column: x => x.IdHistoriaClinica,
@@ -356,17 +375,11 @@ namespace ConsultaMedica.Migrations
                     IdVisitaSucesiva = table.Column<int>(type: "int", nullable: false),
                     FechaProcedimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Observaciones = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProfesionalId = table.Column<int>(type: "int", nullable: false),
-                    DoctoresId = table.Column<int>(type: "int", nullable: true)
+                    ProfesionalId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProcedimientosVisitaSucesiva", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProcedimientosVisitaSucesiva_Doctores_DoctoresId",
-                        column: x => x.DoctoresId,
-                        principalTable: "Doctores",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProcedimientosVisitaSucesiva_Doctores_ProfesionalId",
                         column: x => x.ProfesionalId,
@@ -428,11 +441,6 @@ namespace ConsultaMedica.Migrations
                 column: "CitaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HistoriasClinicas_DoctoresId",
-                table: "HistoriasClinicas",
-                column: "DoctoresId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_HistoriasClinicas_IdMedico",
                 table: "HistoriasClinicas",
                 column: "IdMedico");
@@ -460,11 +468,6 @@ namespace ConsultaMedica.Migrations
                 column: "IdHistoriaClinica");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProcedimientosVisitaSucesiva_DoctoresId",
-                table: "ProcedimientosVisitaSucesiva",
-                column: "DoctoresId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProcedimientosVisitaSucesiva_IdVisitaSucesiva",
                 table: "ProcedimientosVisitaSucesiva",
                 column: "IdVisitaSucesiva");
@@ -486,9 +489,14 @@ namespace ConsultaMedica.Migrations
                 column: "EspecialidadId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VisitasSucesivas_DoctoresId",
-                table: "VisitasSucesivas",
-                column: "DoctoresId");
+                name: "IX_TratamientosFacturados_FacturaId",
+                table: "TratamientosFacturados",
+                column: "FacturaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TratamientosFacturados_TratamientoId",
+                table: "TratamientosFacturados",
+                column: "TratamientoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VisitasSucesivas_IdCita",
@@ -511,22 +519,25 @@ namespace ConsultaMedica.Migrations
                 name: "ExamenesFisicosAdicionales");
 
             migrationBuilder.DropTable(
-                name: "Facturas");
-
-            migrationBuilder.DropTable(
                 name: "ProcedimientosProfesionales");
 
             migrationBuilder.DropTable(
                 name: "ProcedimientosVisitaSucesiva");
 
             migrationBuilder.DropTable(
-                name: "Tratamientos");
+                name: "TratamientosFacturados");
 
             migrationBuilder.DropTable(
                 name: "VisitasSucesivas");
 
             migrationBuilder.DropTable(
+                name: "Facturas");
+
+            migrationBuilder.DropTable(
                 name: "HistoriasClinicas");
+
+            migrationBuilder.DropTable(
+                name: "Tratamientos");
 
             migrationBuilder.DropTable(
                 name: "Citas");

@@ -68,8 +68,6 @@ namespace ConsultaMedica.Controllers
 
             return View();
         }
-
-
         // Método para obtener las citas en formato JSON
         public IActionResult GetCitas()
         {
@@ -213,6 +211,22 @@ namespace ConsultaMedica.Controllers
 
             try
             {
+                // 0. Primero verificar si hay facturas relacionadas
+                var facturasRelacionadas = _context.Facturas
+                    .Where(f => f.CitaId == id)
+                    .ToList();
+
+                if (facturasRelacionadas.Any())
+                {
+                    // Opción 1: No permitir eliminación si hay facturas
+                    // transaction.Rollback();
+                    // TempData["ErrorMessage"] = "No se puede eliminar la cita porque tiene facturas asociadas";
+                    // return RedirectToAction("EditarCitas", new { id });
+
+                    // Opción 2: Eliminar las facturas relacionadas primero
+                    _context.Facturas.RemoveRange(facturasRelacionadas);
+                }
+
                 // 1. Eliminar los procedimientos de las visitas sucesivas
                 var procedimientos = _context.ProcedimientosVisitaSucesiva
                     .Where(p => p.VisitaSucesiva.IdCita == id)
@@ -239,13 +253,13 @@ namespace ConsultaMedica.Controllers
                 _context.SaveChanges();
                 transaction.Commit();
 
-                TempData["SuccessMessage"] = "Cita, visitas relacionadas y procedimientos eliminados correctamente";
+                TempData["success"] = "Cita, visitas relacionadas, procedimientos y facturas asociadas eliminados correctamente";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 transaction.Rollback();
-                TempData["ErrorMessage"] = $"Error al eliminar: {ex.Message}";
+                TempData["error"] = $"Error al eliminar: {ex.Message}";
                 return RedirectToAction("EditarCitas", new { id });
             }
         }

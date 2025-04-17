@@ -37,36 +37,46 @@
 </head>
 
 <body>
-    @if (TempData["Mensaje"] != null)
+    @if (TempData["Mensaje"] != null || TempData["ErrorMessage"] != null)
     {
         <script>
-
             PNotify.defaults.stack = {
-                dir1: 'up', 
+                dir1: 'up',
                 dir2: 'left',
-                firstpos1: 25, 
-                firstpos2: 25, 
-                spacing1: 25, 
-                spacing2: 25, 
-                push: 'bottom', 
-                context: document.body 
+                firstpos1: 25,
+                firstpos2: 25,
+                spacing1: 25,
+                spacing2: 25,
+                push: 'bottom',
+                context: document.body
             };
 
-            // Determinar el tipo de mensaje (éxito o error)
-            var tipoMensaje = "@TempData["TipoMensaje"]";
-            var mensaje = "@TempData["Mensaje"]";
+            // Usar Html.Raw para evitar la codificación HTML
+            var tipoMensaje = "@Html.Raw(TempData["TipoMensaje"])";
+            var mensaje = "@Html.Raw(TempData["Mensaje"])";
+            var errorMessage = "@Html.Raw(TempData["ErrorMessage"])";
 
+            // Mostrar mensaje normal (éxito/error)
             if (tipoMensaje === "success") {
                 PNotify.success({
                     title: 'Éxito',
                     text: mensaje,
-                    delay: 3000 // Duración de 3 segundos
+                    delay: 3000
                 });
             } else if (tipoMensaje === "error") {
                 PNotify.error({
                     title: 'Error',
                     text: mensaje,
-                    delay: 3000 // Duración de 3 segundos
+                    delay: 3000
+                });
+            }
+
+            // Mostrar mensaje de error específico para facturación
+            if (errorMessage && errorMessage !== "") {
+                PNotify.error({
+                    title: 'Error de Facturación',
+                    text: errorMessage,
+                    delay: 3000
                 });
             }
         </script>

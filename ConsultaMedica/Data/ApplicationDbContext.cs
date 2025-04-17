@@ -23,6 +23,7 @@ namespace ConsultaMedica.Data
         public DbSet<VisitaSucesiva> VisitasSucesivas { get; set; }
         public DbSet<Tratamiento> Tratamientos { get; set; }
         public DbSet<Factura> Facturas { get; set; }
+        public DbSet<TratamientoFacturado> TratamientosFacturados { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -166,12 +167,6 @@ namespace ConsultaMedica.Data
                 .HasOne(f => f.Cita)
                 .WithMany()
                 .HasForeignKey(f => f.CitaId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Factura>()
-                .HasOne(f => f.Tratamiento)
-                .WithMany()
-                .HasForeignKey(f => f.TratamientoId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

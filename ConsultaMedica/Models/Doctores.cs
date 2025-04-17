@@ -16,9 +16,9 @@
         public string Movil { get; set; }
         public string Email { get; set; }
 
-        // Propiedades de navegación añadidas
-        public ICollection<HistoriasClinicas> HistoriasClinicas { get; set; } = new List<HistoriasClinicas>();
-        public ICollection<VisitaSucesiva> VisitasSucesivas { get; set; } = new List<VisitaSucesiva>();
-        public ICollection<ProcedimientoVisitaSucesiva> ProcedimientosVisitaSucesiva { get; set; } = new List<ProcedimientoVisitaSucesiva>();
+        //// Propiedades de navegación añadidas
+        //public ICollection<HistoriasClinicas> HistoriasClinicas { get; set; } = new List<HistoriasClinicas>();
+        //public ICollection<VisitaSucesiva> VisitasSucesivas { get; set; } = new List<VisitaSucesiva>();
+        //public ICollection<ProcedimientoVisitaSucesiva> ProcedimientosVisitaSucesiva { get; set; } = new List<ProcedimientoVisitaSucesiva>();
     }
 }

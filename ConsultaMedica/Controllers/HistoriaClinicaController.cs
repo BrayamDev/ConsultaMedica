@@ -115,8 +115,6 @@ namespace ConsultaMedica.Controllers
 
             return View();
         }
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(int citaId, HistoriaClinicaViewModel model)
@@ -254,7 +252,6 @@ namespace ConsultaMedica.Controllers
                 return View("Index", model);
             }
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult InsertarVisitaSucesiva(VisitaSucesivaViewModel model)

@@ -3,314 +3,389 @@
 @model FacturacionViewModel
 
 @{
-    var paciente = ViewBag.Paciente as ConsultaMedica.Models.Pacientes; // Asegúrate de usar el namespace correcto
-    var tratamientosDisponibles = ViewBag.TratamientosDisponibles as List<ConsultaMedica.Models.Tratamiento>;
+    var paciente = ViewBag.Paciente as ConsultaMedica.Models.Pacientes;
 }
 
-<div class="rounded container-fluid text-center">
-    <h2>Gestionar Facturacion</h2>
-</div>
-<form method="post" asp-action="ProcesarFacturacion">
-<div class="container-fluid row mt-4 p-2">
-    <div class="col-md-8">
-        <div class="p-2">
-            <div class="d-flex justify-content-between align-items-start">
-                <div class="text-left">
-                    <h4>Tratamientos <i class="ri-add-circle-line" role="button" data-bs-toggle="modal" data-bs-target="#tratamientosModal"></i></h4>   
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-primary">Gestión Integrada</button>
-                    <button class="btn btn-primary">Movimientos</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card-body">
-            <h3 scope="row">Resumen tratamientos</h3>
-            <table class="table">
-                <thead class="text-white" style="background-color: #00826F; border: none;">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Tratamiento</th>
-                        <th scope="col">Observaciones</th>
-                        <th scope="col">Unidades</th>
-                        <th scope="col">Precio Unitario</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (TempData["TratamientosSeleccionados"] != null)
-                    {
-                        var tratamientosSeleccionados = JsonConvert.DeserializeObject<List<TratamientoSeleccionado>>(TempData["TratamientosSeleccionados"].ToString());
-                        var contador = 1;
-
-                        foreach (var tratamiento in tratamientosSeleccionados)
-                        {
-                            <tr id="tratamiento-@tratamiento.TratamientoId">
-                                <th scope="row">@contador</th>
-                                <td>@tratamiento.NombreTratamiento</td>
-                                <td>
-                                    <input type="text" class="form-control form-control-sm"
-                                           name="observacionesTratamientos[@tratamiento.TratamientoId]"
-                                           value="@tratamiento.Observaciones">
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm unidades"
-                                           name="unidadesTratamientos[@tratamiento.TratamientoId]"
-                                           value="@tratamiento.Unidades" min="1"
-                                           oninput="calcularTotal(this)">
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control form-control-sm precio-unitario"
-                                           name="precioUnitarioTratamientos[@tratamiento.TratamientoId]"
-                                           value="@tratamiento.ImporteUnitario.ToString("C")"
-                                           onblur="formatearMoneda(this); calcularTotal(this)">
-                                </td>
-                                <td class="total">@((tratamiento.Unidades * tratamiento.ImporteUnitario).ToString("C"))</td>
-                                <td>
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-danger btn-eliminar-tratamiento"
-                                            data-tratamiento-id="@tratamiento.TratamientoId"
-                                            data-paciente-id="@paciente.Id"
-                                            data-cita-id="@Context.Request.Query["id"]">
-                                        <i class="ri-delete-bin-line"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            contador++;
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="7" class="text-center">No hay tratamientos seleccionados</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="container mt-4">
-                <div class="row">
-                    <!-- Factura -->
-                    <div class="col-md-6 d-flex">
-                        <div class="card shadow-sm flex-fill">
-                            <div class="card-header text-white" style="background-color: #00826F; border: none;">
-                                <h5 class="card-title text-white mb-0">Factura</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label"><strong>Fecha Doc.</strong></label>
-                                    <input type="text" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label"><strong>Empresa</strong></label>
-                                    <input class="form-control" placeholder="Ingrese la empresa" value="Consulta médica domiciliaria">
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox">
-                                    <label class="form-check-label">
-                                        Factura
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cobrar -->
-                    <div class="col-md-6 d-flex">
-                        <div class="card shadow-sm flex-fill">
-                            <div class="card-header text-white" style="background-color: #00826F; border: none;">
-                                <h5 class="card-title mb-0 text-white">Cobrar</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label"><strong>Cobrar la visita</strong></label>
-                                        <select class="form-select">
-                                            <option value="efectivo">Efectivo</option>
-                                            <option value="tarjeta">Tarjeta</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label"><strong>Importe Total</strong></label>
-                                        @{
-                                            var total = 0.0m;
-                                            if (TempData["TratamientosSeleccionados"] != null)
-                                            {
-                                                var tratamientos = JsonConvert.DeserializeObject<List<TratamientoSeleccionado>>(TempData["TratamientosSeleccionados"].ToString());
-                                                total = tratamientos.Sum(t => t.Unidades * t.ImporteUnitario);
-                                            }
-                                        }
-                                        <input type="text" id="importeTotal" class="form-control" value="@total.ToString("C")" readonly>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label"><strong>Observaciones del cobro</strong></label>
-                                    <textarea class="form-control" rows="3" placeholder="Ingrese observaciones"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-center py-3 bg-light rounded" style="color: #00826F;">
+                <i class="ri-file-list-3-line me-2"></i>Gestión de Facturación
+            </h2>
         </div>
     </div>
 
-    <!-- Información de Visita -->
-    <div class="col-md-4">
+    <form method="post" asp-action="ProcesarFacturacion">
+        <input type="hidden" asp-for="PacienteId" value="@paciente.Id" />
+        <input type="hidden" asp-for="CitaId" value="@Context.Request.Query["id"]" />
+
         <div class="row">
-            <div class="col-md-12">
-                <div class="card shadow-sm">
-                    <div class="card-header text-white" style="background-color: #00826F; border: none;">
-                        <h5 class="card-title text-white mb-0">Información del paciente</h5>
+            <!-- Sección principal -->
+            <div class="col-lg-8">
+                <!-- Tarjeta de Tratamientos -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #00826F;">
+                        <h4 class="mb-0">
+                            <i class="ri-medicine-bottle-line me-2"></i>Tratamientos
+                        </h4>
+                        <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#tratamientosModal">
+                            <i class="ri-add-circle-line me-1"></i>Agregar
+                        </button>
                     </div>
                     <div class="card-body">
-                        <p><strong>ID:</strong> @($"{paciente.Id}") </p>
-                        <p><strong>Nombre:</strong> @($"{paciente.PrimerApellido}, {paciente.Nombre}")</p>
-                        <p><strong>Email:</strong> @($"{paciente.Email}")</p>
-                        <p><strong>Ficha:</strong> <a href="#" class="text-white text-decoration-none btn btn-primary btn-sm">Ver Ficha</a></p>
-                        <p><strong>Docs:</strong> <a href="#" class="text-white text-decoration-none btn btn-danger btn-sm">Ver Documentos</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br />
-        <div class="card shadow-sm">
-            <div class="card-header bg-success text-white">
-                <h5 class="card-title bg-success text-white mb-0">Visita</h5>
-            </div>
-            <div class="card-body">
-                <p><strong>Fecha y hora:</strong> [Fecha y hora actual]</p>
-                <p><strong>Profesional:</strong> JOGA</p>
-                <p><strong>Especialidad:</strong> MEDICINA GENERAL</p>
-                <p><strong>Observaciones:</strong> RECETA MEDICA RESIDENTE</p>
-            </div>
-        </div>
-
-        <div class="card shadow-sm p-3">
-            <div class="d-flex justify-content-around">
-                <form method="post">
-                    <button type="submit" class="btn btn-success">Procesar Visita</button>
-                </form>
-                <a href="#" class="btn btn-success">Volver</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Agregar Tratamientos-->
-    <div class="modal fade" id="tratamientosModal" tabindex="-1" aria-labelledby="tratamientosModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow-lg">
-                <form method="post" asp-action="AgregarTratamientos">
-                    <input type="hidden" name="pacienteId" value="@paciente.Id" />
-                    <input type="hidden" name="CitaId" value="@Context.Request.Query["id"]" />
-
-                    <div class="modal-header text-white" style="background-color: #00826F; border: none;">
-                        <h5 class="modal-title" id="tratamientosModalLabel">Seleccionar tratamientos</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        
-                        <div class="d-flex justify-content-between align-items-center p-2 mb-0">
-                            <h6 class="mb-0">Incluir Tratamientos</h6>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-success">Agregar</button>
-                            </div>
-                        </div>
-
-                        <!-- Barra de búsqueda -->
-                        <div class="input-group mb-3">
-                            <input type="text"
-                                   class="form-control"
-                                   placeholder="Buscar en tratamientos..."
-                                   id="buscarTratamientos"
-                                   oninput="filtrarTabla(this.value)">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="ri-search-line"></i>
-                            </button>
-                        </div>
-
-                        <div class="table-responsive mb-3">
-                            <table class="table table-bordered table-hover align-middle" id="tablaTratamientos">
-                                <thead class="table-light">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="text-white" style="background-color: #00826F;">
                                     <tr>
-                                        <th><input type="checkbox" id="checkTodos" onclick="toggleTodos(this)"></th>
-                                        <th>Tratamiento</th>
-                                        <th>Código</th>
-                                        <th>Precio Unitario</th>
-                                        <th>Especialidad</th>
+                                        <th width="5%">#</th>
+                                        <th width="25%">Tratamiento</th>
+                                        <th width="20%">Observaciones</th>
+                                        <th width="10%">Unidades</th>
+                                        <th width="15%">Precio Unitario</th>
+                                        <th width="15%">Total</th>
+                                        <th width="10%">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var tratamiento in ViewBag.TratamientosDisponibles)
+                                    @if (Model.TratamientosSeleccionados?.Any() == true)
+                                    {
+                                        var counter = 0;
+                                        foreach (var tratamiento in Model.TratamientosSeleccionados)
+                                        {
+                                            <input type="hidden" name="TratamientosSeleccionados[@counter].TratamientoId" value="@tratamiento.TratamientoId" />
+                                            <input type="hidden" name="TratamientosSeleccionados[@counter].NombreTratamiento" value="@tratamiento.NombreTratamiento" />
+                                            <tr id="tratamiento-@tratamiento.TratamientoId" class="align-middle">
+                                                <th scope="row">@(counter + 1)</th>
+                                                <td>@tratamiento.NombreTratamiento</td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm"
+                                                           name="TratamientosSeleccionados[@counter].Observaciones"
+                                                           value="@tratamiento.Observaciones">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm unidades"
+                                                           name="TratamientosSeleccionados[@counter].Unidades"
+                                                           value="@tratamiento.Unidades" min="1"
+                                                           oninput="calcularTotal(this)">
+                                                </td>
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text">$</span>
+                                                        <input type="text" class="form-control precio-visible text-end"
+                                                               value="@tratamiento.ImporteUnitario.ToString("N2")"
+                                                               onblur="formatearMoneda(this)">
+                                                        <input type="hidden" class="precio-unitario"
+                                                               name="TratamientosSeleccionados[@counter].ImporteUnitario"
+                                                               value="@tratamiento.ImporteUnitario.ToString("0.00")">
+                                                    </div>
+                                                </td>
+                                                <td class="total fw-bold text-end">@tratamiento.Total.ToString("C")</td>
+                                                <td class="text-center">
+                                                    <a class="btn btn-sm btn-outline-danger"
+                                                       href="@Url.Action("EliminarTratamientoSeleccionado", "Facturacion",
+                                                              new { tratamientoId = tratamiento.TratamientoId, citaId = Context.Request.Query["id"] })">
+                                                        <i class="ri-delete-bin-line"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            counter++;
+                                        }
+                                    }
+                                    else
                                     {
                                         <tr>
-                                            <td><input type="checkbox" name="tratamientosSeleccionados" value="@tratamiento.Id"></td>
-                                            <td>@tratamiento.NombreTratamiento </td>
-                                            <td>@tratamiento.Codigo</td>
-                                            <td>@tratamiento.ImporteUnitario.ToString("C", new System.Globalization.CultureInfo("es-ES"))</td>
-                                            <td>@(tratamiento.Especialidad?.Nombre ?? "Sin especialidad")</td>
+                                            <td colspan="7" class="text-center py-4 text-muted">
+                                                <i class="ri-information-line me-2"></i>No hay tratamientos seleccionados
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </form>
+                </div>
+
+                <!-- Sección de Factura y Cobro -->
+                <div class="row">
+                    <!-- Factura -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header text-white" style="background-color: #00826F;">
+                                <h5 class="mb-0">
+                                    <i class="ri-file-text-line me-2"></i>Datos de Factura
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Fecha Documento</label>
+                                    <input type="date" class="form-control" asp-for="FechaFactura"
+                                           value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Empresa</label>
+                                    <input class="form-control" asp-for="Empresa"
+                                           placeholder="Ingrese la empresa"
+                                           value="Consulta médica domiciliaria">
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" asp-for="EsFactura" id="esFacturaCheck">
+                                    <label class="form-check-label" for="esFacturaCheck">Generar Factura</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cobro -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header text-white" style="background-color: #00826F;">
+                                <h5 class="mb-0">
+                                    <i class="ri-money-dollar-circle-line me-2"></i>Datos de Cobro
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Método de Pago</label>
+                                    <select class="form-select" asp-for="TipoCobro">
+                                        <option value="efectivo">Efectivo</option>
+                                        <option value="tarjetaDebito">Tarjeta de debito</option>
+                                        <option value="tarjetaDeCredito">Tarjeta de credito</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Importe Total</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="hidden" asp-for="ImporteTotal" id="importeTotalHidden" />
+                                        <input type="text" id="importeTotalVisible" class="form-control text-end fw-bold"
+                                               value="@Model.ImporteTotal.ToString("N2")" readonly>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Observaciones</label>
+                                    <textarea class="form-control" asp-for="ObservacionesCobro"
+                                              rows="3" placeholder="Ingrese observaciones del cobro"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Panel lateral -->
+            <div class="col-lg-4">
+                <!-- Información del Paciente -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #00826F;">
+                        <h5 class="mb-0">
+                            <i class="ri-user-line me-2"></i>Paciente
+                        </h5>
+                        <div>
+                            <a asp-controller="Paciente" asp-action="DetallePaciente" asp-route-id="@paciente.Id" class="btn btn-sm btn-light me-2">
+                                <i class="ri-file-text-line me-1"></i>Ficha
+                            </a>
+                            <button class="btn btn-sm btn-light">
+                                <i class="ri-folder-line me-1"></i>Docs
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="ri-id-card-line fs-4" style="color: #00826F;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">ID</h6>
+                                <p class="mb-0">@paciente.Id</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="ri-user-3-line fs-4" style="color: #00826F;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Nombre</h6>
+                                <p class="mb-0">@($"{paciente.PrimerApellido}, {paciente.Nombre}")</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="ri-mail-line fs-4" style="color: #00826F;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Email</h6>
+                                <p class="mb-0">@paciente.Email</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de la Visita -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header text-white" style="background-color: #00826F;">
+                        <h5 class="mb-0">
+                            <i class="ri-calendar-event-line me-2"></i>Visita
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="ri-time-line fs-4" style="color: #00826F;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Fecha y hora</h6>
+                                <p class="mb-0">@DateTime.Now.ToString("g")</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="ri-user-star-line fs-4" style="color: #00826F;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Profesional</h6>
+                                <p class="mb-0">JOGA</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="ri-stethoscope-line fs-4" style="color: #00826F;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Especialidad</h6>
+                                <p class="mb-0">MEDICINA GENERAL</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div>
+                    <div class="card-body text-center">
+                        <button type="submit" class="btn text-white me-2" style="background-color: #00826F;">
+                            <i class="ri-check-line me-1"></i>Procesar Visita
+                        </button>
+                        <a href="/Agenda" class="btn btn-outline-secondary">
+                            <i class="ri-arrow-left-line me-1"></i>Volver
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Modal para agregar tratamientos -->
+<div class="modal fade" id="tratamientosModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <form method="post" asp-action="AgregarTratamientos">
+                <input type="hidden" name="pacienteId" value="@paciente.Id" />
+                <input type="hidden" name="citaId" value="@Context.Request.Query["id"]" />
+
+                <div class="modal-header text-white" style="background-color: #00826F;">
+                    <h5 class="modal-title">
+                        <i class="ri-medicine-bottle-line me-2"></i>Seleccionar Tratamientos
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="input-group mb-4">
+                        <span class="input-group-text"><i class="ri-search-line"></i></span>
+                        <input type="text" class="form-control" placeholder="Buscar tratamientos..." id="buscarTratamientos">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tablaTratamientos">
+                            <thead class="text-white" style="background-color: #00826F;">
+                                <tr>
+                                    <th width="5%"><input type="checkbox" id="checkTodos"></th>
+                                    <th width="50%">Tratamiento</th>
+                                    <th width="20%">Código</th>
+                                    <th width="25%" class="text-end">Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var tratamiento in Model.TratamientosDisponibles)
+                                {
+                                    <tr>
+                                        <td><input type="checkbox" name="tratamientosSeleccionados" value="@tratamiento.Id"></td>
+                                        <td>@tratamiento.NombreTratamiento</td>
+                                        <td>@tratamiento.Codigo</td>
+                                        <td class="text-end">@tratamiento.ImporteUnitario.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn text-white" style="background-color: #00826F;">
+                        <i class="ri-add-circle-line me-1"></i>Agregar Seleccionados
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-      </form>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Actualizar importe total al cargar la página
-        actualizarImporteTotal();
-        // Manejar eliminación de tratamientos
-        document.querySelectorAll('.btn-eliminar-tratamiento').forEach(button => {
-            button.addEventListener('click', function() {
-                const tratamientoId = this.getAttribute('data-tratamiento-id');
-                const pacienteId = this.getAttribute('data-paciente-id');
-                const citaId = this.getAttribute('data-cita-id');
+    function eliminarTratamiento(tratamientoId, citaId) {
+        if (confirm('¿Estás seguro de eliminar este tratamiento?')) {
+            fetch('@Url.Action("EliminarTratamientoSeleccionado", "Facturacion")', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `tratamientoId=${tratamientoId}&citaId=${citaId}`
+            }).then(response => {
+                if (response.ok) {
+                    // Eliminar la fila de la tabla
+                    document.getElementById(`tratamiento-${tratamientoId}`).remove();
+                    // Actualizar el total si es necesario
+                    calcularTotalGeneral();
 
-                // Eliminar visualmente
-                const row = document.getElementById(`tratamiento-${tratamientoId}`);
-                row.remove();
+                    // Verificar si quedan filas en la tabla (excluyendo posibles filas de mensaje)
+                    const filasTratamiento = document.querySelectorAll('tr[id^="tratamiento-"]').length;
 
-                // Actualizar números de fila
-                updateRowNumbers();
-
-                // Actualizar importe total
-                actualizarImporteTotal();
-
-                // Enviar solicitud al servidor para actualizar TempData
-                fetch('/TuControlador/EliminarTratamientoTemporal', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        pacienteId: pacienteId,
-                        citaId: citaId,
-                        tratamientoId: tratamientoId
-                    })
-                }).then(response => {
-                    if (!response.ok) {
-                        console.error('Error al eliminar el tratamiento');
-                        // Podrías mostrar un mensaje de error al usuario
+                    // Si no hay más filas de tratamiento, recargar la página
+                    if (filasTratamiento === 0) {
+                        location.reload();
                     }
-                });
-                 actualizarImporteTotal();
-                // Mostrar mensaje si no hay tratamientos
-                checkEmptyTable();
+                }
+            });
+        }
+    }
+
+        document.addEventListener('DOMContentLoaded', function() {
+        // Función para buscar tratamientos
+        document.getElementById('buscarTratamientos').addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#tablaTratamientos tbody tr');
+
+            rows.forEach(row => {
+                const treatmentName = row.cells[1].textContent.toLowerCase();
+                const treatmentCode = row.cells[2].textContent.toLowerCase();
+
+                if (treatmentName.includes(searchText) || treatmentCode.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
             });
         });
 
-        // Resto del código...
+        // Función para seleccionar/deseleccionar todos los checkboxes
+        document.getElementById('checkTodos').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('input[name="tratamientosSeleccionados"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
     });
 </script>

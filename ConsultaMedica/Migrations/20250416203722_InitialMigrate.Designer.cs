@@ -4,6 +4,7 @@ using ConsultaMedica.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ConsultaMedica.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250416203722_InitialMigrate")]
+    partial class InitialMigrate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,9 +37,6 @@ namespace ConsultaMedica.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("Estado")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Facturada")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("FechaHora")
@@ -258,11 +258,19 @@ namespace ConsultaMedica.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("TratamientoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Unidad")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CitaId");
 
                     b.HasIndex("PacienteId");
+
+                    b.HasIndex("TratamientoId");
 
                     b.ToTable("Facturas");
                 });
@@ -680,9 +688,16 @@ namespace ConsultaMedica.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ConsultaMedica.Models.Tratamiento", "Tratamiento")
+                        .WithMany()
+                        .HasForeignKey("TratamientoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Cita");
 
                     b.Navigation("Paciente");
+
+                    b.Navigation("Tratamiento");
                 });
 
             modelBuilder.Entity("ConsultaMedica.Models.HistoriasClinicas", b =>

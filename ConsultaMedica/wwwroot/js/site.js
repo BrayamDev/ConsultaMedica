@@ -211,6 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         eventContent: function (arg) {
             var observaciones = arg.event.extendedProps.observaciones;
+
             var content = document.createElement('div');
             content.classList.add('event-container');
             content.style.display = 'flex';
@@ -460,16 +461,22 @@ function filtrarTabla(busqueda) {
     });
 }
 
-// Formatea el precio como moneda
-function formatearMoneda(input) {
-    // Remover símbolos de moneda y convertir a número
-    let valor = parseFloat(input.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-    // Formatear como moneda
-    input.value = valor.toLocaleString('es-ES', {
+function formatearMoneda(inputVisible) {
+    let valor = parseFloat(inputVisible.value.replace(/\./g, '').replace(',', '.')) || 0;
+
+    // Formatea visualmente en el campo visible
+    inputVisible.value = valor.toLocaleString('es-ES', {
         style: 'currency',
         currency: 'EUR'
     });
-    return valor; // Devuelve el valor numérico
+
+    // Busca el input hidden en el mismo TD y actualiza el valor real
+    const hiddenInput = inputVisible.parentNode.querySelector('.precio-unitario');
+    if (hiddenInput) {
+        hiddenInput.value = valor.toFixed(2); // formato 0.00
+    }
+
+    calcularTotal(inputVisible); // recalcular fila y total general
 }
 
 // Calcula el total de una fila y el total general
@@ -504,16 +511,18 @@ function actualizarImporteTotal() {
         totalGeneral += unidades * precio;
     });
 
-    // Actualizar el campo de importe total usando el ID
-    const importeTotalInput = document.getElementById('importeTotal');
-    if (importeTotalInput) {
-        importeTotalInput.value = totalGeneral.toLocaleString('es-ES', {
+    // Actualizar ambos campos
+    const importeTotalVisible = document.getElementById('importeTotalVisible');
+    const importeTotalHidden = document.getElementById('importeTotalHidden');
+
+    if (importeTotalVisible && importeTotalHidden) {
+        importeTotalVisible.value = totalGeneral.toLocaleString('es-ES', {
             style: 'currency',
             currency: 'EUR'
         });
+        importeTotalHidden.value = totalGeneral;
     }
 }
-
 
 
 /* ****************************************  FACTURACION JAVASCRIPT   ****************************************** */

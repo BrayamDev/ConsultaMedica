@@ -33,9 +33,6 @@ namespace ConsultaMedica.Models
         [Display(Name = "Importe Total")]
         public decimal ImporteTotal { get; set; }
 
-        [Required]
-        public int Unidad { get; set; }
-
         // Relación con Paciente
         public int PacienteId { get; set; }
         [ForeignKey("PacienteId")]
@@ -45,12 +42,7 @@ namespace ConsultaMedica.Models
         public int? CitaId { get; set; }
         [ForeignKey("CitaId")]
         public virtual Citas Cita { get; set; }
-
-        // Relación con Tratamientos
-        public int? TratamientoId { get; set; }
-
-        [ForeignKey("TratamientoId")]
-        public virtual Tratamiento Tratamiento { get; set; } 
+        public ICollection<TratamientoFacturado> TratamientosFacturados { get; set; }
 
 
     }

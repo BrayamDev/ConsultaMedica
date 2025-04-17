@@ -18,6 +18,7 @@ namespace ConsultaMedica.Models
         public int PacienteId { get; set; }
         public string Observaciones { get; set; }
         public bool Estado { get; set; }
+        public bool Facturada { get; set; }
 
         // Propiedades de navegación
         public Pacientes Paciente { get; set; }

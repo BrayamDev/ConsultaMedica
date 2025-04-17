@@ -17,7 +17,6 @@ namespace ConsultaMedica.Controllers
             _context = context;
         }
 
-        // GET: PacienteController
         public IActionResult Index()
         {
             var listaPacientes = _context.Pacientes.ToList();
@@ -25,20 +24,14 @@ namespace ConsultaMedica.Controllers
 
             return View(listaPacientes);
         }
-
-        // GET: PacienteController/Details/5
         public IActionResult ConsolidadoPacientes()
         {
             return View();
         }
-
-        // GET: Paciente/CrearPacienteCita
         public IActionResult CrearPacienteCita()
         {
-            // Puedes agregar lógica de inicialización aquí si es necesario
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CrearPacienteCita(CitaPacienteViewModel model)
@@ -124,6 +117,36 @@ namespace ConsultaMedica.Controllers
 
                 return View(model);
             }
+        }
+        public IActionResult DetallePaciente(int id)
+        {
+            var paciente = _context.Pacientes
+                .FirstOrDefault(p => p.Id == id);
+
+            if (paciente == null)
+            {
+                return NotFound();
+            }
+
+            // Asignar todos los datos al ViewBag
+            ViewBag.Id = paciente.Id;
+            ViewBag.NombreCompleto = $"{paciente.Nombre} {paciente.PrimerApellido} {paciente.SegundoApellido}";
+            ViewBag.FechaNacimiento = paciente.FechaNacimiento;
+            ViewBag.Sexo = paciente.Sexo;
+            ViewBag.NumeroDocumento = paciente.NumeroDocumento;
+            ViewBag.Direccion = paciente.Direccion;
+            ViewBag.CodigoPostal = paciente.CodigoPostal;
+            ViewBag.Poblacion = paciente.Poblacion;
+            ViewBag.Provincia = paciente.Provincia;
+            ViewBag.PaisOrigen = paciente.PaisOrigen;
+            ViewBag.Telefono = paciente.Telefono;
+            ViewBag.Movil = paciente.Movil;
+            ViewBag.Email = paciente.Email;
+            ViewBag.Procedencia = paciente.Procedencia;
+            ViewBag.Aseguradora = paciente.Aseguradora;
+            ViewBag.Observaciones = paciente.Observaciones;
+
+            return View();
         }
     }
 }

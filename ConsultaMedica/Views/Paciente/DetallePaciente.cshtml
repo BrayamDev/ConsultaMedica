@@ -1,0 +1,140 @@
+﻿@model ConsultaMedica.Models.Pacientes
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- En tu vista -->
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    <!-- Remix Icon CSS (para los iconos) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- JS for jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- bootstrap css and js -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- PNotify  -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pnotify/dist/PNotifyBrightTheme.css">
+    <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotifyButtons.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- FullCalendar CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<div class="container-fluid mt-4">
+    <div class="card shadow">
+        <div class="card-header text-white" style="background-color: #00826F;">
+            <h3><i class="ri-user-line me-2"></i>Detalles del Paciente</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Columna izquierda - Información básica -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Información Personal</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4">ID:</dt>
+                        <dd class="col-sm-8">@ViewBag.Id</dd>
+
+                        <dt class="col-sm-4">Nombre completo:</dt>
+                        <dd class="col-sm-8">@ViewBag.NombreCompleto</dd>
+
+                        <dt class="col-sm-4">Fecha Nacimiento:</dt>
+                        <dd class="col-sm-8">@ViewBag.FechaNacimiento</dd>
+
+                        <dt class="col-sm-4">Sexo:</dt>
+                        <dd class="col-sm-8">@ViewBag.Sexo</dd>
+
+                        <dt class="col-sm-4">Documento:</dt>
+                        <dd class="col-sm-8">@ViewBag.NumeroDocumento</dd>
+                    </dl>
+                </div>
+
+                <!-- Columna derecha - Información de contacto -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Contacto y Ubicación</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4">Dirección:</dt>
+                        <dd class="col-sm-8">@ViewBag.Direccion</dd>
+
+                        <dt class="col-sm-4">Código Postal:</dt>
+                        <dd class="col-sm-8">@ViewBag.CodigoPostal</dd>
+
+                        <dt class="col-sm-4">Población:</dt>
+                        <dd class="col-sm-8">@ViewBag.Poblacion</dd>
+
+                        <dt class="col-sm-4">Provincia:</dt>
+                        <dd class="col-sm-8">@ViewBag.Provincia</dd>
+
+                        <dt class="col-sm-4">País:</dt>
+                        <dd class="col-sm-8">@ViewBag.PaisOrigen</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row">
+                <!-- Información de contacto -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Medios de Contacto</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4">Teléfono:</dt>
+                        <dd class="col-sm-8">@ViewBag.Telefono</dd>
+
+                        <dt class="col-sm-4">Móvil:</dt>
+                        <dd class="col-sm-8">@ViewBag.Movil</dd>
+
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@ViewBag.Email</dd>
+                    </dl>
+                </div>
+
+                <!-- Información médica -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Información Médica</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4">Procedencia:</dt>
+                        <dd class="col-sm-8">@ViewBag.Procedencia</dd>
+
+                        <dt class="col-sm-4">Aseguradora:</dt>
+                        <dd class="col-sm-8">@ViewBag.Aseguradora</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Observaciones -->
+            @if (!string.IsNullOrEmpty(ViewBag.Observaciones))
+            {
+                <hr class="my-4">
+                <div class="row">
+                    <div class="col-12">
+                        <h5>Observaciones</h5>
+                        <div class="border p-3 rounded bg-light">
+                            @ViewBag.Observaciones
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="text-end mt-4">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="ri-arrow-left-line"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
