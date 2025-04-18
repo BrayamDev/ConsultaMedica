@@ -1,5 +1,7 @@
 ﻿@model ConsultaMedica.Models.Pacientes
-
+@{
+    ViewData["Title"] = "Detalle del paciente";
+}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -131,7 +133,7 @@
             }
 
             <div class="text-end mt-4">
-                <a asp-action="Index" class="btn btn-secondary">
+                <a href="/Agenda" class="btn btn-secondary">
                     <i class="ri-arrow-left-line"></i> Volver
                 </a>
             </div>

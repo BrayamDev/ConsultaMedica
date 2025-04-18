@@ -4,8 +4,107 @@
 
 @{
     var paciente = ViewBag.Paciente as ConsultaMedica.Models.Pacientes;
+    ViewData["Title"] = "Facturacion";
 }
 
+<!DOCTYPE html>
+<html5 lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    <!-- Remix Icon CSS (para los iconos) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- JS for jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- bootstrap css and js -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- PNotify  -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pnotify/dist/PNotifyBrightTheme.css">
+    <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotifyButtons.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <!-- CSS de intl-tel-input -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    <!-- Utilidades para validación y formato -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+</head>
+
+@if (ViewBag.FacturaCreada != null && ViewBag.FacturaCreada)
+{
+    var factura = ViewBag.FacturaExistente as FacturaResumenViewModel;
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="ri-file-list-3-line me-2"></i>Factura ya generada
+                    </h5>
+                    <div>
+                        <span class="badge bg-light text-success fs-6">@factura.NumeroFactura</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Paciente:</strong> @factura.NombrePaciente</p>
+                            <p><strong>Fecha:</strong> @factura.FechaFactura.ToString("dd/MM/yyyy")</p>
+                            <p><strong>Método de pago:</strong> @factura.TipoCobro</p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h4 class="text-success">Total: @factura.ImporteTotal.ToString("C")</h4>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h6>Tratamientos:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Tratamiento</th>
+                                        <th class="text-end">Unidades</th>
+                                        <th class="text-end">P. Unitario</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var tratamiento in factura.Tratamientos)
+                                    {
+                                        <tr>
+                                            <td>@tratamiento.Nombre</td>
+                                            <td class="text-end">@tratamiento.Unidades</td>
+                                            <td class="text-end">@tratamiento.PrecioUnitario.ToString("C")</td>
+                                            <td class="text-end">@tratamiento.Total.ToString("C")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end mt-3">
+                        <a href="@Url.Action("DescargarFactura", new { numeroFactura = factura.NumeroFactura })" 
+                           class="btn btn-outline-success me-2">
+                            <i class="ri-download-line me-1"></i>Descargar Factura
+                        </a>
+                        <a href="@Url.Action("Index", "Agenda")" class="btn btn-success">
+                            <i class="ri-arrow-left-line me-1"></i>Volver a Agenda
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
@@ -127,9 +226,14 @@
                                            placeholder="Ingrese la empresa"
                                            value="Consulta médica domiciliaria">
                                 </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" asp-for="EsFactura" id="esFacturaCheck">
-                                    <label class="form-check-label" for="esFacturaCheck">Generar Factura</label>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="EsFactura" id="esFacturaCheck">
+                                        <label class="form-check-label" for="esFacturaCheck">
+                                            <span class="fw-bold">Generar Factura</span>
+                                            <small class="d-block text-muted">Al activar, se descargara un PDF de la factura</small>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -156,7 +260,8 @@
                                     <label class="form-label fw-bold">Importe Total</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
-                                        <input type="hidden" asp-for="ImporteTotal" id="importeTotalHidden" />
+                                        <input type="hidden" asp-for="ImporteTotal" id="importeTotalHidden"
+                                               value="@Model.ImporteTotal.ToString("0.00")" />
                                         <input type="text" id="importeTotalVisible" class="form-control text-end fw-bold"
                                                value="@Model.ImporteTotal.ToString("N2")" readonly>
                                     </div>
@@ -190,15 +295,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="flex-shrink-0">
-                                <i class="ri-id-card-line fs-4" style="color: #00826F;"></i>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-0">ID</h6>
-                                <p class="mb-0">@paciente.Id</p>
-                            </div>
-                        </div>
                         <div class="d-flex align-items-center mb-3">
                             <div class="flex-shrink-0">
                                 <i class="ri-user-3-line fs-4" style="color: #00826F;"></i>
@@ -278,114 +374,392 @@
 <div class="modal fade" id="tratamientosModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
-            <form method="post" asp-action="AgregarTratamientos">
-                <input type="hidden" name="pacienteId" value="@paciente.Id" />
-                <input type="hidden" name="citaId" value="@Context.Request.Query["id"]" />
+            <div class="modal-header text-white" style="background-color: #00826F;">
+                <h5 class="modal-title">
+                    <i class="ri-medicine-bottle-line me-2"></i>Seleccionar Tratamientos
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
 
-                <div class="modal-header text-white" style="background-color: #00826F;">
-                    <h5 class="modal-title">
-                        <i class="ri-medicine-bottle-line me-2"></i>Seleccionar Tratamientos
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body">
+                <div class="input-group mb-4">
+                    <span class="input-group-text"><i class="ri-search-line"></i></span>
+                    <input type="text" class="form-control" placeholder="Buscar tratamientos..." id="buscarTratamientos">
                 </div>
 
-                <div class="modal-body">
-                    <div class="input-group mb-4">
-                        <span class="input-group-text"><i class="ri-search-line"></i></span>
-                        <input type="text" class="form-control" placeholder="Buscar tratamientos..." id="buscarTratamientos">
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="tablaTratamientos">
-                            <thead class="text-white" style="background-color: #00826F;">
-                                <tr>
-                                    <th width="5%"><input type="checkbox" id="checkTodos"></th>
-                                    <th width="50%">Tratamiento</th>
-                                    <th width="20%">Código</th>
-                                    <th width="25%" class="text-end">Precio</th>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tablaTratamientos">
+                        <thead class="text-white" style="background-color: #00826F;">
+                            <tr>
+                                <th width="5%"><input type="checkbox" id="checkTodos"></th>
+                                <th width="50%">Tratamiento</th>
+                                <th width="20%">Código</th>
+                                <th width="25%" class="text-end">Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var tratamiento in Model.TratamientosDisponibles)
+                            {
+                                <tr data-id="@tratamiento.Id" data-nombre="@tratamiento.NombreTratamiento"
+                                    data-codigo="@tratamiento.Codigo" data-precio="@tratamiento.ImporteUnitario">
+                                    <td><input type="checkbox" class="tratamiento-checkbox"></td>
+                                    <td>@tratamiento.NombreTratamiento</td>
+                                    <td>@tratamiento.Codigo</td>
+                                    <td class="text-end">@tratamiento.ImporteUnitario.ToString("C")</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var tratamiento in Model.TratamientosDisponibles)
-                                {
-                                    <tr>
-                                        <td><input type="checkbox" name="tratamientosSeleccionados" value="@tratamiento.Id"></td>
-                                        <td>@tratamiento.NombreTratamiento</td>
-                                        <td>@tratamiento.Codigo</td>
-                                        <td class="text-end">@tratamiento.ImporteUnitario.ToString("C")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="ri-close-line me-1"></i>Cancelar
-                    </button>
-                    <button type="submit" class="btn text-white" style="background-color: #00826F;">
-                        <i class="ri-add-circle-line me-1"></i>Agregar Seleccionados
-                    </button>
-                </div>
-            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1"></i>Cancelar
+                </button>
+                <button type="submit" class="btn text-white" style="background-color: #00826F;" id="agregarTratamientosBtn">
+                    <i class="ri-add-circle-line me-1"></i>Agregar Seleccionados
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-<script>
-    function eliminarTratamiento(tratamientoId, citaId) {
-        if (confirm('¿Estás seguro de eliminar este tratamiento?')) {
-            fetch('@Url.Action("EliminarTratamientoSeleccionado", "Facturacion")', {
-                method: 'POST',
-                headers: {
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value,
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `tratamientoId=${tratamientoId}&citaId=${citaId}`
-            }).then(response => {
-                if (response.ok) {
-                    // Eliminar la fila de la tabla
-                    document.getElementById(`tratamiento-${tratamientoId}`).remove();
-                    // Actualizar el total si es necesario
-                    calcularTotalGeneral();
+    }
+<<script>
+        document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar cálculos
+        inicializarCalculos();
 
-                    // Verificar si quedan filas en la tabla (excluyendo posibles filas de mensaje)
-                    const filasTratamiento = document.querySelectorAll('tr[id^="tratamiento-"]').length;
-
-                    // Si no hay más filas de tratamiento, recargar la página
-                    if (filasTratamiento === 0) {
-                        location.reload();
-                    }
-                }
+        // Event listeners para cambios en unidades
+        document.querySelectorAll('.unidades').forEach(input => {
+            input.addEventListener('input', function () {
+                calcularTotal(this);
             });
+        });
+
+        // Event listeners para cambios en precios
+        document.querySelectorAll('.precio-visible').forEach(input => {
+            input.addEventListener('blur', function () {
+                formatearMoneda(this);
+            });
+        });
+
+        // Configurar búsqueda de tratamientos
+        const buscarInput = document.getElementById('buscarTratamientos');
+        if (buscarInput) {
+            buscarInput.addEventListener('input', function () {
+                filtrarTabla(this.value);
+            });
+        }
+
+        // Configurar selección de todos los tratamientos
+        const checkTodos = document.getElementById('checkTodos');
+        if (checkTodos) {
+            checkTodos.addEventListener('change', function () {
+                toggleTodos(this);
+            });
+        }
+
+        // Agregar tratamientos seleccionados
+        const agregarTratamientosBtn = document.getElementById('agregarTratamientosBtn');
+        if (agregarTratamientosBtn) {
+            agregarTratamientosBtn.addEventListener('click', agregarTratamientosSeleccionados);
+        }
+    });
+
+    // Función para agregar tratamientos seleccionados a la tabla
+    function agregarTratamientosSeleccionados() {
+        const checkboxes = document.querySelectorAll('.tratamiento-checkbox:checked');
+        const tbody = document.querySelector('form tbody');
+
+        // Si no hay tratamientos seleccionados
+        if (checkboxes.length === 0) {
+            alert('Por favor seleccione al menos un tratamiento');
+            return;
+        }
+
+        // Si la tabla está vacía (mostrando mensaje), limpiarla
+        if (tbody.querySelector('tr:not([id^="tratamiento-"])')) {
+            tbody.innerHTML = '';
+        }
+
+        // Contador para los índices de los inputs
+        let counter = tbody.querySelectorAll('tr[id^="tratamiento-"]').length;
+
+        // Agregar cada tratamiento seleccionado
+        checkboxes.forEach(checkbox => {
+            const fila = checkbox.closest('tr');
+            const id = fila.dataset.id;
+            const nombre = fila.dataset.nombre;
+            const codigo = fila.dataset.codigo;
+            const precio = parseFloat(fila.dataset.precio);
+
+            // Verificar si el tratamiento ya está agregado
+            if (document.getElementById(`tratamiento-${id}`)) {
+                return; // Saltar este tratamiento si ya existe
+            }
+
+            // Crear la nueva fila
+            const nuevaFila = document.createElement('tr');
+            nuevaFila.id = `tratamiento-${id}`;
+            nuevaFila.className = 'align-middle';
+            nuevaFila.innerHTML = `
+                <input type="hidden" name="TratamientosSeleccionados[${counter}].TratamientoId" value="${id}" />
+                <input type="hidden" name="TratamientosSeleccionados[${counter}].NombreTratamiento" value="${nombre}" />
+                <th scope="row">${counter + 1}</th>
+                <td>${nombre}</td>
+                <td>
+                    <input type="text" class="form-control form-control-sm"
+                           name="TratamientosSeleccionados[${counter}].Observaciones">
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm unidades"
+                           name="TratamientosSeleccionados[${counter}].Unidades"
+                           value="1" min="1" oninput="calcularTotal(this)">
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">$</span>
+                        <input type="text" class="form-control precio-visible text-end"
+                               value="${precio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}"
+                               onblur="formatearMoneda(this)">
+                        <input type="hidden" class="precio-unitario"
+                               name="TratamientosSeleccionados[${counter}].ImporteUnitario"
+                               value="${precio.toFixed(2)}">
+                    </div>
+                </td>
+                <td class="total fw-bold text-end">${(precio * 1).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarTratamiento(${id}, ${document.querySelector('input[name="CitaId"]').value})">
+                        <i class="ri-delete-bin-line"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(nuevaFila);
+            counter++;
+        });
+
+        // Cerrar el modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('tratamientosModal'));
+        modal.hide();
+
+        // Actualizar el total general
+        actualizarImporteTotal();
+
+        // Agregar event listeners a los nuevos elementos
+        document.querySelectorAll('.unidades').forEach(input => {
+            input.addEventListener('input', function () {
+                calcularTotal(this);
+            });
+        });
+
+        document.querySelectorAll('.precio-visible').forEach(input => {
+            input.addEventListener('blur', function () {
+                formatearMoneda(this);
+            });
+        });
+    }
+
+    // Función para inicializar los cálculos al cargar la página
+    function inicializarCalculos() {
+        // Formatear todos los precios visibles y calcular totales
+        document.querySelectorAll('.precio-visible').forEach(input => {
+            // Obtener valor numérico (aceptando tanto . como , como separador decimal)
+            let valor = input.value.replace(/[^\d,.-]/g, '')
+                .replace(/\./g, '')
+                .replace(',', '.');
+            valor = parseFloat(valor) || 0;
+
+            // Formatear visualmente
+            input.value = valor.toLocaleString('es-ES', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            // Actualizar campo oculto
+            const hiddenInput = input.closest('.input-group').querySelector('.precio-unitario');
+            if (hiddenInput) {
+                hiddenInput.value = valor.toFixed(2);
+            }
+        });
+
+        // Calcular totales por fila y general
+        document.querySelectorAll('.unidades').forEach(input => {
+            calcularTotal(input);
+        });
+    }
+
+    // Función para actualizar el importe total general
+    function actualizarImporteTotal() {
+        let totalGeneral = 0;
+
+        document.querySelectorAll('tbody tr[id^="tratamiento-"]').forEach(fila => {
+            const unidades = parseFloat(fila.querySelector('.unidades').value) || 0;
+            const precioUnitario = parseFloat(fila.querySelector('.precio-unitario').value) || 0;
+            totalGeneral += unidades * precioUnitario;
+        });
+
+        // Actualizar ambos campos del total general
+        const importeTotalVisible = document.getElementById('importeTotalVisible');
+        const importeTotalHidden = document.getElementById('importeTotalHidden');
+
+        if (importeTotalVisible && importeTotalHidden) {
+            importeTotalVisible.value = totalGeneral.toLocaleString('es-ES', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            importeTotalHidden.value = totalGeneral.toFixed(2);
         }
     }
 
-        document.addEventListener('DOMContentLoaded', function() {
-        // Función para buscar tratamientos
-        document.getElementById('buscarTratamientos').addEventListener('input', function() {
-            const searchText = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#tablaTratamientos tbody tr');
+    // Función para formatear moneda en inputs visibles
+    function formatearMoneda(inputVisible) {
+        // Obtener valor numérico
+        let valor = inputVisible.value.replace(/[^\d,.-]/g, '')
+            .replace(/\./g, '')
+            .replace(',', '.');
+        valor = parseFloat(valor) || 0;
 
-            rows.forEach(row => {
-                const treatmentName = row.cells[1].textContent.toLowerCase();
-                const treatmentCode = row.cells[2].textContent.toLowerCase();
+        // Formatear visualmente
+        inputVisible.value = valor.toLocaleString('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
 
-                if (treatmentName.includes(searchText) || treatmentCode.includes(searchText)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
+        // Actualizar campo oculto
+        const hiddenInput = inputVisible.closest('.input-group').querySelector('.precio-unitario');
+        if (hiddenInput) {
+            hiddenInput.value = valor.toFixed(2);
+        }
+
+        // Recalcular total de la fila
+        const unidadesInput = inputVisible.closest('tr').querySelector('.unidades');
+        calcularTotal(unidadesInput);
+    }
+
+    // Función para calcular el total de una fila individual
+    function calcularTotal(elemento) {
+        const fila = elemento.closest('tr');
+        if (!fila) return;
+
+        const unidades = parseFloat(elemento.value) || 0;
+        const precioUnitario = parseFloat(fila.querySelector('.precio-unitario').value) || 0;
+        const totalFila = unidades * precioUnitario;
+
+        // Actualizar celda de total
+        fila.querySelector('.total').textContent = totalFila.toLocaleString('es-ES', {
+            style: 'currency',
+            currency: 'EUR'
+        });
+
+        // Actualizar total general
+        actualizarImporteTotal();
+    }
+
+    // Función para filtrar la tabla de tratamientos
+    function filtrarTabla(busqueda) {
+        const filas = document.querySelectorAll('#tablaTratamientos tbody tr');
+        const textoBusqueda = busqueda.toLowerCase().trim();
+
+        filas.forEach(fila => {
+            const textoFila = fila.textContent.toLowerCase();
+            fila.style.display = textoBusqueda === '' || textoFila.includes(textoBusqueda)
+                ? ''
+                : 'none';
+        });
+    }
+
+    // Función para seleccionar/deseleccionar todos los checkboxes
+    function toggleTodos(source) {
+        const checkboxes = document.querySelectorAll('.tratamiento-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
+
+    // Función para eliminar tratamiento
+    function eliminarTratamiento(tratamientoId, citaId) {
+        if (confirm('¿Estás seguro de eliminar este tratamiento?')) {
+            const fila = document.getElementById(`tratamiento-${tratamientoId}`);
+            if (fila) {
+                fila.remove();
+                actualizarImporteTotal();
+
+                // Reindexar los nombres de los inputs
+                const filasTratamiento = document.querySelectorAll('tr[id^="tratamiento-"]');
+                filasTratamiento.forEach((fila, index) => {
+                    // Actualizar el número de fila
+                    fila.querySelector('th').textContent = index + 1;
+
+                    // Actualizar los nombres de los inputs
+                    const inputs = fila.querySelectorAll('input');
+                    inputs.forEach(input => {
+                        const name = input.getAttribute('name');
+                        if (name && name.includes('TratamientosSeleccionados')) {
+                            input.setAttribute('name', name.replace(/\[\d+\]/, `[${index}]`));
+                        }
+                    });
+                });
+
+                // Si no quedan tratamientos, mostrar mensaje
+                if (filasTratamiento.length === 0) {
+                    const tbody = document.querySelector('form tbody');
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                <i class="ri-information-line me-2"></i>No hay tratamientos seleccionados
+                            </td>
+                        </tr>
+                    `;
                 }
-            });
-        });
+            }
+        }
+    }
 
-        // Función para seleccionar/deseleccionar todos los checkboxes
-        document.getElementById('checkTodos').addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('input[name="tratamientosSeleccionados"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-        });
+        // Manejar el checkbox de generación de factura
+    document.getElementById('esFacturaCheck').addEventListener('change', function() {
+        // Puedes agregar lógica adicional aquí si necesitas
+        console.log('Generar factura:', this.checked);
+    });
+
+    // Modificar el evento de submit del formulario
+    document.querySelector('form').addEventListener('submit', function(e) {
+        // Validar que haya tratamientos seleccionados
+        const tieneTratamientos = document.querySelectorAll('tr[id^="tratamiento-"]').length > 0;
+
+        if (!tieneTratamientos) {
+            e.preventDefault();
+            alert('Debe agregar al menos un tratamiento para procesar la factura');
+            return;
+        }
+
+        // Validar que el importe total sea mayor que 0
+        const importeTotal = parseFloat(document.getElementById('importeTotalHidden').value) || 0;
+
+        if (importeTotal <= 0) {
+            e.preventDefault();
+            alert('El importe total debe ser mayor que cero');
+            return;
+        }
+
+        // Mostrar mensaje de confirmación si se va a generar factura
+        if (document.getElementById('esFacturaCheck').checked) {
+            if (!confirm('¿Está seguro que desea generar la factura y procesar el pago?')) {
+                e.preventDefault();
+                return;
+            }
+        } else {
+            if (!confirm('¿Está seguro que desea procesar el pago sin generar factura?')) {
+                e.preventDefault();
+                return;
+            }
+        }
+
+        // Aquí podrías agregar una animación de carga
+        const submitBtn = document.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="ri-loader-4-line ri-spin me-1"></i> Procesando...';
     });
 </script>

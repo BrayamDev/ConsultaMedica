@@ -32,8 +32,8 @@ namespace ConsultaMedica.Models
         [Column(TypeName = "decimal(18,2)")]
         [Display(Name = "Importe Total")]
         public decimal ImporteTotal { get; set; }
+        public bool EsFactura { get; set; }
 
-        // Relación con Paciente
         public int PacienteId { get; set; }
         [ForeignKey("PacienteId")]
         public virtual Pacientes Paciente { get; set; }

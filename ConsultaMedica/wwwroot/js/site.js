@@ -1,4 +1,4 @@
-﻿/* **************************************** Busqueda de pacientes en nueva cita ****************************************** */
+﻿/* ************************** BUSQUEDA DE PACIENTES EN EL MODAL DE NUEVA CITA *************************************** */
 document.addEventListener("DOMContentLoaded", function () {
     const buscarPaciente = document.getElementById("buscarPaciente");
     const listaPacientes = document.getElementById("listaPacientes");
@@ -37,11 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-/* **************************************** Busqueda de pacientes en nueva cita ****************************************** */
-
-
 /* **************************************** FULL CALENDAR en nueva ANGENDA ****************************************** */
-
 document.addEventListener('DOMContentLoaded', function () {
     // Configuración del mini calendario
     var miniCalendarEl = document.getElementById('miniCalendar');
@@ -124,8 +120,6 @@ document.addEventListener('DOMContentLoaded', function () {
         e.stopPropagation();
     });
 });
-
-
 document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -370,31 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
     calendar.render();
 });
 
-
-
-
-/* **************************************** FULL CALENDAR en nueva ANGENDA ****************************************** */
-
-
-/* **************************************** INTEL TEL INPUT EN PACIENTE ****************************************** */
-// Inicializar intl-tel-input
-const input = document.querySelector("#telefono");
-window.intlTelInput(input, {
-    initialCountry: "auto", // Detectar país automáticamente
-    geoIpLookup: function (callback) {
-        fetch("https://ipapi.co/json")
-            .then(response => response.json())
-            .then(data => callback(data.country_code))
-            .catch(() => callback("us")); // País por defecto si falla la detección
-    },
-    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js", // Utilidades
-});
-
-/* **************************************** INTEL TEL INPUT EN PACIENTE ****************************************** */
-
-/* **************************************** FICHA DEL DOCTOR ****************************************** */
-
-
+/* **************************************** FICHA DEL DOCTOR ******************************************************* */
 document.getElementById('fotografia').addEventListener('change', function (event) {
     const file = event.target.files[0];
     if (file) {
@@ -405,8 +375,6 @@ document.getElementById('fotografia').addEventListener('change', function (event
         reader.readAsDataURL(file);
     }
 });
-
-// Script para mostrar la imagen seleccionada en el campo de tipo file
 document.getElementById('fotografia').addEventListener('change', function (event) {
     const file = event.target.files[0];
     if (file) {
@@ -417,112 +385,5 @@ document.getElementById('fotografia').addEventListener('change', function (event
         reader.readAsDataURL(file);
     }
 });
-
-
-/* ****************************************  FICHA DEL DOCTOR  ****************************************** */
-/* ****************************************  FACTURACION JAVASCRIPT  ****************************************** */
-// Función para cargar datos en el modal de edición
-function cargarDatosModal(tratamientoId, codigo, nombreTratamiento, observaciones, unidades, importeUnitario) {
-    document.getElementById('editarTratamientoId').value = tratamientoId;
-    document.getElementById('editarNombreTratamiento').value = nombreTratamiento;
-    document.getElementById('importeUnitario').value = importeUnitario; // Asigna al campo editable
-    document.getElementById('editarUnidades').value = unidades;
-    document.getElementById('editarObservaciones').value = observaciones || '';
-
-    // Abre el modal
-    var modal = new bootstrap.Modal(document.getElementById('editarTratamientoModal'));
-    modal.show();
-}
-// Función para filtrar la tabla de tratamientos
-function filtrarTabla(busqueda) {
-    const filas = document.querySelectorAll('#tablaTratamientos tbody tr');
-    const textoBusqueda = busqueda.toLowerCase();
-
-    filas.forEach(fila => {
-        const textoFila = fila.textContent.toLowerCase();
-        fila.style.display = textoFila.includes(textoBusqueda) ? '' : 'none';
-    });
-}
-
-// Función para seleccionar/deseleccionar todos los checkboxes
-function toggleTodos(source) {
-    const checkboxes = document.querySelectorAll('input[name="tratamientosSeleccionados"]');
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = source.checked;
-    });
-}
-function filtrarTabla(busqueda) {
-    const filas = document.querySelectorAll('#tablaTratamientos tbody tr');
-    const textoBusqueda = busqueda.toLowerCase();
-
-    filas.forEach(fila => {
-        const textoFila = fila.textContent.toLowerCase();
-        fila.style.display = textoFila.includes(textoBusqueda) ? '' : 'none';
-    });
-}
-
-function formatearMoneda(inputVisible) {
-    let valor = parseFloat(inputVisible.value.replace(/\./g, '').replace(',', '.')) || 0;
-
-    // Formatea visualmente en el campo visible
-    inputVisible.value = valor.toLocaleString('es-ES', {
-        style: 'currency',
-        currency: 'EUR'
-    });
-
-    // Busca el input hidden en el mismo TD y actualiza el valor real
-    const hiddenInput = inputVisible.parentNode.querySelector('.precio-unitario');
-    if (hiddenInput) {
-        hiddenInput.value = valor.toFixed(2); // formato 0.00
-    }
-
-    calcularTotal(inputVisible); // recalcular fila y total general
-}
-
-// Calcula el total de una fila y el total general
-function calcularTotal(elemento) {
-    const fila = elemento.closest('tr');
-    const unidades = parseFloat(fila.querySelector('.unidades').value) || 0;
-    const precioTexto = fila.querySelector('.precio-unitario').value;
-
-    // Convertir precio de vuelta a número
-    const precio = parseFloat(precioTexto.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-
-    // Calcular y formatear total de la fila
-    const totalFila = unidades * precio;
-    fila.querySelector('.total').textContent = totalFila.toLocaleString('es-ES', {
-        style: 'currency',
-        currency: 'EUR'
-    });
-
-    // Calcular el total general
-    actualizarImporteTotal();
-}
-
-// Actualiza el importe total sumando todos los tratamientos
-function actualizarImporteTotal() {
-    let totalGeneral = 0;
-
-    document.querySelectorAll('tbody tr[id^="tratamiento-"]').forEach(fila => {
-        const unidades = parseFloat(fila.querySelector('.unidades').value) || 0;
-        const precioTexto = fila.querySelector('.precio-unitario').value;
-        const precio = parseFloat(precioTexto.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-
-        totalGeneral += unidades * precio;
-    });
-
-    // Actualizar ambos campos
-    const importeTotalVisible = document.getElementById('importeTotalVisible');
-    const importeTotalHidden = document.getElementById('importeTotalHidden');
-
-    if (importeTotalVisible && importeTotalHidden) {
-        importeTotalVisible.value = totalGeneral.toLocaleString('es-ES', {
-            style: 'currency',
-            currency: 'EUR'
-        });
-        importeTotalHidden.value = totalGeneral;
-    }
-}
-
 
 /* ****************************************  FACTURACION JAVASCRIPT   ****************************************** */

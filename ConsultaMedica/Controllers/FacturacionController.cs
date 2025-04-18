@@ -1,8 +1,11 @@
 ﻿using ConsultaMedica.Data;
 using ConsultaMedica.Models;
 using ConsultaMedica.Models.ViewModels;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -18,10 +21,39 @@ namespace ConsultaMedica.Controllers
             _context = context;
         }
 
-        // GET: FacturacionController
+        [HttpGet]
         public IActionResult Index(int id)
         {
-            // Obtener la cita con el paciente relacionado
+            // Verificar si ya existe una factura para esta cita
+            var facturaExistente = _context.Facturas
+                .Include(f => f.Paciente)
+                .Include(f => f.TratamientosFacturados)
+                .FirstOrDefault(f => f.CitaId == id);
+
+            if (facturaExistente != null)
+            {
+                var resumen = new FacturaResumenViewModel
+                {
+                    NumeroFactura = facturaExistente.NumeroFactura,
+                    FechaFactura = facturaExistente.FechaFactura,
+                    NombrePaciente = facturaExistente.Paciente.NombreCompleto,
+                    ImporteTotal = facturaExistente.ImporteTotal,
+                    TipoCobro = facturaExistente.TipoCobro,
+                    Tratamientos = facturaExistente.TratamientosFacturados.Select(t => new TratamientoResumenViewModel
+                    {
+                        Nombre = t.NombreTratamiento,
+                        Unidades = t.Unidades,
+                        PrecioUnitario = t.ImporteUnitario,
+                        Total = t.Total
+                    }).ToList(),
+                    EsFactura = facturaExistente.EsFactura
+                };
+
+                ViewBag.FacturaExistente = resumen;
+                ViewBag.FacturaCreada = true;
+            }
+
+            // Resto de tu código actual...
             var cita = _context.Citas
                 .Include(c => c.Paciente)
                 .FirstOrDefault(c => c.Id == id);
@@ -47,22 +79,12 @@ namespace ConsultaMedica.Controllers
                 .OrderBy(t => t.NombreTratamiento)
                 .ToList();
 
-            // Recuperar tratamientos seleccionados desde TempData (si existen)
-            List<TratamientoSeleccionado> tratamientosSeleccionados = new();
-            if (TempData["TratamientosSeleccionados"] != null)
-            {
-                tratamientosSeleccionados = JsonConvert.DeserializeObject<List<TratamientoSeleccionado>>(
-                    TempData["TratamientosSeleccionados"].ToString()
-                );
-                // Reestablecer en TempData por si necesitas acceder nuevamente
-                TempData.Keep("TratamientosSeleccionados");
-            }
-
             // Crear el ViewModel y pasarlo a la vista
             var model = new FacturacionViewModel
             {
                 CitaId = id,
-                TratamientosSeleccionados = tratamientosSeleccionados,
+                PacienteId = cita.PacienteId,
+                TratamientosSeleccionados = new List<TratamientoSeleccionado>(),
                 TratamientosDisponibles = tratamientosDisponibles
             };
 
@@ -70,42 +92,6 @@ namespace ConsultaMedica.Controllers
             ViewBag.TratamientosDisponibles = tratamientosDisponibles;
 
             return View(model);
-        }
-        [HttpPost]
-        public IActionResult AgregarTratamientos(int PacienteId, int CitaId, List<int> tratamientosSeleccionados)
-        {
-            // 1. Obtener la última cita del paciente (o la lógica que necesites)
-            var cita = _context.Citas
-                .Where(c => c.PacienteId == PacienteId)
-                .OrderByDescending(c => c.FechaHora) // Obtener la más reciente
-                .FirstOrDefault();
-
-            if (cita == null)
-            {
-                return NotFound("No se encontró cita para este paciente");
-            }
-
-            // 2. Obtener los tratamientos seleccionados
-            var tratamientos = _context.Tratamientos
-                .Where(t => tratamientosSeleccionados.Contains(t.Id))
-                .Include(t => t.Especialidad)
-                .ToList();
-
-            // 3. Mapear a ViewModel
-            var tratamientosVM = tratamientos.Select(t => new TratamientoSeleccionado
-            {
-                TratamientoId = t.Id,
-                NombreTratamiento = t.NombreTratamiento,
-                Codigo = t.Codigo,
-                ImporteUnitario = t.ImporteUnitario,
-                Unidades = 1
-            }).ToList();
-
-            // 4. Guardar en TempData
-            TempData["TratamientosSeleccionados"] = JsonConvert.SerializeObject(tratamientosVM);
-
-            // 5. Redireccionar con el ID de la cita encontrada
-            return Redirect($"~/Facturacion/Index?id={CitaId}");
         }
         [HttpGet]
         public IActionResult EliminarTratamientoSeleccionado(int tratamientoId, int citaId)
@@ -122,13 +108,19 @@ namespace ConsultaMedica.Controllers
             TempData["TratamientosSeleccionados"] = JsonConvert.SerializeObject(tratamientos);
             TempData.Keep("TratamientosSeleccionados");
 
-            // 5. Redireccionar con el ID de la cita encontrada
             return Redirect($"~/Facturacion/Index?id={citaId}");
         }
         [HttpPost]
         public IActionResult ProcesarFacturacion(FacturacionViewModel model)
         {
-            // Recargar datos necesarios si hay algún error posterior
+
+            // Verificar si ya existe una factura para esta cita
+            if (_context.Facturas.Any(f => f.CitaId == model.CitaId))
+            {
+                TempData["ErrorMessage"] = "Esta cita ya tiene una factura asociada.";
+                return RedirectToAction("Index", "Agenda");
+            }
+
             var cita = _context.Citas
                 .Include(c => c.Paciente)
                 .FirstOrDefault(c => c.Id == model.CitaId);
@@ -149,69 +141,78 @@ namespace ConsultaMedica.Controllers
                     FechaFactura = model.FechaFactura,
                     Empresa = model.Empresa,
                     TipoCobro = model.TipoCobro,
-                    ObservacionesCobro = string.IsNullOrEmpty(model.ObservacionesCobro) ? "" : model.ObservacionesCobro,
+                    ObservacionesCobro = model.ObservacionesCobro ?? string.Empty,
                     ImporteTotal = model.ImporteTotal,
                     PacienteId = model.PacienteId,
-                    CitaId = model.CitaId
+                    CitaId = model.CitaId,
+                    EsFactura = model.EsFactura // Añadir este campo
                 };
 
                 _context.Facturas.Add(factura);
                 _context.SaveChanges();
 
-                // 2. Procesar los tratamientos seleccionados
-                if (model.TratamientosSeleccionados != null && model.TratamientosSeleccionados.Any())
+                // 2. Procesar tratamientos
+                if (model.TratamientosSeleccionados?.Any() == true)
                 {
                     foreach (var tratamientoVM in model.TratamientosSeleccionados)
                     {
-                        var tratamientoFacturado = new TratamientoFacturado
+                        _context.TratamientosFacturados.Add(new TratamientoFacturado
                         {
                             FacturaId = factura.Id,
                             TratamientoId = tratamientoVM.TratamientoId,
                             NombreTratamiento = tratamientoVM.NombreTratamiento,
                             Unidades = tratamientoVM.Unidades,
                             ImporteUnitario = tratamientoVM.ImporteUnitario,
-                            ObservacionesTratamiento = string.IsNullOrEmpty(tratamientoVM.Observaciones) ? "" : tratamientoVM.Observaciones,
+                            ObservacionesTratamiento = tratamientoVM.Observaciones ?? string.Empty,
                             Total = tratamientoVM.Unidades * tratamientoVM.ImporteUnitario
-                        };
-
-                        _context.TratamientosFacturados.Add(tratamientoFacturado);
+                        });
                     }
-
                     _context.SaveChanges();
                 }
 
-                // 3. Actualizar la cita como facturada
-                if (cita != null)
-                {
-                    cita.Facturada = true;
-                    _context.SaveChanges();
-                }
+                // 3. Actualizar estado de la cita
+                cita.Facturada = true;
+                _context.SaveChanges();
 
                 transaction.Commit();
-
-                // Limpiar los tratamientos seleccionados
                 TempData.Remove("TratamientosSeleccionados");
 
-                // Configurar ViewBag para la vista de éxito
-                ViewBag.NumeroFactura = factura.NumeroFactura;
-                ViewBag.FechaFactura = factura.FechaFactura.ToString("dd/MM/yyyy");
-                ViewBag.ImporteTotal = factura.ImporteTotal.ToString("C");
+                // Generar PDF si está marcado
+                if (model.EsFactura)
+                {
+                    var pdfBytes = GenerarFacturaPdf(factura);
+                    TempData["PDFBytes"] = Convert.ToBase64String(pdfBytes);
+                }
 
-                return View("FacturaGenerada", factura);
+                var resumen = new FacturaResumenViewModel
+                {
+                    NumeroFactura = factura.NumeroFactura,
+                    FechaFactura = factura.FechaFactura,
+                    NombrePaciente = cita.Paciente.NombreCompleto,
+                    ImporteTotal = factura.ImporteTotal,
+                    TipoCobro = factura.TipoCobro,
+                    Tratamientos = factura.TratamientosFacturados.Select(t => new TratamientoResumenViewModel
+                    {
+                        Nombre = t.NombreTratamiento,
+                        Unidades = t.Unidades,
+                        PrecioUnitario = t.ImporteUnitario,
+                        Total = t.Total
+                    }).ToList()
+                };
+
+                return View("ResumenFactura", resumen);
+
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
-                // Loggear el error (ex)
-
-                // Recargar datos necesarios para mostrar la vista nuevamente
                 ViewBag.Paciente = cita.Paciente;
                 ViewBag.TratamientosDisponibles = _context.Tratamientos.ToList();
+                TempData["ErrorMessage"] = $"Error al procesar: {ex.Message}";
 
-                TempData["ErrorMessage"] = "Ocurrió un error al procesar la factura. Por favor, inténtelo de nuevo.";
                 return View("Index", model);
             }
         }
+        /*Metodos de ayuda*/
         private string GenerarNumeroFactura()
         {
             var now = DateTime.Now;
@@ -226,6 +227,111 @@ namespace ConsultaMedica.Controllers
             }
 
             return $"FAC-{now:yyyyMMdd}-{secuencia:D4}";
+        }
+        private byte[] GenerarFacturaPdf(Factura factura)
+        {
+            using (var ms = new MemoryStream())
+            {
+                using (var document = new Document(PageSize.A4, 30, 30, 30, 30))
+                {
+                    PdfWriter writer = PdfWriter.GetInstance(document, ms);
+                    document.Open();
+
+                    // Encabezado
+                    var titulo = new Paragraph("FACTURA", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+                    titulo.Alignment = Element.ALIGN_CENTER;
+                    document.Add(titulo);
+
+                    document.Add(new Paragraph(" ")); // Espacio
+
+                    // Datos de la factura
+                    var tablaDatos = new PdfPTable(2);
+                    tablaDatos.WidthPercentage = 100;
+                    tablaDatos.SetWidths(new float[] { 1, 2 });
+
+                    // Número y fecha
+                    tablaDatos.AddCell("Número de Factura:");
+                    tablaDatos.AddCell(factura.NumeroFactura);
+                    tablaDatos.AddCell("Fecha:");
+                    tablaDatos.AddCell(factura.FechaFactura.ToString("dd/MM/yyyy"));
+
+                    // Datos del paciente
+                    tablaDatos.AddCell("Paciente:");
+                    tablaDatos.AddCell(factura.Paciente.NombreCompleto);
+
+                    // Método de pago
+                    tablaDatos.AddCell("Método de Pago:");
+                    tablaDatos.AddCell(factura.TipoCobro);
+
+                    document.Add(tablaDatos);
+                    document.Add(new Paragraph(" ")); // Espacio
+
+                    // Tabla de tratamientos
+                    var tablaTratamientos = new PdfPTable(4);
+                    tablaTratamientos.WidthPercentage = 100;
+                    tablaTratamientos.SetWidths(new float[] { 3, 1, 1, 1 });
+
+                    // Encabezados de la tabla
+                    tablaTratamientos.AddCell(new Phrase("Tratamiento", new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD)));
+                    tablaTratamientos.AddCell(new Phrase("Unidades", new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD)));
+                    tablaTratamientos.AddCell(new Phrase("P. Unitario", new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD)));
+                    tablaTratamientos.AddCell(new Phrase("Total", new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD)));
+
+                    // Filas de datos
+                    foreach (var tratamiento in factura.TratamientosFacturados)
+                    {
+                        tablaTratamientos.AddCell(tratamiento.NombreTratamiento);
+                        tablaTratamientos.AddCell(tratamiento.Unidades.ToString());
+                        tablaTratamientos.AddCell(tratamiento.ImporteUnitario.ToString("C"));
+                        tablaTratamientos.AddCell(tratamiento.Total.ToString("C"));
+                    }
+
+                    document.Add(tablaTratamientos);
+                    document.Add(new Paragraph(" ")); // Espacio
+
+                    // Total
+                    var total = new Paragraph($"TOTAL: {factura.ImporteTotal.ToString("C")}",
+                        new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD));
+                    total.Alignment = Element.ALIGN_RIGHT;
+                    document.Add(total);
+
+                    document.Close();
+                }
+                return ms.ToArray();
+            }
+        }
+        [HttpGet]
+        public IActionResult DescargarFactura(string numeroFactura)
+        {
+            try
+            {
+                var factura = _context.Facturas
+                    .Include(f => f.Paciente)
+                    .Include(f => f.TratamientosFacturados)
+                    .FirstOrDefault(f => f.NumeroFactura == numeroFactura);
+
+                if (factura == null)
+                {
+                    TempData["ErrorMessage"] = "Factura no encontrada";
+                    return RedirectToAction("Index", "Agenda");
+                }
+
+                // Si ya tenemos el PDF generado en TempData (desde ProcesarFacturacion)
+                if (TempData["PDFBytes"] is string pdfBase64)
+                {
+                    var pdfBytes = Convert.FromBase64String(pdfBase64);
+                    return File(pdfBytes, "application/pdf", $"Factura-{numeroFactura}.pdf");
+                }
+
+                // Generar PDF si no está en TempData
+                var newPdfBytes = GenerarFacturaPdf(factura);
+                return File(newPdfBytes, "application/pdf", $"Factura-{numeroFactura}.pdf");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al generar PDF: {ex.Message}";
+                return RedirectToAction("Index", "Agenda");
+            }
         }
     }
 }

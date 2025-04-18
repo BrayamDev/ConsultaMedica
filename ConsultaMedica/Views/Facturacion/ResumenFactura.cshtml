@@ -1,0 +1,104 @@
+﻿@model ConsultaMedica.Models.ViewModels.FacturaResumenViewModel
+
+@{
+    ViewData["Title"] = "Resumen de la factura";
+}
+
+<!DOCTYPE html>
+<html5 lang="es">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>@ViewBag.Title</title>
+        <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+        <!-- Remix Icon CSS (para los iconos) -->
+        <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+        <!-- JS for jQuery -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <!-- bootstrap css and js -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <!-- PNotify  -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pnotify/dist/PNotifyBrightTheme.css">
+        <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotify.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/pnotify/dist/iife/PNotifyButtons.js"></script>
+        <!-- DataTables CSS -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+        <!-- CSS de intl-tel-input -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+        <!-- Utilidades para validación y formato -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    </head>
+
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">
+                <i class="ri-checkbox-circle-line"></i> Factura Procesada Correctamente
+            </h3>
+        </div>
+
+        <div class="card-body">
+            <!-- Encabezado -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Factura #@Model.NumeroFactura</h5>
+                    <p class="text-muted">Fecha: @Model.FechaFactura.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h5>@Model.NombrePaciente</h5>
+                    <p class="text-muted">Método de pago: @Model.TipoCobro</p>
+                </div>
+            </div>
+
+            <!-- Detalle de tratamientos -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tratamiento</th>
+                            <th class="text-end">Unidades</th>
+                            <th class="text-end">P. Unitario</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Tratamientos)
+                        {
+                            <tr>
+                                <td>@item.Nombre</td>
+                                <td class="text-end">@item.Unidades</td>
+                                <td class="text-end">@item.PrecioUnitario.ToString("C")</td>
+                                <td class="text-end fw-bold">@item.Total.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-group-divider">
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold">TOTAL:</td>
+                            <td class="text-end fw-bold fs-5 text-success">@Model.ImporteTotal.ToString("C")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="@Url.Action("Index", "Agenda")" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Volver a Agenda
+                </a>
+                  
+                <a href="@Url.Action("DescargarFactura", "Facturacion", new { numeroFactura = Model.NumeroFactura })"
+                    class="btn btn-danger"
+                    id="btnDescargarPdf">
+                    <i class="ri-file-pdf-line"></i> Descargar PDF
+                </a>
+
+
+            </div>
+        </div>
+    </div>
+</div>
