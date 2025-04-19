@@ -213,6 +213,7 @@ namespace ConsultaMedica.Controllers
             }
         }
         /*Metodos de ayuda*/
+        [HttpGet]
         private string GenerarNumeroFactura()
         {
             var now = DateTime.Now;
@@ -228,6 +229,7 @@ namespace ConsultaMedica.Controllers
 
             return $"FAC-{now:yyyyMMdd}-{secuencia:D4}";
         }
+        [HttpGet]
         private byte[] GenerarFacturaPdf(Factura factura)
         {
             using (var ms = new MemoryStream())
